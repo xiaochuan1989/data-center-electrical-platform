@@ -70,6 +70,9 @@ function navButton(view, label, icon, strong = false) {
 
 function buildSidebar() {
   return `<aside class="platform-sidebar" aria-label="平台导航">
+    <button type="button" class="platform-sidebar-control" data-sidebar-toggle aria-label="收起平台导航" aria-expanded="true" title="收起左侧导航">
+      ${navIcon('chevron-down')}<span class="platform-nav-text platform-sidebar-control-text">收起导航</span>
+    </button>
     ${navButton('project', '项目工作台', 'clipboard-data', true)}
     ${navButton('tools', '工具中心', 'tool', true)}
     <div class="platform-nav-label">UPS 与电池</div>
@@ -624,23 +627,29 @@ function bindEvents() {
     event.target.value = '';
   });
   const appbar = document.querySelector('.appbar-inner');
-  if (appbar) appbar.insertAdjacentHTML('afterbegin', `<button id="platform-sidebar-toggle" class="platform-sidebar-toggle" aria-label="收起平台导航" aria-expanded="true" title="展开或收起左侧导航">${navIcon('stack-2')}</button>`);
-  const sidebarToggle = document.getElementById('platform-sidebar-toggle');
+  if (appbar) appbar.insertAdjacentHTML('afterbegin', `<button type="button" class="platform-sidebar-toggle" data-sidebar-toggle aria-label="打开平台导航" aria-expanded="false" title="打开左侧导航">${navIcon('stack-2')}</button>`);
   const applySidebarState = collapsed => {
     document.body.classList.toggle('platform-sidebar-collapsed', collapsed);
-    sidebarToggle?.setAttribute('aria-expanded', String(!collapsed));
-    sidebarToggle?.setAttribute('aria-label', collapsed ? '展开平台导航' : '收起平台导航');
+    document.querySelectorAll('[data-sidebar-toggle]').forEach(toggle => {
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      toggle.setAttribute('aria-label', collapsed ? '展开平台导航' : '收起平台导航');
+      toggle.setAttribute('title', collapsed ? '展开左侧导航' : '收起左侧导航');
+    });
+    document.querySelectorAll('.platform-sidebar-control-text').forEach(text => {
+      text.textContent = collapsed ? '展开导航' : '收起导航';
+    });
   };
   if (window.innerWidth >= 900) applySidebarState(localStorage.getItem(SIDEBAR_PREF_KEY) === '1');
-  sidebarToggle?.addEventListener('click', () => {
+  document.querySelectorAll('[data-sidebar-toggle]').forEach(toggle => toggle.addEventListener('click', () => {
     if (window.innerWidth < 900) {
       document.body.classList.toggle('platform-sidebar-open');
+      toggle.setAttribute('aria-expanded', String(document.body.classList.contains('platform-sidebar-open')));
       return;
     }
     const collapsed = !document.body.classList.contains('platform-sidebar-collapsed');
     applySidebarState(collapsed);
     localStorage.setItem(SIDEBAR_PREF_KEY, collapsed ? '1' : '0');
-  });
+  }));
 }
 
 export async function initializePlatform() {
