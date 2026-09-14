@@ -1,6 +1,7 @@
 import {
   calculateApf,
   calculateBranch,
+  calculateBusbarSelection,
   calculateBusway,
   calculateLoadSummary,
   calculateSmartBusway,
@@ -24,6 +25,7 @@ import {
 
 const LEGACY_VIEWS = new Set(['home', 'battery', 'runtime', 'lead', 'dc', 'db']);
 const ENGINEERING_WARNING = '初步设计校核结果，仅用于方案比较；最终设计与订货前须结合项目规范、厂家数据及注册工程师审核。';
+const SIDEBAR_PREF_KEY = 'dc_platform_sidebar_collapsed';
 
 const state = {
   project: null,
@@ -58,32 +60,41 @@ function viewPanel(id, title, subtitle, body) {
   </section>`;
 }
 
+function navIcon(name) {
+  return `<span class="platform-nav-icon" aria-hidden="true"><svg class="ti ti-${name}"><use href="#ti-${name}"/></svg></span>`;
+}
+
+function navButton(view, label, icon, strong = false) {
+  return `<button class="platform-nav-item" data-platform-view="${view}" title="${label}">${navIcon(icon)}<span class="platform-nav-text${strong ? ' strong' : ''}">${label}</span></button>`;
+}
+
 function buildSidebar() {
   return `<aside class="platform-sidebar" aria-label="平台导航">
-    <button class="platform-nav-item" data-platform-view="project"><span>▣</span><b>项目工作台</b></button>
-    <button class="platform-nav-item" data-platform-view="tools"><span>⌘</span><b>工具中心</b></button>
+    ${navButton('project', '项目工作台', 'clipboard-data', true)}
+    ${navButton('tools', '工具中心', 'tool', true)}
     <div class="platform-nav-label">UPS 与电池</div>
-    <button class="platform-nav-item" data-platform-view="home"><span>◎</span>智能选型</button>
-    <button class="platform-nav-item" data-platform-view="battery"><span>▤</span>UPS 与电池配置</button>
-    <button class="platform-nav-item" data-platform-view="runtime"><span>◷</span>后备时间反算</button>
-    <button class="platform-nav-item" data-platform-view="lead"><span>▧</span>电池方法一 / 锂电</button>
-    <button class="platform-nav-item" data-platform-view="dc"><span>◇</span>数据中心方案校核</button>
-    <button class="platform-nav-item" data-platform-view="db"><span>◉</span>产品数据库</button>
+    ${navButton('home', '智能选型', 'target')}
+    ${navButton('battery', 'UPS 与电池配置', 'battery-3')}
+    ${navButton('runtime', '后备时间反算', 'clock-hour-4')}
+    ${navButton('lead', '电池方法一 / 锂电', 'calculator')}
+    ${navButton('dc', '数据中心方案校核', 'building')}
+    ${navButton('db', '产品数据库', 'database')}
     <div class="platform-nav-label">工程设计</div>
-    <button class="platform-nav-item" data-platform-view="load"><span>∑</span>负荷与配电</button>
-    <button class="platform-nav-item" data-platform-view="conductor"><span>⌁</span>电缆与导体</button>
-    <button class="platform-nav-item" data-platform-view="busway"><span>═</span>母线系统</button>
-    <button class="platform-nav-item" data-platform-view="power-quality"><span>∿</span>电能质量</button>
+    ${navButton('load', '负荷与配电', 'chart-dots-3')}
+    ${navButton('conductor', '电缆与导体', 'plug')}
+    ${navButton('busbar', '铜排计算', 'stack-2')}
+    ${navButton('busway', '母线系统', 'device-desktop-analytics')}
+    ${navButton('power-quality', '电能质量', 'calculator')}
     <div class="platform-nav-label">成果管理</div>
-    <button class="platform-nav-item" data-platform-view="delivery"><span>▥</span>编码与交付</button>
-    <button class="platform-nav-item" data-platform-view="templates"><span>□</span>模板中心</button>
+    ${navButton('delivery', '编码与交付', 'device-floppy')}
+    ${navButton('templates', '模板中心', 'clipboard-data')}
   </aside>`;
 }
 
 function projectView() {
   const steps = [
     ['项目信息', 'project'], ['负荷计算', 'load'], ['UPS与电池', 'battery'], ['配电设备', 'load'],
-    ['电缆/铜排/母线', 'conductor'], ['电能质量', 'power-quality'], ['编码与成果输出', 'delivery']
+    ['电缆/铜排/母线', 'busbar'], ['电能质量', 'power-quality'], ['编码与成果输出', 'delivery']
   ];
   return viewPanel('project', '项目工作台', '一个项目、一套参数，计算结果可在模块之间复用。', `
     <div class="project-toolbar">
@@ -159,15 +170,52 @@ function loadView() {
 }
 
 function conductorView() {
-  return viewPanel('conductor', '电缆与导体选型', '合并电缆、铜排和导体数据库；当前先提供载流量条件筛选与来源追溯。', `
+  return viewPanel('conductor', '电缆与导体选型', '合并电缆和导体数据库；铜排已拆分为独立计算页面。', `
     <div class="platform-form-grid cols-4">
-      <label>对象<select id="conductor-kind"><option value="cable">电缆</option><option value="busbar">铜排</option><option value="conductor">导体</option></select></label>
+      <label>对象<select id="conductor-kind"><option value="cable">电缆</option><option value="conductor">导体</option></select></label>
       <label>所需载流量(A)<input id="conductor-current" type="number" value="400"></label>
       <label>环境温度(°C)<input id="conductor-ambient" type="number" value="30"></label>
       <div class="field-action"><button id="calculate-conductor" class="primary">查询当前数据库</button></div>
     </div>
     <div id="conductor-result" class="catalog-result"></div>
     <p class="engineering-warning">⚠ 并联根数、敷设方式、桥架层数、环境温度及绝缘温度均会影响最终结果。当前结果只用于初步筛选。</p>`);
+}
+
+function busbarView() {
+  return viewPanel('busbar', '铜排计算', '独立校核铜排规格，并可查看完整 DIN43671-1975 载流量数据。', `
+    <div class="engineering-tabs busbar-tabs" role="tablist" aria-label="铜排工具">
+      <button class="active" role="tab" aria-selected="true" data-busbar-tab="calculator">铜排智能计算</button>
+      <button role="tab" aria-selected="false" data-busbar-tab="catalog">载流量数据表 <span>${busbarCatalog.length} 条</span></button>
+    </div>
+    <div class="busbar-pane" data-busbar-pane="calculator">
+      <div class="busbar-source-note"><b>计算口径</b><span>基础载流量来自 DIN43671-1975，环境温度 35°C；A03 工作簿中的温升、安装环境和表面处理规则均已保留。</span></div>
+      <div class="platform-form-grid cols-4 busbar-inputs">
+        <label>负载电流(A)<input id="busbar-load-current" type="number" min="1" max="20000" step="1" value="1600"></label>
+        <label>安装环境<select id="busbar-environment"><option value="ventilated">通风</option><option value="sealed">IP54 / 密封</option></select></label>
+        <label>表面处理<select id="busbar-surface"><option value="bare-or-tinned">光裸 / 全镀锡</option><option value="heat-shrink">热缩套管</option></select></label>
+        <label>温升标准<select id="busbar-temperature-rise"><option value="iec50">IEC增强 (50K)</option><option value="din30">DIN保守 (30K)</option></select></label>
+      </div>
+      <div class="busbar-formula-strip" aria-label="计算说明">
+        <span><b>结构顺序</b> 单片 → 双拼 → 三拼 → 四拼</span>
+        <span><b>50K系数</b> 通风 1.3，密封 1.0</span>
+        <span><b>PE截面</b> 按 S、16、S/2 或 S/4</span>
+      </div>
+      <button id="calculate-busbar" class="platform-primary-action">计算铜排配置</button>
+      <div id="busbar-result" class="busbar-result" aria-live="polite"></div>
+    </div>
+    <div class="busbar-pane" data-busbar-pane="catalog" hidden>
+      <div class="busbar-catalog-toolbar">
+        <label>结构形式<select id="busbar-catalog-configuration"><option value="">全部结构</option><option>单片</option><option>双拼</option><option>三拼</option><option>四拼</option></select></label>
+        <label>快速筛选<input id="busbar-catalog-search" placeholder="输入 80 x 10、插值等关键词"></label>
+        <div class="busbar-table-summary" id="busbar-table-summary"></div>
+      </div>
+      <div class="data-entry-table busbar-data-table"><table>
+        <thead><tr><th>ID</th><th>规格名称</th><th>配置</th><th>涂层载流(A)</th><th>裸排载流(A)</th><th>截面积(mm²)</th><th>备注</th></tr></thead>
+        <tbody id="busbar-catalog-body"></tbody>
+      </table></div>
+      <p class="busbar-table-footnote">数据口径：DIN43671-1975，允许温升 30K，环境温度 35°C。标注“根据插入法计算”的规格为 A03 原表插值数据。</p>
+    </div>
+    <p class="engineering-warning">⚠ 铜排间距、相间距、柜内温升、短路耐受能力和实际散热条件仍需结合成套结构复核；大于等于 4000A 时必须专项校核 Icw。</p>`);
 }
 
 function buswayView() {
@@ -204,7 +252,7 @@ function templatesView() {
 }
 
 function shellViews() {
-  return [projectView(), toolsView(), loadView(), conductorView(), buswayView(), powerQualityView(), deliveryView(), templatesView()].join('');
+  return [projectView(), toolsView(), loadView(), conductorView(), busbarView(), buswayView(), powerQualityView(), deliveryView(), templatesView()].join('');
 }
 
 function resultCards(items) {
@@ -377,8 +425,7 @@ function calculateConductorSelection() {
   const required = numberValue('conductor-current');
   const ambient = numberValue('conductor-ambient', 30);
   let item;
-  if (kind === 'busbar') item = selectCatalogItem(state.catalogs.busbars, required, 'coatedCurrentA');
-  else if (kind === 'conductor') item = selectCatalogItem(state.catalogs.conductors, required, 'current70A', ambient ? { ambientC: ambient } : {});
+  if (kind === 'conductor') item = selectCatalogItem(state.catalogs.conductors, required, 'current70A', ambient ? { ambientC: ambient } : {});
   else item = selectCatalogItem(state.catalogs.cables, required, 'currentA', ambient ? { ambientC: ambient } : {});
   const result = document.getElementById('conductor-result');
   if (!item) {
@@ -387,6 +434,56 @@ function calculateConductorSelection() {
   }
   state.project.cables = { kind, requiredCurrentA: required, ambientC: ambient, selected: item };
   result.innerHTML = `<div class="catalog-answer"><span>建议起点</span><strong>${htmlEscape(item.size || item.spec || item.type || '匹配项')}</strong><pre>${htmlEscape(JSON.stringify(item, null, 2))}</pre></div>`;
+}
+
+function renderBusbarCatalog() {
+  const body = document.getElementById('busbar-catalog-body');
+  if (!body) return;
+  const configuration = document.getElementById('busbar-catalog-configuration')?.value || '';
+  const query = (document.getElementById('busbar-catalog-search')?.value || '').trim().toLowerCase();
+  const rows = state.catalogs.busbars.filter(item => {
+    if (configuration && item.configuration !== configuration) return false;
+    const searchText = `${item.spec} ${item.configuration} ${item.note || ''}`.toLowerCase();
+    return !query || searchText.includes(query);
+  });
+  body.innerHTML = rows.map(item => {
+    const sourceIndex = state.catalogs.busbars.indexOf(item) + 1;
+    return `<tr><td>${sourceIndex}</td><td><b>${htmlEscape(item.spec)}</b></td><td>${htmlEscape(item.configuration)}</td><td>${format(item.coatedCurrentA, 0)}</td><td>${format(item.bareCurrentA, 0)}</td><td>${format(item.areaMm2, 0)}</td><td>${htmlEscape(item.note || '标准实测数据')}</td></tr>`;
+  }).join('');
+  document.getElementById('busbar-table-summary').textContent = `显示 ${rows.length} / ${state.catalogs.busbars.length} 条`;
+}
+
+function calculateBusbar() {
+  const result = calculateBusbarSelection(state.catalogs.busbars, {
+    loadCurrentA: numberValue('busbar-load-current'),
+    installationEnvironment: document.getElementById('busbar-environment').value,
+    surfaceTreatment: document.getElementById('busbar-surface').value,
+    temperatureRise: document.getElementById('busbar-temperature-rise').value
+  });
+  const target = document.getElementById('busbar-result');
+  if (result.error) {
+    target.innerHTML = `<div class="no-result"><b>${htmlEscape(result.error)}</b>${result.lookupCurrentA ? `<span>折算需求电流为 ${format(result.lookupCurrentA)}A。</span>` : ''}</div>`;
+    return;
+  }
+
+  state.project.busbars = { ...state.project.busbars, calculation: result };
+  const warningClass = result.loadRate > 1 ? 'danger' : result.loadRate > 0.92 ? 'warning' : 'safe';
+  target.innerHTML = `
+    <div class="busbar-result-hero">
+      <div><span>推荐规格</span><strong>${htmlEscape(result.selected.spec)}</strong><small>${htmlEscape(result.selected.configuration)}</small></div>
+      <div class="busbar-capacity"><span>系统额定载流</span><strong>${format(result.ratedCurrentA, 0)} A</strong><small>${result.currentField === 'bareCurrentA' ? '裸排载流量列' : '涂层载流量列'}</small></div>
+      <div class="busbar-load-gauge ${warningClass}"><span>负载率</span><strong>${format(result.loadRate * 100, 1)}%</strong><small>${htmlEscape(result.loadWarning)}</small></div>
+    </div>
+    <div class="result-grid busbar-result-grid">${resultCards([
+      ['综合系数 K_Total', format(result.totalFactor, 2), ''],
+      ['折算需求电流', format(result.lookupCurrentA), 'A'],
+      ['铜排总截面', format(result.areaMm2, 0), 'mm²'],
+      ['PE排推荐', format(result.peAreaMm2, 0), 'mm²']
+    ])}</div>
+    <div class="busbar-notices">
+      <p class="${result.isInterpolated ? 'warning' : 'safe'}">${result.isInterpolated ? '该规格为 A03 原表插值计算数据，订货前请复核。' : '该规格为 A03 中的 DIN 原值数据。'}</p>
+      <p class="${result.requiresShortCircuitCheck ? 'warning' : 'neutral'}">${result.requiresShortCircuitCheck ? '大电流达到 4000A 及以上，请务必校核短路耐受能力 Icw。' : '当前电流低于 4000A，仍需按项目短路电流复核。'}</p>
+    </div>`;
 }
 
 function calculateBuswayConfig() {
@@ -481,12 +578,24 @@ function bindEvents() {
   document.getElementById('calculate-load').addEventListener('click', calculateLoad);
   document.getElementById('calculate-distribution').addEventListener('click', calculateDistribution);
   document.getElementById('calculate-conductor').addEventListener('click', calculateConductorSelection);
+  document.getElementById('calculate-busbar').addEventListener('click', calculateBusbar);
+  document.getElementById('busbar-catalog-configuration').addEventListener('change', renderBusbarCatalog);
+  document.getElementById('busbar-catalog-search').addEventListener('input', renderBusbarCatalog);
   document.getElementById('calculate-smart-busway').addEventListener('click', calculateBuswayConfig);
   document.getElementById('calculate-power-quality').addEventListener('click', calculatePowerQuality);
   document.getElementById('export-project-excel').addEventListener('click', exportExcel);
   document.querySelectorAll('[data-calc-tab]').forEach(button => button.addEventListener('click', () => {
     document.querySelectorAll('[data-calc-tab]').forEach(item => item.classList.toggle('active', item === button));
     document.querySelectorAll('[data-calc-pane]').forEach(pane => { pane.hidden = pane.dataset.calcPane !== button.dataset.calcTab; });
+  }));
+  document.querySelectorAll('[data-busbar-tab]').forEach(button => button.addEventListener('click', () => {
+    document.querySelectorAll('[data-busbar-tab]').forEach(item => {
+      const active = item === button;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-selected', String(active));
+    });
+    document.querySelectorAll('[data-busbar-pane]').forEach(pane => { pane.hidden = pane.dataset.busbarPane !== button.dataset.busbarTab; });
+    if (button.dataset.busbarTab === 'catalog') renderBusbarCatalog();
   }));
   document.getElementById('platform-project-select').addEventListener('change', async event => {
     const projects = await listProjects();
@@ -515,8 +624,23 @@ function bindEvents() {
     event.target.value = '';
   });
   const appbar = document.querySelector('.appbar-inner');
-  if (appbar) appbar.insertAdjacentHTML('afterbegin', '<button id="platform-sidebar-toggle" class="platform-sidebar-toggle" aria-label="展开平台导航">☰</button>');
-  document.getElementById('platform-sidebar-toggle')?.addEventListener('click', () => document.body.classList.toggle('platform-sidebar-open'));
+  if (appbar) appbar.insertAdjacentHTML('afterbegin', `<button id="platform-sidebar-toggle" class="platform-sidebar-toggle" aria-label="收起平台导航" aria-expanded="true" title="展开或收起左侧导航">${navIcon('stack-2')}</button>`);
+  const sidebarToggle = document.getElementById('platform-sidebar-toggle');
+  const applySidebarState = collapsed => {
+    document.body.classList.toggle('platform-sidebar-collapsed', collapsed);
+    sidebarToggle?.setAttribute('aria-expanded', String(!collapsed));
+    sidebarToggle?.setAttribute('aria-label', collapsed ? '展开平台导航' : '收起平台导航');
+  };
+  if (window.innerWidth >= 900) applySidebarState(localStorage.getItem(SIDEBAR_PREF_KEY) === '1');
+  sidebarToggle?.addEventListener('click', () => {
+    if (window.innerWidth < 900) {
+      document.body.classList.toggle('platform-sidebar-open');
+      return;
+    }
+    const collapsed = !document.body.classList.contains('platform-sidebar-collapsed');
+    applySidebarState(collapsed);
+    localStorage.setItem(SIDEBAR_PREF_KEY, collapsed ? '1' : '0');
+  });
 }
 
 export async function initializePlatform() {
@@ -537,6 +661,7 @@ export async function initializePlatform() {
   state.project = await getCurrentProject();
   await Promise.all([refreshProjectSelect(), loadCatalogs()]);
   fillProjectForm();
+  renderBusbarCatalog();
   const migrationElement = document.getElementById('migration-status');
   migrationElement.textContent = `旧版数据已安全复制：${migration.copiedKeys?.length || 0} 项；旧数据仍保留。`;
   bindEvents();

@@ -3,6 +3,7 @@ const SQRT3 = Math.sqrt(3);
 export const BREAKER_STANDARDS = [16, 20, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 320, 400, 500, 630, 800, 1000, 1250, 1600];
 export const BUSWAY_STANDARDS = [160, 250, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6300];
 export const TRANSFORMER_STANDARDS = [100, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150];
+export const BUSBAR_CONFIGURATION_PRIORITY = ['单片', '双拼', '三拼', '四拼'];
 
 function number(value, fallback = 0) {
   const parsed = Number(value);
@@ -110,6 +111,64 @@ export function calculateSmartBusway(input) {
     serialServer: input.touchscreen ? 0 : 1,
     touchscreen: input.touchscreen ? 1 : 0,
     supports: input.installation === 'cabinet-top' ? Math.ceil(fixingPieces / 2) + startBoxes : 0
+  };
+}
+
+export function calculateBusbarSelection(catalog, input = {}) {
+  const loadCurrentA = Math.max(0, number(input.loadCurrentA));
+  if (loadCurrentA <= 0) return { error: '请输入大于 0A 的负载电流' };
+
+  const installationEnvironment = input.installationEnvironment === 'sealed' ? 'sealed' : 'ventilated';
+  const surfaceTreatment = input.surfaceTreatment === 'heat-shrink' ? 'heat-shrink' : 'bare-or-tinned';
+  const temperatureRise = input.temperatureRise === 'din30' ? 'din30' : 'iec50';
+  const totalFactor = temperatureRise === 'din30' || installationEnvironment === 'sealed' ? 1 : 1.3;
+  const lookupCurrentA = loadCurrentA / totalFactor;
+  const currentField = surfaceTreatment === 'heat-shrink' ? 'coatedCurrentA' : 'bareCurrentA';
+
+  let selected = null;
+  for (const configuration of BUSBAR_CONFIGURATION_PRIORITY) {
+    selected = catalog
+      .filter(item => item.configuration === configuration && number(item[currentField]) >= lookupCurrentA)
+      .sort((a, b) => number(a[currentField]) - number(b[currentField]) || number(a.areaMm2) - number(b.areaMm2))[0] || null;
+    if (selected) break;
+  }
+
+  if (!selected) {
+    return {
+      error: '当前数据表中没有满足条件的规格',
+      loadCurrentA,
+      totalFactor,
+      lookupCurrentA,
+      currentField
+    };
+  }
+
+  const ratedCurrentA = number(selected[currentField]);
+  const areaMm2 = number(selected.areaMm2);
+  const loadRate = ratedCurrentA > 0 ? loadCurrentA / (ratedCurrentA * totalFactor) : 0;
+  const peAreaMm2 = areaMm2 <= 16 ? areaMm2 : areaMm2 <= 35 ? 16 : areaMm2 <= 800 ? areaMm2 / 2 : areaMm2 / 4;
+  const loadWarning = loadRate > 1
+    ? '危险：负载率超过 100%'
+    : loadRate > 0.92
+      ? '警告：负载率超过 92%'
+      : '负载率处于合理范围';
+
+  return {
+    loadCurrentA,
+    installationEnvironment,
+    surfaceTreatment,
+    temperatureRise,
+    totalFactor,
+    lookupCurrentA,
+    currentField,
+    selected,
+    ratedCurrentA,
+    areaMm2,
+    loadRate,
+    peAreaMm2,
+    loadWarning,
+    isInterpolated: selected.note === '根据插入法计算',
+    requiresShortCircuitCheck: loadCurrentA >= 4000
   };
 }
 

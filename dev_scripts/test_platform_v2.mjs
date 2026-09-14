@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import {
   calculateApf,
   calculateBranch,
+  calculateBusbarSelection,
   calculateBusway,
   calculateLoadSummary,
   calculateSmartBusway,
@@ -58,6 +59,39 @@ assert.equal(smartBusway.buswayLengthM, 32);
 assert.equal(smartBusway.startBoxes, 4);
 assert.equal(smartBusway.touchscreen, 1);
 
+const busbarCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'busbar-catalog.json'), 'utf8'));
+assert.equal(busbarCatalog.length, 97);
+assert.deepEqual(Object.fromEntries(['单片', '双拼', '三拼', '四拼'].map(configuration => [configuration, busbarCatalog.filter(item => item.configuration === configuration).length])), {
+  单片: 36, 双拼: 25, 三拼: 25, 四拼: 11
+});
+const busbar = calculateBusbarSelection(busbarCatalog, {
+  loadCurrentA: 1600,
+  installationEnvironment: 'ventilated',
+  surfaceTreatment: 'bare-or-tinned',
+  temperatureRise: 'iec50'
+});
+assert.equal(busbar.totalFactor, 1.3);
+assert.ok(Math.abs(busbar.lookupCurrentA - 1230.7692) < 0.001);
+assert.equal(busbar.selected.spec, '80 x 10');
+assert.equal(busbar.selected.configuration, '单片');
+assert.equal(busbar.ratedCurrentA, 1240);
+assert.equal(busbar.areaMm2, 800);
+assert.equal(busbar.peAreaMm2, 400);
+assert.ok(Math.abs(busbar.loadRate - 0.9925558) < 0.00001);
+assert.equal(calculateBusbarSelection(busbarCatalog, {
+  loadCurrentA: 1600,
+  installationEnvironment: 'sealed',
+  surfaceTreatment: 'bare-or-tinned',
+  temperatureRise: 'iec50'
+}).totalFactor, 1);
+assert.equal(calculateBusbarSelection(busbarCatalog, {
+  loadCurrentA: 2400,
+  installationEnvironment: 'sealed',
+  surfaceTreatment: 'bare-or-tinned',
+  temperatureRise: 'din30'
+}).selected.configuration, '双拼');
+assert.match(calculateBusbarSelection(busbarCatalog, { loadCurrentA: 0 }).error, /大于 0A/);
+
 for (const filename of ['busbar-catalog.json', 'conductor-catalog.json', 'cable-catalog.json']) {
   const file = path.join(root, 'src', 'data', filename);
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -68,8 +102,9 @@ for (const filename of ['busbar-catalog.json', 'conductor-catalog.json', 'cable-
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.0\.0"/);
+assert.match(index, /const APP_VERSION = "v2\.1\.0"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
+assert.match(fs.readFileSync(path.join(root, 'src', 'platform', 'app-shell.js'), 'utf8'), /navButton\('busbar'/);
 
 console.log('✅ v2 平台计算、数据脱敏与入口检查通过');
