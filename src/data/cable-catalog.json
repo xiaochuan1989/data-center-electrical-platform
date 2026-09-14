@@ -1,0 +1,2018 @@
+[
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 20,
+    "size": 1,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 25,
+    "size": 1.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 34,
+    "size": 2.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 45,
+    "size": 4,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 58,
+    "size": 6,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 80,
+    "size": 10,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 111,
+    "size": 16,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 146,
+    "size": 25,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 180,
+    "size": 35,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 228,
+    "size": 50,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 281,
+    "size": 70,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 345,
+    "size": 95,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 398,
+    "size": 120,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 456,
+    "size": 150,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 519,
+    "size": 185,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 19,
+    "size": 1,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 24,
+    "size": 1.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 32,
+    "size": 2.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 42,
+    "size": 4,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 55,
+    "size": 6,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 75,
+    "size": 10,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 105,
+    "size": 16,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 138,
+    "size": 25,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 170,
+    "size": 35,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 215,
+    "size": 50,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 265,
+    "size": 70,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 325,
+    "size": 95,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 375,
+    "size": 120,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 430,
+    "size": 150,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 490,
+    "size": 185,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 18,
+    "size": 1,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 23,
+    "size": 1.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 30,
+    "size": 2.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 40,
+    "size": 4,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 52,
+    "size": 6,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 71,
+    "size": 10,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 99,
+    "size": 16,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 130,
+    "size": 25,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 160,
+    "size": 35,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 202,
+    "size": 50,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 249,
+    "size": 70,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 306,
+    "size": 95,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 353,
+    "size": 120,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 404,
+    "size": 150,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 461,
+    "size": 185,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 17,
+    "size": 1,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 21,
+    "size": 1.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 28,
+    "size": 2.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 37,
+    "size": 4,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 48,
+    "size": 6,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 65,
+    "size": 10,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 91,
+    "size": 16,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 120,
+    "size": 25,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 148,
+    "size": 35,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 187,
+    "size": 50,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 231,
+    "size": 70,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 283,
+    "size": 95,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 326,
+    "size": 120,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 374,
+    "size": 150,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "BV、BVR型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 426,
+    "size": 185,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 25.08,
+    "size": 1.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 33.059999999999995,
+    "size": 2.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 44.459999999999994,
+    "size": 4,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 53.58,
+    "size": 6,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 74.1,
+    "size": 10,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 98.03999999999999,
+    "size": 16,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 131.1,
+    "size": 25,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 159.6,
+    "size": 35,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 193.79999999999998,
+    "size": 50,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 245.09999999999997,
+    "size": 70,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 296.4,
+    "size": 95,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 341.99999999999994,
+    "size": 120,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 387.59999999999997,
+    "size": 150,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 444.59999999999997,
+    "size": 185,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 518.6999999999999,
+    "size": 240,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 24,
+    "size": 1.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 32,
+    "size": 2.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 43,
+    "size": 4,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 51,
+    "size": 6,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 71,
+    "size": 10,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 94,
+    "size": 16,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 125,
+    "size": 25,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 153,
+    "size": 35,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 185,
+    "size": 50,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 234,
+    "size": 70,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 283,
+    "size": 95,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 327,
+    "size": 120,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 371,
+    "size": 150,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 425,
+    "size": 185,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 496,
+    "size": 240,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 23,
+    "size": 1.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 30,
+    "size": 2.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 41,
+    "size": 4,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 49,
+    "size": 6,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 68,
+    "size": 10,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 89,
+    "size": 16,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 120,
+    "size": 25,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 146,
+    "size": 35,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 177,
+    "size": 50,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 224,
+    "size": 70,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 270,
+    "size": 95,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 312,
+    "size": 120,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 354,
+    "size": 150,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 406,
+    "size": 185,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 473,
+    "size": 240,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 22,
+    "size": 1.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 29,
+    "size": 2.5,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 39,
+    "size": 4,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 47,
+    "size": 6,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 65,
+    "size": 10,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 86,
+    "size": 16,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 115,
+    "size": 25,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 140,
+    "size": 35,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 170,
+    "size": 50,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 215,
+    "size": 70,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 260,
+    "size": 95,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 300,
+    "size": 120,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 340,
+    "size": 150,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 390,
+    "size": 185,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "三芯/五芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 455,
+    "size": 240,
+    "arrangement": "不考虑"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 150.48,
+    "size": 25,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 186.95999999999998,
+    "size": 35,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 223.43999999999997,
+    "size": 50,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 286.14,
+    "size": 70,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 347.7,
+    "size": 95,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 400.14,
+    "size": 120,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 457.14,
+    "size": 150,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 525.54,
+    "size": 185,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 622.4399999999999,
+    "size": 240,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 696.54,
+    "size": 300,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 816.2399999999999,
+    "size": 400,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 915.42,
+    "size": 500,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 1019.16,
+    "size": 630,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 143.88000000000002,
+    "size": 25,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 178.76000000000002,
+    "size": 35,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 213.64000000000001,
+    "size": 50,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 273.59000000000003,
+    "size": 70,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 332.45000000000005,
+    "size": 95,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 382.59000000000003,
+    "size": 120,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 437.09000000000003,
+    "size": 150,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 502.49,
+    "size": 185,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 595.1400000000001,
+    "size": 240,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 665.99,
+    "size": 300,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 780.44,
+    "size": 400,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 875.2700000000001,
+    "size": 500,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 974.46,
+    "size": 630,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 138.6,
+    "size": 25,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 172.20000000000002,
+    "size": 35,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 205.8,
+    "size": 50,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 263.55,
+    "size": 70,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 320.25,
+    "size": 95,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 368.55,
+    "size": 120,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 421.05,
+    "size": 150,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 484.05,
+    "size": 185,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 573.3000000000001,
+    "size": 240,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 641.5500000000001,
+    "size": 300,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 751.8000000000001,
+    "size": 400,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 843.1500000000001,
+    "size": 500,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 938.7,
+    "size": 630,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 132,
+    "size": 25,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 164,
+    "size": 35,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 196,
+    "size": 50,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 251,
+    "size": 70,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 305,
+    "size": 95,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 351,
+    "size": 120,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 401,
+    "size": 150,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 461,
+    "size": 185,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 546,
+    "size": 240,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 611,
+    "size": 300,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 716,
+    "size": 400,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 803,
+    "size": 500,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 894,
+    "size": 630,
+    "arrangement": "品字形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 170.99999999999997,
+    "size": 25,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 202.92,
+    "size": 35,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 238.26,
+    "size": 50,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 300.96,
+    "size": 70,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 353.4,
+    "size": 95,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 400.14,
+    "size": 120,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 446.87999999999994,
+    "size": 150,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 499.31999999999994,
+    "size": 185,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 572.28,
+    "size": 240,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 629.28,
+    "size": 300,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 712.4999999999999,
+    "size": 400,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 790.02,
+    "size": 500,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 25,
+    "currentA": 862.9799999999999,
+    "size": 630,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 163.5,
+    "size": 25,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 194.02,
+    "size": 35,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 227.81000000000003,
+    "size": 50,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 287.76000000000005,
+    "size": 70,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 337.90000000000003,
+    "size": 95,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 382.59000000000003,
+    "size": 120,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 427.28000000000003,
+    "size": 150,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 477.42,
+    "size": 185,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 547.1800000000001,
+    "size": 240,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 601.6800000000001,
+    "size": 300,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 681.25,
+    "size": 400,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 755.37,
+    "size": 500,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 30,
+    "currentA": 825.1300000000001,
+    "size": 630,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 157.5,
+    "size": 25,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 186.9,
+    "size": 35,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 219.45000000000002,
+    "size": 50,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 277.2,
+    "size": 70,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 325.5,
+    "size": 95,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 368.55,
+    "size": 120,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 411.6,
+    "size": 150,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 459.90000000000003,
+    "size": 185,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 527.1,
+    "size": 240,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 579.6,
+    "size": 300,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 656.25,
+    "size": 400,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 727.65,
+    "size": 500,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 35,
+    "currentA": 794.85,
+    "size": 630,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 150,
+    "size": 25,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 178,
+    "size": 35,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 209,
+    "size": 50,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 264,
+    "size": 70,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 310,
+    "size": 95,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 351,
+    "size": 120,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 392,
+    "size": 150,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 438,
+    "size": 185,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 502,
+    "size": 240,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 552,
+    "size": 300,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 625,
+    "size": 400,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 693,
+    "size": 500,
+    "arrangement": "水平形"
+  },
+  {
+    "type": "YJV、YJLV、YJY、YJLY型(铜芯)",
+    "coreCount": "单芯",
+    "installation": "明敷",
+    "ambientC": 40,
+    "currentA": 757,
+    "size": 630,
+    "arrangement": "水平形"
+  }
+]

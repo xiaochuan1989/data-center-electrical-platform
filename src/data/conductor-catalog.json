@@ -1,0 +1,8822 @@
+[
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 603,
+    "current105A": 1100.9223405853838,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 681,
+    "current105A": 905.73,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 735,
+    "current105A": 977.5500000000001,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 831,
+    "current105A": 1105.23,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1141,
+    "current105A": 1517.53,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1302,
+    "current105A": 1731.66,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1415,
+    "current105A": 1881.95,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1465,
+    "current105A": 1948.45,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1598,
+    "current105A": 2125.34,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1686,
+    "current105A": 2242.38,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1811,
+    "current105A": 2408.63,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1897,
+    "current105A": 2523.01,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2047,
+    "current105A": 2722.51,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2174,
+    "current105A": 2891.42,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2294,
+    "current105A": 3051.02,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2555,
+    "current105A": 3398.15,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 566,
+    "current105A": 752.7800000000001,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 640,
+    "current105A": 851.2,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 690,
+    "current105A": 917.7,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 781,
+    "current105A": 1038.73,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1072,
+    "current105A": 1425.76,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1223,
+    "current105A": 1626.5900000000001,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1330,
+    "current105A": 1768.9,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1377,
+    "current105A": 1831.41,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1502,
+    "current105A": 1997.66,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1584,
+    "current105A": 2106.7200000000003,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1702,
+    "current105A": 2263.6600000000003,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1783,
+    "current105A": 2371.3900000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1924,
+    "current105A": 2558.92,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2043,
+    "current105A": 2717.19,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2156,
+    "current105A": 2867.48,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2401,
+    "current105A": 3193.3300000000004,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 530,
+    "current105A": 704.9000000000001,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 599,
+    "current105A": 796.6700000000001,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 646,
+    "current105A": 859.1800000000001,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 731,
+    "current105A": 972.23,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1004,
+    "current105A": 1335.3200000000002,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1145,
+    "current105A": 1522.8500000000001,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1245,
+    "current105A": 1655.8500000000001,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1289,
+    "current105A": 1714.3700000000001,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1406,
+    "current105A": 1869.98,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1483,
+    "current105A": 1972.39,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1593,
+    "current105A": 2118.69,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1669,
+    "current105A": 2219.77,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1801,
+    "current105A": 2395.33,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1913,
+    "current105A": 2544.29,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2018,
+    "current105A": 2683.94,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2248,
+    "current105A": 2989.84,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 488,
+    "current105A": 649.0400000000001,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 551,
+    "current105A": 732.83,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 595,
+    "current105A": 791.35,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 673,
+    "current105A": 895.09,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 924,
+    "current105A": 1228.92,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1054,
+    "current105A": 1401.8200000000002,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1146,
+    "current105A": 1524.18,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1186,
+    "current105A": 1577.38,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1294,
+    "current105A": 1721.02,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1365,
+    "current105A": 1815.45,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1466,
+    "current105A": 1949.7800000000002,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1536,
+    "current105A": 2042.88,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1658,
+    "current105A": 2205.1400000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1760,
+    "current105A": 2340.8,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1858,
+    "current105A": 2471.1400000000003,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2069,
+    "current105A": 2751.77,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 348.1422123213443,
+    "current105A": 635.6178096938442,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 393.17553331813514,
+    "current105A": 717.8370288582221,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 424.35244785437493,
+    "current105A": 774.7580267412529,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 479.778073696579,
+    "current105A": 875.950911866641,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 658.756657145363,
+    "current105A": 1202.7196034173737,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 751.7100504848927,
+    "current105A": 1372.4285045130766,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 816.9506309033204,
+    "current105A": 1491.5409630460856,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 845.8181443628017,
+    "current105A": 1544.2455907155586,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 922.6057301650219,
+    "current105A": 1684.4399003163567,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 973.412553853709,
+    "current105A": 1777.2000450146293,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1045.5813375024122,
+    "current105A": 1908.9616141883116,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1095.23346065272,
+    "current105A": 1999.6135737798052,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1181.836001031164,
+    "current105A": 2157.727456788224,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1255.1594852182463,
+    "current105A": 2291.5972110686857,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1324.4415175210015,
+    "current105A": 2418.088317475421,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1475.1299377794937,
+    "current105A": 2693.2064739100697,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 632,
+    "current105A": 840.5600000000001,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 706,
+    "current105A": 938.98,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 770,
+    "current105A": 1024.1000000000001,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 869,
+    "current105A": 1155.77,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1193,
+    "current105A": 1586.69,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1359,
+    "current105A": 1807.47,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1477,
+    "current105A": 1964.41,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1531,
+    "current105A": 2036.23,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1668,
+    "current105A": 2218.44,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1758,
+    "current105A": 2338.1400000000003,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1891,
+    "current105A": 2515.03,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1979,
+    "current105A": 2632.07,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2133,
+    "current105A": 2836.8900000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2265,
+    "current105A": 3012.4500000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2390,
+    "current105A": 3178.7000000000003,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2662,
+    "current105A": 3540.46,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 594,
+    "current105A": 790.0200000000001,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 663,
+    "current105A": 881.7900000000001,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 723,
+    "current105A": 961.59,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 816,
+    "current105A": 1085.28,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1121,
+    "current105A": 1490.93,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1277,
+    "current105A": 1698.41,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1388,
+    "current105A": 1846.0400000000002,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1439,
+    "current105A": 1913.8700000000001,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1567,
+    "current105A": 2084.11,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1652,
+    "current105A": 2197.1600000000003,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1777,
+    "current105A": 2363.4100000000003,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1860,
+    "current105A": 2473.8,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2005,
+    "current105A": 2666.65,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2129,
+    "current105A": 2831.57,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2246,
+    "current105A": 2987.1800000000003,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2502,
+    "current105A": 3327.6600000000003,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 556,
+    "current105A": 739.48,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 621,
+    "current105A": 825.9300000000001,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 377,
+    "current105A": 501.41,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 764,
+    "current105A": 1016.12,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1049,
+    "current105A": 1395.17,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1195,
+    "current105A": 1589.3500000000001,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1299,
+    "current105A": 1727.67,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1347,
+    "current105A": 1791.51,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1467,
+    "current105A": 1951.1100000000001,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1547,
+    "current105A": 2057.51,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1664,
+    "current105A": 2213.12,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1741,
+    "current105A": 2315.53,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1877,
+    "current105A": 2496.4100000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1993,
+    "current105A": 2650.69,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2103,
+    "current105A": 2796.9900000000002,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2342,
+    "current105A": 3114.86,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 511,
+    "current105A": 679.63,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 571,
+    "current105A": 759.4300000000001,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 623,
+    "current105A": 828.59,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 703,
+    "current105A": 934.99,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 966,
+    "current105A": 1284.78,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1100,
+    "current105A": 1463,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1196,
+    "current105A": 1590.68,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1240,
+    "current105A": 1649.2,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1351,
+    "current105A": 1796.8300000000002,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1423,
+    "current105A": 1892.5900000000001,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1531,
+    "current105A": 2036.23,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1602,
+    "current105A": 2130.6600000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1727,
+    "current105A": 2296.9100000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1834,
+    "current105A": 2439.2200000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1935,
+    "current105A": 2573.55,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2156,
+    "current105A": 2867.48,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 364.8853701278435,
+    "current105A": 666.1864937421386,
+    "size": "40*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 407.6092900478758,
+    "current105A": 744.1893426929587,
+    "size": "40*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 444.5597072760118,
+    "current105A": 811.651266109884,
+    "size": "50*4"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 501.71738392578476,
+    "current105A": 916.0064288954405,
+    "size": "50*5"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 688.7788711432235,
+    "current105A": 1257.5324161936255,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 784.6190158287013,
+    "current105A": 1432.5117800562757,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 852.7463475930772,
+    "current105A": 1556.894701356232,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 883.923262129317,
+    "current105A": 1613.8156992392628,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 963.0202490082958,
+    "current105A": 1758.226379053619,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1014.9817732353621,
+    "current105A": 1853.0947088586704,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1091.7693590375823,
+    "current105A": 1993.2890184594685,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1142.5761827262693,
+    "current105A": 2086.0491631577406,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1231.4881241814717,
+    "current105A": 2248.379416379718,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1307.6983597145022,
+    "current105A": 2387.5196334271263,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1379.8671433632055,
+    "current105A": 2519.2812026008087,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1536.9064165827838,
+    "current105A": 2805.994377122742,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 480,
+    "current105A": 638.4000000000001,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 542,
+    "current105A": 720.86,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 586,
+    "current105A": 779.38,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 661,
+    "current105A": 879.13,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 910,
+    "current105A": 1210.3,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1038,
+    "current105A": 1380.54,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1128,
+    "current105A": 1500.24,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1168,
+    "current105A": 1553.44,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1274,
+    "current105A": 1694.42,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1371,
+    "current105A": 1823.43,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1472,
+    "current105A": 1957.7600000000002,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1542,
+    "current105A": 2050.86,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1674,
+    "current105A": 2226.42,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1730,
+    "current105A": 2300.9,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1876,
+    "current105A": 2495.08,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2089,
+    "current105A": 2778.3700000000003,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 451,
+    "current105A": 599.83,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 509,
+    "current105A": 676.97,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 550,
+    "current105A": 731.5,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 621,
+    "current105A": 825.9300000000001,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 855,
+    "current105A": 1137.15,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 975,
+    "current105A": 1296.75,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1060,
+    "current105A": 1409.8000000000002,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1097,
+    "current105A": 1459.01,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1197,
+    "current105A": 1592.01,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1288,
+    "current105A": 1713.0400000000002,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1383,
+    "current105A": 1839.39,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1449,
+    "current105A": 1927.17,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1573,
+    "current105A": 2092.09,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1631.3899999999999,
+    "current105A": 2169.7487,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1763,
+    "current105A": 2344.79,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1963,
+    "current105A": 2610.79,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 422,
+    "current105A": 561.26,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 476,
+    "current105A": 633.08,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 515,
+    "current105A": 684.95,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 581,
+    "current105A": 772.73,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 800,
+    "current105A": 1064,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 913,
+    "current105A": 1214.29,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 992,
+    "current105A": 1319.3600000000001,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1027,
+    "current105A": 1365.91,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1121,
+    "current105A": 1490.93,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1206,
+    "current105A": 1603.98,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1295,
+    "current105A": 1722.3500000000001,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1356,
+    "current105A": 1803.48,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1473,
+    "current105A": 1959.0900000000001,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1525.86,
+    "current105A": 2029.3938,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1650,
+    "current105A": 2194.5,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1838,
+    "current105A": 2444.54,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 388,
+    "current105A": 516.0400000000001,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 439,
+    "current105A": 583.87,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 474,
+    "current105A": 630.4200000000001,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 535,
+    "current105A": 711.5500000000001,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 737,
+    "current105A": 980.21,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 840,
+    "current105A": 1117.2,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 913,
+    "current105A": 1214.29,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 946,
+    "current105A": 1258.18,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1031,
+    "current105A": 1371.23,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1110,
+    "current105A": 1476.3000000000002,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1192,
+    "current105A": 1585.3600000000001,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1249,
+    "current105A": 1661.17,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1355,
+    "current105A": 1802.15,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1411.6799999999998,
+    "current105A": 1877.5343999999998,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1519,
+    "current105A": 2020.2700000000002,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1692,
+    "current105A": 2250.36,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 277.12812921102034,
+    "current105A": 505.9644256269407,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 312.92384590077717,
+    "current105A": 571.3181639370872,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 338.3272577451207,
+    "current105A": 617.6982362862234,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 381.6285279343426,
+    "current105A": 696.755177790433,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 525.3887449625594,
+    "current105A": 959.2242235844083,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 599.2895794188315,
+    "current105A": 1094.1480704182593,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 651.2511036458978,
+    "current105A": 1189.0164002233107,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 674.3451144134829,
+    "current105A": 1231.180102358889,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 735.5442429475831,
+    "current105A": 1342.9139130181716,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 791.5472190589769,
+    "current105A": 1445.1608906969493,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 849.859596247129,
+    "current105A": 1551.6242385892847,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 890.2741150904029,
+    "current105A": 1625.410717326547,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 966.4843506234334,
+    "current105A": 1764.5509343739557,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 998.8159656980525,
+    "current105A": 1823.5801173637653,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1083.1091049997378,
+    "current105A": 1977.4776301586264,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1206.0847123371282,
+    "current105A": 2201.9993440305816,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 503,
+    "current105A": 668.99,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 562,
+    "current105A": 747.46,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 613,
+    "current105A": 815.2900000000001,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 692,
+    "current105A": 920.36,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 952,
+    "current105A": 1266.16,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1085,
+    "current105A": 1443.0500000000002,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1178,
+    "current105A": 1566.74,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1221,
+    "current105A": 1623.93,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1330,
+    "current105A": 1768.9,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1430,
+    "current105A": 1901.9,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1490,
+    "current105A": 1981.7,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1609,
+    "current105A": 2139.9700000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1744,
+    "current105A": 2319.52,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1803,
+    "current105A": 2397.9900000000002,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1955,
+    "current105A": 2600.15,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2177,
+    "current105A": 2895.4100000000003,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 472,
+    "current105A": 627.76,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 528,
+    "current105A": 702.24,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 576,
+    "current105A": 766.08,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 650,
+    "current105A": 864.5,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 894,
+    "current105A": 1189.02,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1019,
+    "current105A": 1355.27,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1107,
+    "current105A": 1472.3100000000002,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1147,
+    "current105A": 1525.51,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1250,
+    "current105A": 1662.5,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1344,
+    "current105A": 1787.52,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1400,
+    "current105A": 1862,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1512,
+    "current105A": 2010.96,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1639,
+    "current105A": 2179.87,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1694,
+    "current105A": 2253.02,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1837,
+    "current105A": 2443.21,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2046,
+    "current105A": 2721.1800000000003,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 442,
+    "current105A": 587.86,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 494,
+    "current105A": 657.02,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 539,
+    "current105A": 716.87,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 608,
+    "current105A": 808.6400000000001,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 837,
+    "current105A": 1113.21,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 954,
+    "current105A": 1268.8200000000002,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1036,
+    "current105A": 1377.88,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1074,
+    "current105A": 1428.42,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1170,
+    "current105A": 1556.1000000000001,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1258,
+    "current105A": 1673.14,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1311,
+    "current105A": 1743.63,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1415,
+    "current105A": 1881.95,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1534,
+    "current105A": 2040.22,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1586,
+    "current105A": 2109.38,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1720,
+    "current105A": 2287.6,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1915,
+    "current105A": 2546.9500000000003,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 407,
+    "current105A": 541.3100000000001,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 455,
+    "current105A": 605.15,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 496,
+    "current105A": 659.6800000000001,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 560,
+    "current105A": 744.8000000000001,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 771,
+    "current105A": 1025.43,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 878,
+    "current105A": 1167.74,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 954,
+    "current105A": 1268.8200000000002,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 989,
+    "current105A": 1315.3700000000001,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1077,
+    "current105A": 1432.41,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1158,
+    "current105A": 1540.14,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1206,
+    "current105A": 1603.98,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1303,
+    "current105A": 1732.99,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1412,
+    "current105A": 1877.96,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1460,
+    "current105A": 1941.8000000000002,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1583,
+    "current105A": 2105.3900000000003,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1763,
+    "current105A": 2344.79,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 290.40718540238174,
+    "current105A": 530.2085543548983,
+    "size": "40*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 324.4708512845697,
+    "current105A": 592.4000150048764,
+    "size": "40*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 353.9157150132406,
+    "current105A": 646.1587352277388,
+    "size": "50*4"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 399.526386279221,
+    "current105A": 729.4320469455062,
+    "size": "50*5"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 549.6374562685237,
+    "current105A": 1003.4961108267657,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 626.4250420707439,
+    "current105A": 1143.6904204275638,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 680.1186171053791,
+    "current105A": 1241.7210278927837,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 704.944678680533,
+    "current105A": 1287.0470076885304,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 767.8758580222022,
+    "current105A": 1401.9430960079815,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 825.6108849411648,
+    "current105A": 1507.3523513469277,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 860.2519010925423,
+    "current105A": 1570.597904550295,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 928.9565831261078,
+    "current105A": 1696.0349184036409,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1006.8988694667073,
+    "current105A": 1838.337413111218,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1040.9625353488952,
+    "current105A": 1900.528873761196,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1128.7197762657183,
+    "current105A": 2060.750941876394,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "单条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1256.8915360258152,
+    "current105A": 2294.7594887288537,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1766,
+    "current105A": 2348.78,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2036,
+    "current105A": 2707.88,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2162,
+    "current105A": 2875.46,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2290,
+    "current105A": 3045.7000000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2440,
+    "current105A": 3245.2000000000003,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2526,
+    "current105A": 3359.5800000000004,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2760,
+    "current105A": 3670.8,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2827,
+    "current105A": 3759.9100000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2991,
+    "current105A": 3978.03,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3128,
+    "current105A": 4160.24,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3333,
+    "current105A": 4432.89,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3674,
+    "current105A": 4886.42,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1660,
+    "current105A": 2207.8,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1913,
+    "current105A": 2544.29,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2032,
+    "current105A": 2702.56,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2152,
+    "current105A": 2862.1600000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2293,
+    "current105A": 3049.69,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2374,
+    "current105A": 3157.42,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2594,
+    "current105A": 3450.02,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2657,
+    "current105A": 3533.8100000000004,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2811,
+    "current105A": 3738.63,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2940,
+    "current105A": 3910.2000000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3133,
+    "current105A": 4166.89,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3453,
+    "current105A": 4592.490000000001,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1554,
+    "current105A": 2066.82,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1791,
+    "current105A": 2382.03,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1902,
+    "current105A": 2529.6600000000003,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2015,
+    "current105A": 2679.9500000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2147,
+    "current105A": 2855.51,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2222,
+    "current105A": 2955.26,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2428,
+    "current105A": 3229.2400000000002,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2487,
+    "current105A": 3307.71,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2632,
+    "current105A": 3500.5600000000004,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2752,
+    "current105A": 3660.1600000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2933,
+    "current105A": 3900.8900000000003,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3233,
+    "current105A": 4299.89,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1430,
+    "current105A": 1901.9,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1649,
+    "current105A": 2193.17,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1751,
+    "current105A": 2328.83,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1854,
+    "current105A": 2465.82,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1976,
+    "current105A": 2628.08,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2046,
+    "current105A": 2721.1800000000003,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2235,
+    "current105A": 2972.55,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2289,
+    "current105A": 3044.3700000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2422,
+    "current105A": 3221.26,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2533,
+    "current105A": 3368.8900000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2699,
+    "current105A": 3589.67,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2975,
+    "current105A": 3956.75,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1019.6005753888791,
+    "current105A": 1861.527449285786,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1175.485148070078,
+    "current105A": 2146.13243870094,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1248.2312819879708,
+    "current105A": 2278.948100428012,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1322.132116444243,
+    "current105A": 2413.8719472618627,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1408.7346568226867,
+    "current105A": 2571.985830270282,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1458.3867799729946,
+    "current105A": 2662.6377898617757,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1593.486742963367,
+    "current105A": 2909.295447354909,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1632.169210999072,
+    "current105A": 2979.9196484320028,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1726.8546551461707,
+    "current105A": 3152.7908271878746,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1805.9516420251493,
+    "current105A": 3297.2015070022303,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1924.3084472090225,
+    "current105A": 3513.290480447069,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2121.184889002685,
+    "current105A": 3872.7360411528753,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1939,
+    "current105A": 2578.8700000000003,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2230,
+    "current105A": 2965.9,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2372,
+    "current105A": 3154.76,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2503,
+    "current105A": 3328.9900000000002,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2672,
+    "current105A": 3553.76,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2771,
+    "current105A": 3685.4300000000003,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3011,
+    "current105A": 4004.63,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3095,
+    "current105A": 4116.35,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3278,
+    "current105A": 4359.74,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3419,
+    "current105A": 4547.27,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3647,
+    "current105A": 4850.51,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4019,
+    "current105A": 5345.27,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1822,
+    "current105A": 2423.26,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2096,
+    "current105A": 2787.6800000000003,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2229,
+    "current105A": 2964.57,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2352,
+    "current105A": 3128.1600000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2511,
+    "current105A": 3339.63,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2604,
+    "current105A": 3463.32,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2830,
+    "current105A": 3763.9,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2909,
+    "current105A": 3868.9700000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3081,
+    "current105A": 4097.7300000000005,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3213,
+    "current105A": 4273.29,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3428,
+    "current105A": 4559.240000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3777,
+    "current105A": 5023.41,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1706,
+    "current105A": 2268.98,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1962,
+    "current105A": 2609.46,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2087,
+    "current105A": 2775.71,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2202,
+    "current105A": 2928.6600000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2351,
+    "current105A": 3126.8300000000004,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2438,
+    "current105A": 3242.54,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2649,
+    "current105A": 3523.17,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2723,
+    "current105A": 3621.59,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2884,
+    "current105A": 3835.7200000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3008,
+    "current105A": 4000.6400000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3209,
+    "current105A": 4267.97,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3536,
+    "current105A": 4702.88,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1570,
+    "current105A": 2088.1,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1806,
+    "current105A": 2401.98,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1921,
+    "current105A": 2554.9300000000003,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2027,
+    "current105A": 2695.9100000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2164,
+    "current105A": 2878.1200000000003,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2244,
+    "current105A": 2984.52,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2438,
+    "current105A": 3242.54,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2506,
+    "current105A": 3332.98,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2655,
+    "current105A": 3531.15,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2769,
+    "current105A": 3682.77,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2954,
+    "current105A": 3928.82,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3255,
+    "current105A": 4329.150000000001,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1119.4821719586844,
+    "current105A": 2043.8854610221626,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1287.4911002928654,
+    "current105A": 2350.6263940584954,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1369.4748385177923,
+    "current105A": 2500.3075366397984,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1445.1077237816332,
+    "current105A": 2638.3936611338177,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1542.67991927468,
+    "current105A": 2816.5353026566368,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1599.837595924453,
+    "current105A": 2920.890465442193,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1738.401660529963,
+    "current105A": 3173.8726782556632,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1786.8990831418917,
+    "current105A": 3262.416452740378,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1892.5541824035931,
+    "current105A": 3455.315390010649,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1973.9605703593304,
+    "current105A": 3603.942440038563,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2105.596431734565,
+    "current105A": 3844.27554221136,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2320.370731873106,
+    "current105A": 4236.397972072239,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1409,
+    "current105A": 1873.97,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1623,
+    "current105A": 2158.59,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1724,
+    "current105A": 2292.92,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1825,
+    "current105A": 2427.25,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1946,
+    "current105A": 2588.1800000000003,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2054,
+    "current105A": 2731.82,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2175,
+    "current105A": 2892.75,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2298,
+    "current105A": 3056.34,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2446,
+    "current105A": 3253.1800000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2558,
+    "current105A": 3402.1400000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2725,
+    "current105A": 3624.25,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3005,
+    "current105A": 3996.65,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1324,
+    "current105A": 1760.92,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1525,
+    "current105A": 2028.25,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1620,
+    "current105A": 2154.6,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1715,
+    "current105A": 2280.9500000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1829,
+    "current105A": 2432.57,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1930,
+    "current105A": 2566.9,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2044,
+    "current105A": 2718.52,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2160,
+    "current105A": 2872.8,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2299,
+    "current105A": 3057.67,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2404,
+    "current105A": 3197.32,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2561,
+    "current105A": 3406.13,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2824,
+    "current105A": 3755.92,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1239,
+    "current105A": 1647.8700000000001,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1428,
+    "current105A": 1899.24,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1517,
+    "current105A": 2017.6100000000001,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1606,
+    "current105A": 2135.98,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1712,
+    "current105A": 2276.96,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1807,
+    "current105A": 2403.31,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1914,
+    "current105A": 2545.6200000000003,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2022,
+    "current105A": 2689.26,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2152,
+    "current105A": 2862.1600000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2251,
+    "current105A": 2993.8300000000004,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2398,
+    "current105A": 3189.34,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2644,
+    "current105A": 3516.52,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1141,
+    "current105A": 1517.53,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1314,
+    "current105A": 1747.6200000000001,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1396,
+    "current105A": 1856.68,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1478,
+    "current105A": 1965.74,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1576,
+    "current105A": 2096.08,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1663,
+    "current105A": 2211.79,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1761,
+    "current105A": 2342.13,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1861,
+    "current105A": 2475.13,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1981,
+    "current105A": 2634.73,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2071,
+    "current105A": 2754.4300000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2207,
+    "current105A": 2935.31,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2434,
+    "current105A": 3237.2200000000003,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 813.4865292881826,
+    "current105A": 1485.2164077257487,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 937.0394868947626,
+    "current105A": 1710.7922141510933,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 995.3518640829147,
+    "current105A": 1817.2555620434287,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1053.6642412710669,
+    "current105A": 1923.718909935764,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1123.5236238430116,
+    "current105A": 2051.2641088958885,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1185.8774529154912,
+    "current105A": 2165.10610466195,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1255.7368354874359,
+    "current105A": 2292.651303622075,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1326.75091859776,
+    "current105A": 2422.3046876889784,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1412.1987584378246,
+    "current105A": 2578.310385590619,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1476.8619885870626,
+    "current105A": 2696.368751570238,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1573.27948354173,
+    "current105A": 2872.402207986278,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1734.9375589148253,
+    "current105A": 3167.548122935327,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1547,
+    "current105A": 2057.51,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1777,
+    "current105A": 2363.4100000000003,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1892,
+    "current105A": 2516.36,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 1994,
+    "current105A": 2652.02,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2131,
+    "current105A": 2834.23,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2253,
+    "current105A": 2996.4900000000002,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2373,
+    "current105A": 3156.09,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2516,
+    "current105A": 3346.28,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2680,
+    "current105A": 3564.4,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2796,
+    "current105A": 3718.6800000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2982,
+    "current105A": 3966.0600000000004,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3282,
+    "current105A": 4365.06,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1454,
+    "current105A": 1933.8200000000002,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1670,
+    "current105A": 2221.1,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1778,
+    "current105A": 2364.7400000000002,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1874,
+    "current105A": 2492.42,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2003,
+    "current105A": 2663.9900000000002,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2117,
+    "current105A": 2815.61,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2230,
+    "current105A": 2965.9,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2365,
+    "current105A": 3145.4500000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2519,
+    "current105A": 3350.27,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2628,
+    "current105A": 3495.2400000000002,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2803,
+    "current105A": 3727.9900000000002,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3085,
+    "current105A": 4103.05,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1361,
+    "current105A": 1810.13,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1563,
+    "current105A": 2078.79,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1664,
+    "current105A": 2213.12,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1754,
+    "current105A": 2332.82,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1875,
+    "current105A": 2493.75,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1982,
+    "current105A": 2636.06,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2088,
+    "current105A": 2777.04,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2214,
+    "current105A": 2944.6200000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2358,
+    "current105A": 3136.1400000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2460,
+    "current105A": 3271.8,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2624,
+    "current105A": 3489.92,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2888,
+    "current105A": 3841.0400000000004,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1253,
+    "current105A": 1666.49,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1439,
+    "current105A": 1913.8700000000001,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1532,
+    "current105A": 2037.5600000000002,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1615,
+    "current105A": 2147.9500000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1726,
+    "current105A": 2295.58,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1824,
+    "current105A": 2425.92,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1922,
+    "current105A": 2556.26,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2037,
+    "current105A": 2709.21,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2170,
+    "current105A": 2886.1000000000004,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2264,
+    "current105A": 3011.1200000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2415,
+    "current105A": 3211.9500000000003,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2658,
+    "current105A": 3535.1400000000003,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 893.1608664363511,
+    "current105A": 1630.6811800934943,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1025.951428349965,
+    "current105A": 1873.12246737307,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1092.3467093067718,
+    "current105A": 1994.3431110128577,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1151.2364367641137,
+    "current105A": 2101.860551458583,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1230.3334236430924,
+    "current105A": 2246.2712312729386,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1300.7701564842268,
+    "current105A": 2374.870522786453,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1370.0521887869818,
+    "current105A": 2501.361629193188,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1452.6132772810984,
+    "current105A": 2652.0968643278807,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1547.298721428197,
+    "current105A": 2824.9680430837525,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1614.2713526541936,
+    "current105A": 2947.2427792769295,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1721.658502723464,
+    "current105A": 3143.303994207369,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "双条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1894.8635834803517,
+    "current105A": 3459.531760224207,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2340,
+    "current105A": 3112.2000000000003,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2651,
+    "current105A": 3525.8300000000004,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2773,
+    "current105A": 3688.09,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2987,
+    "current105A": 3972.71,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3124,
+    "current105A": 4154.92,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3237,
+    "current105A": 4305.21,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3521,
+    "current105A": 4682.93,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3608,
+    "current105A": 4798.64,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3764,
+    "current105A": 5006.12,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3889,
+    "current105A": 5172.37,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 4127,
+    "current105A": 5488.91,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 4556,
+    "current105A": 6059.4800000000005,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2199,
+    "current105A": 2924.67,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2491,
+    "current105A": 3313.03,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2606,
+    "current105A": 3465.98,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2807,
+    "current105A": 3733.3100000000004,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2936,
+    "current105A": 3904.88,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3042,
+    "current105A": 4045.86,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3309,
+    "current105A": 4400.97,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3391,
+    "current105A": 4510.030000000001,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3538,
+    "current105A": 4705.54,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3655,
+    "current105A": 4861.150000000001,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3879,
+    "current105A": 5159.070000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 4282,
+    "current105A": 5695.06,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2059,
+    "current105A": 2738.4700000000003,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2332,
+    "current105A": 3101.56,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2440,
+    "current105A": 3245.2000000000003,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2628,
+    "current105A": 3495.2400000000002,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2749,
+    "current105A": 3656.17,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2848,
+    "current105A": 3787.84,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3098,
+    "current105A": 4120.34,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3175,
+    "current105A": 4222.75,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3312,
+    "current105A": 4404.96,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3422,
+    "current105A": 4551.26,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3631,
+    "current105A": 4829.2300000000005,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 4009,
+    "current105A": 5331.97,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1895,
+    "current105A": 2520.35,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2147,
+    "current105A": 2855.51,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2246,
+    "current105A": 2987.1800000000003,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2419,
+    "current105A": 3217.27,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2530,
+    "current105A": 3364.9,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2621,
+    "current105A": 3485.9300000000003,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2852,
+    "current105A": 3793.1600000000003,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2922,
+    "current105A": 3886.26,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3048,
+    "current105A": 4053.84,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3150,
+    "current105A": 4189.5,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3342,
+    "current105A": 4444.860000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3690,
+    "current105A": 4907.7,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1350.999629903724,
+    "current105A": 2466.5765749313355,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1530.5555636216977,
+    "current105A": 2794.3993590354576,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1600.9922964628322,
+    "current105A": 2922.998650548972,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1724.545254069412,
+    "current105A": 3148.5744569743165,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1803.6422409483907,
+    "current105A": 3292.985136788672,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1868.8828213668185,
+    "current105A": 3412.097595321681,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2032.8502978166723,
+    "current105A": 3711.459880484288,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2083.0797712361696,
+    "current105A": 3803.1659326291706,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2173.146413229751,
+    "current105A": 3967.604370957926,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2245.3151968784546,
+    "current105A": 4099.365940131609,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2382.7245609455854,
+    "current105A": 4350.239967838301,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2630.4078264279347,
+    "current105A": 4802.445673242379,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2644,
+    "current105A": 3516.52,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2903,
+    "current105A": 3860.9900000000002,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3142,
+    "current105A": 4178.860000000001,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3343,
+    "current105A": 4446.1900000000005,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3524,
+    "current105A": 4686.92,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3671,
+    "current105A": 4882.43,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3954,
+    "current105A": 5258.820000000001,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4074,
+    "current105A": 5418.42,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4265,
+    "current105A": 5672.450000000001,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4375,
+    "current105A": 5818.75,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4663,
+    "current105A": 6201.79,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 5130,
+    "current105A": 6822.900000000001,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2485,
+    "current105A": 3305.05,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2728,
+    "current105A": 3628.2400000000002,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2953,
+    "current105A": 3927.4900000000002,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3142,
+    "current105A": 4178.860000000001,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3312,
+    "current105A": 4404.96,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2450,
+    "current105A": 3258.5,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3716,
+    "current105A": 4942.280000000001,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3829,
+    "current105A": 5092.570000000001,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4009,
+    "current105A": 5331.97,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4112,
+    "current105A": 5468.96,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4383,
+    "current105A": 5829.39,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4822,
+    "current105A": 6413.26,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2326,
+    "current105A": 3093.5800000000004,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2554,
+    "current105A": 3396.82,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2764,
+    "current105A": 3676.1200000000003,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2941,
+    "current105A": 3911.53,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3101,
+    "current105A": 4124.33,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3230,
+    "current105A": 4295.900000000001,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3479,
+    "current105A": 4627.070000000001,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3585,
+    "current105A": 4768.05,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3753,
+    "current105A": 4991.490000000001,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3850,
+    "current105A": 5120.5,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4103,
+    "current105A": 5456.990000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4514,
+    "current105A": 6003.62,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2141,
+    "current105A": 2847.53,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2351,
+    "current105A": 3126.8300000000004,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2545,
+    "current105A": 3384.8500000000004,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2707,
+    "current105A": 3600.3100000000004,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2854,
+    "current105A": 3795.82,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2973,
+    "current105A": 3954.09,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3202,
+    "current105A": 4258.66,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3299,
+    "current105A": 4387.67,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3454,
+    "current105A": 4593.820000000001,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3543,
+    "current105A": 4712.1900000000005,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3777,
+    "current105A": 5023.41,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 4155,
+    "current105A": 5526.150000000001,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1526.5141117373705,
+    "current105A": 2787.020711161732,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1676.0478314574834,
+    "current105A": 3060.0306824896015,
+    "size": "63*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1814.034545793804,
+    "current105A": 3311.9588027496825,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1930.0819499009187,
+    "current105A": 3523.831405980964,
+    "size": "63*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2034.5823486242411,
+    "current105A": 3714.6221581444565,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2119.452838195116,
+    "current105A": 3869.5737634927063,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2282.84296437578,
+    "current105A": 4167.881956101924,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2352.1249966785354,
+    "current105A": 4294.373062508659,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2462.398898093754,
+    "current105A": 4495.704740206046,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2525.9074277046125,
+    "current105A": 4611.654921078886,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2692.1843052312247,
+    "current105A": 4915.233576455051,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2961.80688094278,
+    "current105A": 5407.4947988879285,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 1866,
+    "current105A": 2481.78,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2113,
+    "current105A": 2810.29,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2211,
+    "current105A": 2940.63,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2381,
+    "current105A": 3166.73,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2491,
+    "current105A": 3313.03,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2633,
+    "current105A": 3501.8900000000003,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2774,
+    "current105A": 3689.42,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2933,
+    "current105A": 3900.8900000000003,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2079,
+    "current105A": 2765.07,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3181,
+    "current105A": 4230.7300000000005,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3375,
+    "current105A": 4488.75,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3725,
+    "current105A": 4954.25,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1754,
+    "current105A": 2332.82,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1986,
+    "current105A": 2641.38,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2078,
+    "current105A": 2763.7400000000002,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2238,
+    "current105A": 2976.54,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2341,
+    "current105A": 3113.53,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2475,
+    "current105A": 3291.75,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2607,
+    "current105A": 3467.3100000000004,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2757,
+    "current105A": 3666.8100000000004,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 1954,
+    "current105A": 2598.82,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2990,
+    "current105A": 3976.7000000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3172,
+    "current105A": 4218.76,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3501,
+    "current105A": 4656.33,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1642,
+    "current105A": 2183.86,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1859,
+    "current105A": 2472.4700000000003,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1945,
+    "current105A": 2586.8500000000004,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2095,
+    "current105A": 2786.3500000000004,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2192,
+    "current105A": 2915.36,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2317,
+    "current105A": 3081.61,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2441,
+    "current105A": 3246.53,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2581,
+    "current105A": 3432.73,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 1829,
+    "current105A": 2432.57,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2799,
+    "current105A": 3722.67,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2970,
+    "current105A": 3950.1000000000004,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3278,
+    "current105A": 4359.74,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1511,
+    "current105A": 2009.63,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1711,
+    "current105A": 2275.63,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1790,
+    "current105A": 2380.7000000000003,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1928,
+    "current105A": 2564.2400000000002,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2017,
+    "current105A": 2682.61,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2132,
+    "current105A": 2835.56,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2246,
+    "current105A": 2987.1800000000003,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2375,
+    "current105A": 3158.75,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 1683,
+    "current105A": 2238.3900000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2576,
+    "current105A": 3426.0800000000004,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2733,
+    "current105A": 3634.8900000000003,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3017,
+    "current105A": 4012.61,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1077.3356023078416,
+    "current105A": 1966.9367046247319,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1219.941118797679,
+    "current105A": 2227.2975653119283,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1276.5214451782624,
+    "current105A": 2330.5986355440955,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1374.6709909404988,
+    "current105A": 2509.7943696203033,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1438.1795205513577,
+    "current105A": 2625.7445504931443,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1520.1632587762845,
+    "current105A": 2775.4256930744473,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1601.5696467320217,
+    "current105A": 2924.0527431023615,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1693.3683395331723,
+    "current105A": 3091.6534590912856,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1200.3112096452319,
+    "current105A": 2191.458418496687,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1836.5512062921994,
+    "current105A": 3353.0684123318715,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1948.557158514987,
+    "current105A": 3557.562367689427,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2150.629752731356,
+    "current105A": 3926.4947613757377,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2111,
+    "current105A": 2807.63,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2379,
+    "current105A": 3164.07,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2505,
+    "current105A": 3331.65,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2665,
+    "current105A": 3544.4500000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2809,
+    "current105A": 3735.9700000000003,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 2985,
+    "current105A": 3970.05,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3114,
+    "current105A": 4141.62,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3311,
+    "current105A": 4403.63,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3490,
+    "current105A": 4641.7,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3578,
+    "current105A": 4758.740000000001,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3813,
+    "current105A": 5071.29,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4194,
+    "current105A": 5578.02,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 1984,
+    "current105A": 2638.7200000000003,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2236,
+    "current105A": 2973.88,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2354,
+    "current105A": 3130.82,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2505,
+    "current105A": 3331.65,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2640,
+    "current105A": 3511.2000000000003,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2805,
+    "current105A": 3730.65,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 2927,
+    "current105A": 3892.9100000000003,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3112,
+    "current105A": 4138.96,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3280,
+    "current105A": 4362.400000000001,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3363,
+    "current105A": 4472.79,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3584,
+    "current105A": 4766.72,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3942,
+    "current105A": 5242.860000000001,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 1857,
+    "current105A": 2469.81,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2093,
+    "current105A": 2783.69,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2204,
+    "current105A": 2931.32,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2345,
+    "current105A": 3118.8500000000004,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2471,
+    "current105A": 3286.4300000000003,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2626,
+    "current105A": 3492.5800000000004,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2740,
+    "current105A": 3644.2000000000003,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 2913,
+    "current105A": 3874.2900000000004,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3071,
+    "current105A": 4084.4300000000003,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3148,
+    "current105A": 4186.84,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3355,
+    "current105A": 4462.150000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3690,
+    "current105A": 4907.7,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1709,
+    "current105A": 2272.9700000000003,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 1926,
+    "current105A": 2561.58,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2029,
+    "current105A": 2698.57,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2158,
+    "current105A": 2870.1400000000003,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2275,
+    "current105A": 3025.75,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2417,
+    "current105A": 3214.61,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2522,
+    "current105A": 3354.26,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2681,
+    "current105A": 3565.73,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2826,
+    "current105A": 3758.5800000000004,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2898,
+    "current105A": 3854.34,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3088,
+    "current105A": 4107.04,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3397,
+    "current105A": 4518.01,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1218.7864182592998,
+    "current105A": 2225.1893802051495,
+    "size": "63*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1373.5162904021197,
+    "current105A": 2507.686184513525,
+    "size": "63*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1446.2624243200125,
+    "current105A": 2640.501846240597,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1538.6384673903526,
+    "current105A": 2809.15665478291,
+    "size": "63*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1621.7769061536587,
+    "current105A": 2960.9459824709925,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1723.3905535310328,
+    "current105A": 3146.466271867537,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1797.8687382564945,
+    "current105A": 3282.4442112547777,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1911.6067412868508,
+    "current105A": 3490.100444272501,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2014.9524394717937,
+    "current105A": 3678.7830113292143,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2065.7592631604807,
+    "current105A": 3771.543156027487,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2201.436576420043,
+    "current105A": 4019.2549060740103,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "三条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2421.4070289812903,
+    "current105A": 4420.864168915395,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3209,
+    "current105A": 4267.97,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3591,
+    "current105A": 4776.030000000001,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3729,
+    "current105A": 4959.570000000001,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 4019,
+    "current105A": 5345.27,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 4132,
+    "current105A": 5495.56,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 4311,
+    "current105A": 5733.63,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 4428,
+    "current105A": 5889.240000000001,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 4703,
+    "current105A": 6254.990000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 5166,
+    "current105A": 6870.780000000001,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3016,
+    "current105A": 4011.28,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3375,
+    "current105A": 4488.75,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3505,
+    "current105A": 4661.650000000001,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3777,
+    "current105A": 5023.41,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3884,
+    "current105A": 5165.72,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 4052,
+    "current105A": 5389.16,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 4162,
+    "current105A": 5535.46,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 4420,
+    "current105A": 5878.6,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 4856,
+    "current105A": 6458.4800000000005,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2823,
+    "current105A": 3754.59,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3160,
+    "current105A": 4202.8,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3281,
+    "current105A": 4363.7300000000005,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3536,
+    "current105A": 4702.88,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3636,
+    "current105A": 4835.88,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3793,
+    "current105A": 5044.6900000000005,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3896,
+    "current105A": 5181.68,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 4138,
+    "current105A": 5503.54,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 4546,
+    "current105A": 6046.18,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2599,
+    "current105A": 3456.67,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2908,
+    "current105A": 3867.6400000000003,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3020,
+    "current105A": 4016.6000000000004,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3255,
+    "current105A": 4329.150000000001,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3346,
+    "current105A": 4450.18,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3491,
+    "current105A": 4643.030000000001,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3586,
+    "current105A": 4769.38,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3809,
+    "current105A": 5065.97,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 4184,
+    "current105A": 5564.72,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1852.717013829509,
+    "current105A": 3382.5830038267763,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2073.264816659946,
+    "current105A": 3785.24635922155,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2152.9391538081145,
+    "current105A": 3930.7111315892957,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2320.370731873106,
+    "current105A": 4236.397972072239,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2385.6113122915335,
+    "current105A": 4355.510430605248,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2488.9570104764766,
+    "current105A": 4544.192997661961,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2556.506991971663,
+    "current105A": 4667.521826408528,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2715.27831599881,
+    "current105A": 4957.397278590629,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2982.5914906336066,
+    "current105A": 5445.442130809949,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4278,
+    "current105A": 5689.740000000001,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4786,
+    "current105A": 6365.38,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4971,
+    "current105A": 6611.43,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 5357,
+    "current105A": 7124.81,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 5508,
+    "current105A": 7325.64,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 5747,
+    "current105A": 7643.51,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 5903,
+    "current105A": 7850.990000000001,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 6269,
+    "current105A": 8337.77,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 6887,
+    "current105A": 9159.710000000001,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4021,
+    "current105A": 5347.93,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4498,
+    "current105A": 5982.34,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4672,
+    "current105A": 6213.76,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 5035,
+    "current105A": 6696.55,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 5177,
+    "current105A": 6885.410000000001,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 5402,
+    "current105A": 7184.660000000001,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 5548,
+    "current105A": 7378.84,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 5892,
+    "current105A": 7836.360000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 6473,
+    "current105A": 8609.09,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3764,
+    "current105A": 5006.12,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4211,
+    "current105A": 5600.63,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4374,
+    "current105A": 5817.42,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4714,
+    "current105A": 6269.62,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4847,
+    "current105A": 6446.51,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 5057,
+    "current105A": 6725.81,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 5194,
+    "current105A": 6908.02,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 5516,
+    "current105A": 7336.280000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 6060,
+    "current105A": 8059.8,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3465,
+    "current105A": 4608.45,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3876,
+    "current105A": 5155.08,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 4026,
+    "current105A": 5354.58,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 4339,
+    "current105A": 5770.87,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 4461,
+    "current105A": 5933.13,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 4655,
+    "current105A": 6191.150000000001,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 4781,
+    "current105A": 6358.7300000000005,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 5077,
+    "current105A": 6752.410000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 5578,
+    "current105A": 7418.740000000001,
+    "size": "125*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2469.9044515932187,
+    "current105A": 4509.407943400109,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2763.1983883415487,
+    "current105A": 5044.886960521954,
+    "size": "80*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2870.0081881416295,
+    "current105A": 5239.894082899004,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 3092.865392048825,
+    "current105A": 5646.773808507336,
+    "size": "80*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 3180.0452826964583,
+    "current105A": 5805.941784069144,
+    "size": "100*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 3318.031997032779,
+    "current105A": 6057.869904329225,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 3408.0986390263606,
+    "current105A": 6222.308342657981,
+    "size": "100*10"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 3619.4088375497636,
+    "current105A": 6608.106217198523,
+    "size": "125*8"
+  },
+  {
+    "type": "铜导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 3976.2113039089522,
+    "current105A": 7259.535415193209,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2558,
+    "current105A": 3402.1400000000003,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 2863,
+    "current105A": 3807.7900000000004,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3032,
+    "current105A": 4032.5600000000004,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3167,
+    "current105A": 4212.110000000001,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3359,
+    "current105A": 4467.47,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3525,
+    "current105A": 4688.25,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3622,
+    "current105A": 4817.26,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 3847,
+    "current105A": 5116.51,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 25,
+    "current70A": 4225,
+    "current105A": 5619.25,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2404,
+    "current105A": 3197.32,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2691,
+    "current105A": 3579.03,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2850,
+    "current105A": 3790.5,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 2976,
+    "current105A": 3958.0800000000004,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3157,
+    "current105A": 4198.81,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3313,
+    "current105A": 4406.29,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3404,
+    "current105A": 4527.320000000001,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3616,
+    "current105A": 4809.280000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 30,
+    "current70A": 3971,
+    "current105A": 5281.43,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2251,
+    "current105A": 2993.8300000000004,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2519,
+    "current105A": 3350.27,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2668,
+    "current105A": 3548.44,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2786,
+    "current105A": 3705.38,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 2955,
+    "current105A": 3930.15,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3102,
+    "current105A": 4125.66,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3187,
+    "current105A": 4238.71,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3385,
+    "current105A": 4502.05,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 35,
+    "current70A": 3718,
+    "current105A": 4944.9400000000005,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2071,
+    "current105A": 2754.4300000000003,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2319,
+    "current105A": 3084.27,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2455,
+    "current105A": 3265.15,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2565,
+    "current105A": 3411.4500000000003,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2720,
+    "current105A": 3617.6000000000004,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2855,
+    "current105A": 3797.15,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 2933,
+    "current105A": 3900.8900000000003,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3116,
+    "current105A": 4144.280000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 40,
+    "current70A": 3422,
+    "current105A": 4551.26,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1476.8619885870626,
+    "current105A": 2696.368751570238,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1652.9538206898985,
+    "current105A": 3017.8669803540233,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1750.526016182945,
+    "current105A": 3196.008621876842,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1828.4683025235447,
+    "current105A": 3338.3111165844193,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 1939.319554207953,
+    "current105A": 3540.6968868351955,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2035.1596988934307,
+    "current105A": 3715.6762506978457,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2091.1626750048245,
+    "current105A": 3817.9232283766232,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2221.0664855724904,
+    "current105A": 4055.094052889252,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "平放",
+    "ambientC": 55,
+    "current70A": 2439.3048873261687,
+    "current105A": 4453.541038070467,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3411,
+    "current105A": 4536.63,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 3817,
+    "current105A": 5076.610000000001,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4043,
+    "current105A": 5377.1900000000005,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4222,
+    "current105A": 5615.26,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4479,
+    "current105A": 5957.070000000001,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4700,
+    "current105A": 6251,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 4829,
+    "current105A": 6422.570000000001,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 5129,
+    "current105A": 6821.570000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 25,
+    "current70A": 5633,
+    "current105A": 7491.89,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3206,
+    "current105A": 4263.9800000000005,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3587,
+    "current105A": 4770.71,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3800,
+    "current105A": 5054,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 3968,
+    "current105A": 5277.4400000000005,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4210,
+    "current105A": 5599.3,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4418,
+    "current105A": 5875.9400000000005,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4539,
+    "current105A": 6036.87,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 4821,
+    "current105A": 6411.93,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 30,
+    "current70A": 5295,
+    "current105A": 7042.35,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3001,
+    "current105A": 3991.3300000000004,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3358,
+    "current105A": 4466.14,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3557,
+    "current105A": 4730.81,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3715,
+    "current105A": 4940.95,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 3941,
+    "current105A": 5241.530000000001,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4136,
+    "current105A": 5500.88,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4249,
+    "current105A": 5651.17,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4513,
+    "current105A": 6002.29,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 35,
+    "current70A": 4957,
+    "current105A": 6592.81,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 2762,
+    "current105A": 3673.46,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3091,
+    "current105A": 4111.030000000001,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3274,
+    "current105A": 4354.42,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3419,
+    "current105A": 4547.27,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3627,
+    "current105A": 4823.91,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3807,
+    "current105A": 5063.31,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 3911,
+    "current105A": 5201.63,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 4154,
+    "current105A": 5524.820000000001,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 40,
+    "current70A": 4562,
+    "current105A": 6067.46,
+    "size": "125*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 1969.3417682058134,
+    "current105A": 3595.5096996114476,
+    "size": "80*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2203.7459774968015,
+    "current105A": 4023.4712762875683,
+    "size": "80*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2334.227138333657,
+    "current105A": 4261.696193353586,
+    "size": "100*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2437.5728365185996,
+    "current105A": 4450.378760410299,
+    "size": "80*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2585.9518557003335,
+    "current105A": 4721.28054663139,
+    "size": "100*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2713.5462651912408,
+    "current105A": 4954.235000930461,
+    "size": "125*6.3"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2788.0244499167025,
+    "current105A": 5090.2129403177005,
+    "size": "100*10"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 2961.2295306735905,
+    "current105A": 5406.44070633454,
+    "size": "125*8"
+  },
+  {
+    "type": "铝导体",
+    "parallelCount": "四条",
+    "orientation": "竖放",
+    "ambientC": 55,
+    "current70A": 3252.214066345162,
+    "current105A": 5937.703353242827,
+    "size": "125*10"
+  }
+]

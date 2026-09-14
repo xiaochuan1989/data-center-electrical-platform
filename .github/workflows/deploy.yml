@@ -36,8 +36,14 @@ jobs:
       - name: Install development dependencies
         run: python -m pip install -r requirements-dev.txt
 
+      - name: Install frontend dependencies
+        run: npm ci
+
       - name: Run full quality suite
         run: python dev_scripts/test.py --all
+
+      - name: Verify production build boundary
+        run: npm run test:build
 
   deploy:
     needs: quality
@@ -52,16 +58,18 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v6
 
-      - name: Prepare public site
-        shell: bash
-        run: |
-          mkdir -p public
-          cp index.html public/index.html
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Build static platform
+        run: npm ci && npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: 'public'
+          path: 'dist'
 
       - name: Deploy to GitHub Pages
         id: deployment

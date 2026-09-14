@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232d6a9f'/%3E%3Cpath d='M36 4 14 36h16l-2 24 22-34H34z' fill='%23fff'/%3E%3C/svg%3E">
-<title>UPS 智能选型助手</title>
+<title>数据中心电气设计与选型平台</title>
 <script>
-const APP_VERSION = "v1.8.39";
+const APP_VERSION = "v2.0.0";
 const DEBUG_MODE = false;
 const CLIENT_SIDE_ACCESS_CODE = '173205';
 const PRICE_VIEW_CODE = '314159';
 function debugLog(...args) {
   if (DEBUG_MODE) console.debug(...args);
 }
-document.title = "UPS 智能选型助手 " + APP_VERSION;
+document.title = "数据中心电气设计与选型平台 " + APP_VERSION;
 document.addEventListener("DOMContentLoaded", function() {
   const versionEl = document.getElementById("app-version");
   if (versionEl) versionEl.textContent = APP_VERSION;
@@ -479,7 +479,7 @@ function ensureLib(globalName) {
 <div id="auth-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#1a3a5c,#2563eb);display:flex;align-items:center;justify-content:center;z-index:99999;">
   <form onsubmit="checkAuth();return false" style="background:white;border-radius:16px;padding:48px 40px;width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
     <div class="iteaq-logo" style="width:186px;height:92px;margin:0 auto 16px" aria-label="iTeaQ 艾特网能"></div>
-    <h2 style="font-size:20px;font-weight:700;color:#16324f;margin-bottom:6px;">UPS 智能选型助手</h2>
+    <h2 style="font-size:20px;font-weight:700;color:#16324f;margin-bottom:6px;">数据中心电气设计与选型平台</h2>
     <p style="font-size:12px;color:#93a1b0;margin-bottom:4px;letter-spacing:.5px;">智能选型 · 电池配置 · 数据中心校核</p>
     <p style="font-size:13px;color:#888;margin-bottom:28px;">请输入访问密码</p>
     <input id="auth-input" type="password" placeholder="请输入密码"
@@ -518,7 +518,7 @@ function checkAuth(){
     <div class="appbar-brand">
       <div class="appbar-logo"><span class="iteaq-logo" aria-label="iTeaQ 艾特网能"></span></div>
       <div>
-        <div class="appbar-name">UPS 智能选型助手</div>
+        <div class="appbar-name">数据中心电气设计与选型平台</div>
         <div class="appbar-sub" id="data-source-label">内置数据 V8.0 | 太行UR / 昆仑UE / 祁连UM / 泰山UT | 共105款产品</div>
       </div>
     </div>
@@ -1477,7 +1477,7 @@ function checkAuth(){
   </div>
 </div>
 
-<div class="footer">UPS智能选型助手 <span id="app-version"></span> · 数据来源：常用UPS速查表V8.0</div>
+<div class="footer">数据中心电气设计与选型平台 <span id="app-version"></span> · UPS数据来源：常用UPS速查表V8.0</div>
 <div id="battery-data-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;overflow-y:auto;padding:20px">
   <div style="max-width:1200px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden">
     <div style="background:linear-gradient(135deg,#1a3a5c,#2563eb);color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center">
@@ -2116,8 +2116,8 @@ function getUpsCatalogSummaryDefaults(product, modularInfo) {
   const modulePrices = [];
   codeParts.forEach((codePart, index) => {
     const pricePart = priceParts[index] || '';
-    // 产品编码列只保存 PDF 中的 8 位数字；机柜/模块语义由同序目录价说明提供。
-    if (/模块/.test(pricePart)) {
+    // 产品编码列只保存 PDF 中的 8 位数字；公开构建不带目录价，用已核对的模块编码表保留机柜/功率模块语义。
+    if (UPS_POWER_MODULE_CODES.has(codePart) || /模块/.test(pricePart)) {
       moduleCodes.push(codePart);
       if (pricePart) modulePrices.push(pricePart);
     } else {
@@ -2137,6 +2137,8 @@ function getUpsCatalogSummaryDefaults(product, modularInfo) {
   };
 }
 
+const UPS_POWER_MODULE_CODES = new Set(['01021118', '01020386', '01020387', '01021107', '01021115']);
+
 function getUpsCatalogCodeDisplayEntries(product) {
   const codes = String(product?.['产品编码'] || '').split(/[；;]/).map(item => item.trim()).filter(Boolean);
   const priceParts = String(product?.['目录价'] || '').split(/[；;]/).map(item => item.trim());
@@ -2147,6 +2149,8 @@ function getUpsCatalogCodeDisplayEntries(product) {
     if (label && /模块/.test(label) && !/功率模块/.test(label)) {
       label = label.replace(/模块/g, '功率模块');
     }
+    if (!label && UPS_POWER_MODULE_CODES.has(code)) label = '功率模块';
+    if (!label && codes.length > 1) label = '机柜';
     return { code, label };
   });
 }
@@ -2636,7 +2640,7 @@ h1{color:#1a3a5c}h2{color:#2563eb;border-bottom:2px solid #e8e8e8;padding-bottom
 <h2>二、需求分析</h2><div class="analysis">${lastResult.analysis||""}</div>
 <h2>三、推荐产品详情</h2>${productsHtml}
 <div style="margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#aaa;text-align:center">
-本方案由 UPS智能选型助手 自动生成，仅供参考，具体选型请结合现场情况确认</div>
+本方案由 数据中心电气设计与选型平台 自动生成，仅供参考，具体选型请结合现场情况确认</div>
 </body></html>`;
 
   const a = Object.assign(document.createElement("a"), {
@@ -2797,7 +2801,7 @@ th,td{border:1px solid #d9e2ec;padding:8px 10px;vertical-align:top}.summary-tabl
 <h1>UPS项目技术说明</h1>
 <div class="meta">生成日期：${escapeHtml(date)} | 工具版本：${escapeHtml(APP_VERSION)} | 数据来源：常用UPS速查表V8.0</div>
 ${dcHtml}${runtimeHtml}${batteryHtml}${summaryHtml}${aiHtml}
-<div class="meta" style="margin-top:32px;border-top:1px solid #e5eef7;padding-top:12px">本说明由UPS智能选型助手自动生成，正式投标或设计交付前请结合现场条件、厂家曲线和项目规范复核。</div>
+<div class="meta" style="margin-top:32px;border-top:1px solid #e5eef7;padding-top:12px">本说明由数据中心电气设计与选型平台自动生成，正式投标或设计交付前请结合现场条件、厂家曲线和项目规范复核。</div>
 </body></html>`;
 
   var fileDate = new Date().toISOString().slice(0, 10);
@@ -30809,7 +30813,7 @@ function buildDatabaseProductPopoutHtml(product) {
 @media(max-width:1200px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:760px){.summary{grid-template-columns:repeat(3,minmax(0,1fr))}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.window-tip{white-space:normal}.content{padding:14px}.header{padding:16px}.title{font-size:20px}}
 </style></head><body>
 <header class="header"><div class="topline"><div class="eyebrow">UPS 型号数据全景 · 独立窗口</div><div class="window-tip">可拖到另一台显示器 · 上下左右边缘均可调整大小</div></div><div class="title-line"><span class="series">${escapeHtml(product['系列'] || 'UPS')}</span><h1 class="title">${escapeHtml(product['型号'] || '未命名型号')}</h1></div><p class="desc">${escapeHtml(product['描述'] || '暂无产品描述')}</p></header>
-<main class="content"><div class="summary">${summaryHtml}</div><section class="section"><div class="section-head blue"><span>📋 产品信息</span><span class="count">${productCount} 项</span></div><div class="grid">${productFields}</div></section><section class="section"><div class="section-head green"><span>🔧 技术规格（泰尔参数）</span><span class="count">${techCount} 项</span></div><div class="grid">${techFields}</div></section></main><footer class="footer">UPS 智能选型助手 ${escapeHtml(APP_VERSION)} · 主页面点击其他型号时本窗口自动更新</footer>
+<main class="content"><div class="summary">${summaryHtml}</div><section class="section"><div class="section-head blue"><span>📋 产品信息</span><span class="count">${productCount} 项</span></div><div class="grid">${productFields}</div></section><section class="section"><div class="section-head green"><span>🔧 技术规格（泰尔参数）</span><span class="count">${techCount} 项</span></div><div class="grid">${techFields}</div></section></main><footer class="footer">数据中心电气设计与选型平台 ${escapeHtml(APP_VERSION)} · 主页面点击其他型号时本窗口自动更新</footer>
 </body></html>`;
 }
 
@@ -31363,5 +31367,6 @@ async function handleDocUpload(input) {
   input.value = '';
 }
 </script>
+<script type="module" src="./src/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,778 @@
+[
+  {
+    "spec": "15 x 3",
+    "configuration": "单片",
+    "coatedCurrentA": 187,
+    "bareCurrentA": 162,
+    "areaMm2": 45,
+    "note": ""
+  },
+  {
+    "spec": "20 x 3",
+    "configuration": "单片",
+    "coatedCurrentA": 237,
+    "bareCurrentA": 204,
+    "areaMm2": 60,
+    "note": ""
+  },
+  {
+    "spec": "20 x 4",
+    "configuration": "单片",
+    "coatedCurrentA": 278,
+    "bareCurrentA": 239,
+    "areaMm2": 80,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "20 x 5",
+    "configuration": "单片",
+    "coatedCurrentA": 319,
+    "bareCurrentA": 274,
+    "areaMm2": 100,
+    "note": ""
+  },
+  {
+    "spec": "25 x 3",
+    "configuration": "单片",
+    "coatedCurrentA": 287,
+    "bareCurrentA": 245,
+    "areaMm2": 75,
+    "note": ""
+  },
+  {
+    "spec": "25 x 5",
+    "configuration": "单片",
+    "coatedCurrentA": 384,
+    "bareCurrentA": 327,
+    "areaMm2": 125,
+    "note": ""
+  },
+  {
+    "spec": "30 x 3",
+    "configuration": "单片",
+    "coatedCurrentA": 337,
+    "bareCurrentA": 285,
+    "areaMm2": 90,
+    "note": ""
+  },
+  {
+    "spec": "30 x 4",
+    "configuration": "单片",
+    "coatedCurrentA": 392,
+    "bareCurrentA": 332,
+    "areaMm2": 120,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "30 x 5",
+    "configuration": "单片",
+    "coatedCurrentA": 447,
+    "bareCurrentA": 379,
+    "areaMm2": 150,
+    "note": ""
+  },
+  {
+    "spec": "30 x 6",
+    "configuration": "单片",
+    "coatedCurrentA": 492,
+    "bareCurrentA": 417,
+    "areaMm2": 180,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "30 x 8",
+    "configuration": "单片",
+    "coatedCurrentA": 584,
+    "bareCurrentA": 495,
+    "areaMm2": 240,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "30 x 10",
+    "configuration": "单片",
+    "coatedCurrentA": 676,
+    "bareCurrentA": 573,
+    "areaMm2": 300,
+    "note": ""
+  },
+  {
+    "spec": "40 x 3",
+    "configuration": "单片",
+    "coatedCurrentA": 435,
+    "bareCurrentA": 366,
+    "areaMm2": 120,
+    "note": ""
+  },
+  {
+    "spec": "40 x 4",
+    "configuration": "单片",
+    "coatedCurrentA": 504,
+    "bareCurrentA": 424,
+    "areaMm2": 160,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "40 x 5",
+    "configuration": "单片",
+    "coatedCurrentA": 573,
+    "bareCurrentA": 482,
+    "areaMm2": 200,
+    "note": ""
+  },
+  {
+    "spec": "40 x 6",
+    "configuration": "单片",
+    "coatedCurrentA": 628,
+    "bareCurrentA": 528,
+    "areaMm2": 240,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "40 x 8",
+    "configuration": "单片",
+    "coatedCurrentA": 739,
+    "bareCurrentA": 621,
+    "areaMm2": 320,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "40 x 10",
+    "configuration": "单片",
+    "coatedCurrentA": 850,
+    "bareCurrentA": 715,
+    "areaMm2": 400,
+    "note": ""
+  },
+  {
+    "spec": "50 x 5",
+    "configuration": "单片",
+    "coatedCurrentA": 697,
+    "bareCurrentA": 583,
+    "areaMm2": 250,
+    "note": ""
+  },
+  {
+    "spec": "50 x 6",
+    "configuration": "单片",
+    "coatedCurrentA": 761,
+    "bareCurrentA": 636,
+    "areaMm2": 300,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "50 x 8",
+    "configuration": "单片",
+    "coatedCurrentA": 890,
+    "bareCurrentA": 744,
+    "areaMm2": 400,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "50 x 10",
+    "configuration": "单片",
+    "coatedCurrentA": 1020,
+    "bareCurrentA": 852,
+    "areaMm2": 500,
+    "note": ""
+  },
+  {
+    "spec": "60 x 5",
+    "configuration": "单片",
+    "coatedCurrentA": 826,
+    "bareCurrentA": 688,
+    "areaMm2": 300,
+    "note": ""
+  },
+  {
+    "spec": "60 x 6",
+    "configuration": "单片",
+    "coatedCurrentA": 896,
+    "bareCurrentA": 747,
+    "areaMm2": 360,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "60 x 8",
+    "configuration": "单片",
+    "coatedCurrentA": 1038,
+    "bareCurrentA": 866,
+    "areaMm2": 480,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "60 x 10",
+    "configuration": "单片",
+    "coatedCurrentA": 1180,
+    "bareCurrentA": 985,
+    "areaMm2": 600,
+    "note": ""
+  },
+  {
+    "spec": "80 x 5",
+    "configuration": "单片",
+    "coatedCurrentA": 1070,
+    "bareCurrentA": 885,
+    "areaMm2": 400,
+    "note": ""
+  },
+  {
+    "spec": "80 x 6",
+    "configuration": "单片",
+    "coatedCurrentA": 1156,
+    "bareCurrentA": 956,
+    "areaMm2": 480,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "80 x 8",
+    "configuration": "单片",
+    "coatedCurrentA": 1328,
+    "bareCurrentA": 1098,
+    "areaMm2": 640,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "80 x 10",
+    "configuration": "单片",
+    "coatedCurrentA": 1500,
+    "bareCurrentA": 1240,
+    "areaMm2": 800,
+    "note": ""
+  },
+  {
+    "spec": "100 x 5",
+    "configuration": "单片",
+    "coatedCurrentA": 1300,
+    "bareCurrentA": 1080,
+    "areaMm2": 500,
+    "note": ""
+  },
+  {
+    "spec": "100 x 6",
+    "configuration": "单片",
+    "coatedCurrentA": 1402,
+    "bareCurrentA": 1162,
+    "areaMm2": 600,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "100 x 8",
+    "configuration": "单片",
+    "coatedCurrentA": 1606,
+    "bareCurrentA": 1326,
+    "areaMm2": 800,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "100 x 10",
+    "configuration": "单片",
+    "coatedCurrentA": 1810,
+    "bareCurrentA": 1490,
+    "areaMm2": 1000,
+    "note": ""
+  },
+  {
+    "spec": "120 x 10",
+    "configuration": "单片",
+    "coatedCurrentA": 2110,
+    "bareCurrentA": 1740,
+    "areaMm2": 1200,
+    "note": ""
+  },
+  {
+    "spec": "125 x 10",
+    "configuration": "单片",
+    "coatedCurrentA": 2183,
+    "bareCurrentA": 1800,
+    "areaMm2": 1250,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "2 x 12 x 2",
+    "configuration": "双拼",
+    "coatedCurrentA": 202,
+    "bareCurrentA": 182,
+    "areaMm2": 48,
+    "note": ""
+  },
+  {
+    "spec": "2 x 15 x 2",
+    "configuration": "双拼",
+    "coatedCurrentA": 240,
+    "bareCurrentA": 212,
+    "areaMm2": 60,
+    "note": ""
+  },
+  {
+    "spec": "2 x 15 x 3",
+    "configuration": "双拼",
+    "coatedCurrentA": 316,
+    "bareCurrentA": 282,
+    "areaMm2": 90,
+    "note": ""
+  },
+  {
+    "spec": "2 x 20 x 2",
+    "configuration": "双拼",
+    "coatedCurrentA": 302,
+    "bareCurrentA": 264,
+    "areaMm2": 80,
+    "note": ""
+  },
+  {
+    "spec": "2 x 20 x 3",
+    "configuration": "双拼",
+    "coatedCurrentA": 394,
+    "bareCurrentA": 348,
+    "areaMm2": 120,
+    "note": ""
+  },
+  {
+    "spec": "2 x 20 x 5",
+    "configuration": "双拼",
+    "coatedCurrentA": 560,
+    "bareCurrentA": 500,
+    "areaMm2": 200,
+    "note": ""
+  },
+  {
+    "spec": "2 x 20 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 924,
+    "bareCurrentA": 825,
+    "areaMm2": 400,
+    "note": ""
+  },
+  {
+    "spec": "2 x 25 x 3",
+    "configuration": "双拼",
+    "coatedCurrentA": 470,
+    "bareCurrentA": 412,
+    "areaMm2": 150,
+    "note": ""
+  },
+  {
+    "spec": "2 x 25 x 5",
+    "configuration": "双拼",
+    "coatedCurrentA": 662,
+    "bareCurrentA": 586,
+    "areaMm2": 250,
+    "note": ""
+  },
+  {
+    "spec": "2 x 30 x 3",
+    "configuration": "双拼",
+    "coatedCurrentA": 544,
+    "bareCurrentA": 476,
+    "areaMm2": 180,
+    "note": ""
+  },
+  {
+    "spec": "2 x 30 x 5",
+    "configuration": "双拼",
+    "coatedCurrentA": 760,
+    "bareCurrentA": 672,
+    "areaMm2": 300,
+    "note": ""
+  },
+  {
+    "spec": "2 x 30 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 1200,
+    "bareCurrentA": 1060,
+    "areaMm2": 600,
+    "note": ""
+  },
+  {
+    "spec": "2 x 40 x 3",
+    "configuration": "双拼",
+    "coatedCurrentA": 692,
+    "bareCurrentA": 600,
+    "areaMm2": 240,
+    "note": ""
+  },
+  {
+    "spec": "2 x 40 x 5",
+    "configuration": "双拼",
+    "coatedCurrentA": 952,
+    "bareCurrentA": 836,
+    "areaMm2": 400,
+    "note": ""
+  },
+  {
+    "spec": "2 x 40 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 1470,
+    "bareCurrentA": 1290,
+    "areaMm2": 800,
+    "note": ""
+  },
+  {
+    "spec": "2 x 50 x 5",
+    "configuration": "双拼",
+    "coatedCurrentA": 1140,
+    "bareCurrentA": 994,
+    "areaMm2": 500,
+    "note": ""
+  },
+  {
+    "spec": "2 x 50 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 1720,
+    "bareCurrentA": 1510,
+    "areaMm2": 1000,
+    "note": ""
+  },
+  {
+    "spec": "2 x 60 x 5",
+    "configuration": "双拼",
+    "coatedCurrentA": 1330,
+    "bareCurrentA": 1150,
+    "areaMm2": 600,
+    "note": ""
+  },
+  {
+    "spec": "2 x 60 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 1960,
+    "bareCurrentA": 1720,
+    "areaMm2": 1200,
+    "note": ""
+  },
+  {
+    "spec": "2 x 80 x 5",
+    "configuration": "双拼",
+    "coatedCurrentA": 1680,
+    "bareCurrentA": 1450,
+    "areaMm2": 800,
+    "note": ""
+  },
+  {
+    "spec": "2 x 80 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 2410,
+    "bareCurrentA": 2110,
+    "areaMm2": 1600,
+    "note": ""
+  },
+  {
+    "spec": "2 x 100 x 5",
+    "configuration": "双拼",
+    "coatedCurrentA": 2010,
+    "bareCurrentA": 1730,
+    "areaMm2": 1000,
+    "note": ""
+  },
+  {
+    "spec": "2 x 100 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 2850,
+    "bareCurrentA": 2480,
+    "areaMm2": 2000,
+    "note": ""
+  },
+  {
+    "spec": "2 x 120 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 3280,
+    "bareCurrentA": 2860,
+    "areaMm2": 2400,
+    "note": ""
+  },
+  {
+    "spec": "2 x 125 x 10",
+    "configuration": "双拼",
+    "coatedCurrentA": 3386,
+    "bareCurrentA": 2951,
+    "areaMm2": 2500,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "3 x 12 x 2",
+    "configuration": "三拼",
+    "coatedCurrentA": 228,
+    "bareCurrentA": 216,
+    "areaMm2": 72,
+    "note": ""
+  },
+  {
+    "spec": "3 x 15 x 2",
+    "configuration": "三拼",
+    "coatedCurrentA": 261,
+    "bareCurrentA": 247,
+    "areaMm2": 90,
+    "note": ""
+  },
+  {
+    "spec": "3 x 15 x 3",
+    "configuration": "三拼",
+    "coatedCurrentA": 381,
+    "bareCurrentA": 361,
+    "areaMm2": 135,
+    "note": ""
+  },
+  {
+    "spec": "3 x 20 x 2",
+    "configuration": "三拼",
+    "coatedCurrentA": 313,
+    "bareCurrentA": 298,
+    "areaMm2": 120,
+    "note": ""
+  },
+  {
+    "spec": "3 x 20 x 3",
+    "configuration": "三拼",
+    "coatedCurrentA": 454,
+    "bareCurrentA": 431,
+    "areaMm2": 180,
+    "note": ""
+  },
+  {
+    "spec": "3 x 20 x 5",
+    "configuration": "三拼",
+    "coatedCurrentA": 728,
+    "bareCurrentA": 690,
+    "areaMm2": 300,
+    "note": ""
+  },
+  {
+    "spec": "3 x 20 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 1320,
+    "bareCurrentA": 1180,
+    "areaMm2": 600,
+    "note": ""
+  },
+  {
+    "spec": "3 x 25 x 3",
+    "configuration": "三拼",
+    "coatedCurrentA": 525,
+    "bareCurrentA": 498,
+    "areaMm2": 225,
+    "note": ""
+  },
+  {
+    "spec": "3 x 25 x 5",
+    "configuration": "三拼",
+    "coatedCurrentA": 839,
+    "bareCurrentA": 795,
+    "areaMm2": 375,
+    "note": ""
+  },
+  {
+    "spec": "3 x 30 x 3",
+    "configuration": "三拼",
+    "coatedCurrentA": 593,
+    "bareCurrentA": 564,
+    "areaMm2": 270,
+    "note": ""
+  },
+  {
+    "spec": "3 x 30 x 5",
+    "configuration": "三拼",
+    "coatedCurrentA": 944,
+    "bareCurrentA": 896,
+    "areaMm2": 450,
+    "note": ""
+  },
+  {
+    "spec": "3 x 30 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 1670,
+    "bareCurrentA": 1480,
+    "areaMm2": 900,
+    "note": ""
+  },
+  {
+    "spec": "3 x 40 x 3",
+    "configuration": "三拼",
+    "coatedCurrentA": 725,
+    "bareCurrentA": 690,
+    "areaMm2": 360,
+    "note": ""
+  },
+  {
+    "spec": "3 x 40 x 5",
+    "configuration": "三拼",
+    "coatedCurrentA": 1140,
+    "bareCurrentA": 1090,
+    "areaMm2": 600,
+    "note": ""
+  },
+  {
+    "spec": "3 x 40 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 2000,
+    "bareCurrentA": 1770,
+    "areaMm2": 1200,
+    "note": ""
+  },
+  {
+    "spec": "3 x 50 x 5",
+    "configuration": "三拼",
+    "coatedCurrentA": 1330,
+    "bareCurrentA": 1260,
+    "areaMm2": 750,
+    "note": ""
+  },
+  {
+    "spec": "3 x 50 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 2320,
+    "bareCurrentA": 2040,
+    "areaMm2": 1500,
+    "note": ""
+  },
+  {
+    "spec": "3 x 60 x 5",
+    "configuration": "三拼",
+    "coatedCurrentA": 1510,
+    "bareCurrentA": 1440,
+    "areaMm2": 900,
+    "note": ""
+  },
+  {
+    "spec": "3 x 60 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 2610,
+    "bareCurrentA": 2300,
+    "areaMm2": 1800,
+    "note": ""
+  },
+  {
+    "spec": "3 x 80 x 5",
+    "configuration": "三拼",
+    "coatedCurrentA": 1830,
+    "bareCurrentA": 1750,
+    "areaMm2": 1200,
+    "note": ""
+  },
+  {
+    "spec": "3 x 80 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 3170,
+    "bareCurrentA": 2790,
+    "areaMm2": 2400,
+    "note": ""
+  },
+  {
+    "spec": "3 x 100 x 5",
+    "configuration": "三拼",
+    "coatedCurrentA": 2150,
+    "bareCurrentA": 2050,
+    "areaMm2": 1500,
+    "note": ""
+  },
+  {
+    "spec": "3 x 100 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 3720,
+    "bareCurrentA": 3260,
+    "areaMm2": 3000,
+    "note": ""
+  },
+  {
+    "spec": "3 x 120 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 4270,
+    "bareCurrentA": 3740,
+    "areaMm2": 3600,
+    "note": ""
+  },
+  {
+    "spec": "3 x 125 x 10",
+    "configuration": "三拼",
+    "coatedCurrentA": 4406,
+    "bareCurrentA": 3857,
+    "areaMm2": 3750,
+    "note": "根据插入法计算"
+  },
+  {
+    "spec": "4 x 40 x 10",
+    "configuration": "四拼",
+    "coatedCurrentA": 2580,
+    "bareCurrentA": 2280,
+    "areaMm2": 1600,
+    "note": ""
+  },
+  {
+    "spec": "4 x 50 x 5",
+    "configuration": "四拼",
+    "coatedCurrentA": 2010,
+    "bareCurrentA": 1920,
+    "areaMm2": 1000,
+    "note": ""
+  },
+  {
+    "spec": "4 x 50 x 10",
+    "configuration": "四拼",
+    "coatedCurrentA": 2950,
+    "bareCurrentA": 2600,
+    "areaMm2": 2000,
+    "note": ""
+  },
+  {
+    "spec": "4 x 60 x 5",
+    "configuration": "四拼",
+    "coatedCurrentA": 2310,
+    "bareCurrentA": 2210,
+    "areaMm2": 1200,
+    "note": ""
+  },
+  {
+    "spec": "4 x 60 x 10",
+    "configuration": "四拼",
+    "coatedCurrentA": 3290,
+    "bareCurrentA": 2900,
+    "areaMm2": 2400,
+    "note": ""
+  },
+  {
+    "spec": "4 x 80 x 5",
+    "configuration": "四拼",
+    "coatedCurrentA": 2830,
+    "bareCurrentA": 2720,
+    "areaMm2": 1600,
+    "note": ""
+  },
+  {
+    "spec": "4 x 80 x 10",
+    "configuration": "四拼",
+    "coatedCurrentA": 3930,
+    "bareCurrentA": 3450,
+    "areaMm2": 3200,
+    "note": ""
+  },
+  {
+    "spec": "4 x 100 x 5",
+    "configuration": "四拼",
+    "coatedCurrentA": 3300,
+    "bareCurrentA": 3190,
+    "areaMm2": 2000,
+    "note": ""
+  },
+  {
+    "spec": "4 x 100 x 10",
+    "configuration": "四拼",
+    "coatedCurrentA": 4530,
+    "bareCurrentA": 3980,
+    "areaMm2": 4000,
+    "note": ""
+  },
+  {
+    "spec": "4 x 120 x 10",
+    "configuration": "四拼",
+    "coatedCurrentA": 5130,
+    "bareCurrentA": 4500,
+    "areaMm2": 4800,
+    "note": ""
+  },
+  {
+    "spec": "4 x 125 x 10",
+    "configuration": "四拼",
+    "coatedCurrentA": 5278,
+    "bareCurrentA": 4628,
+    "areaMm2": 5000,
+    "note": "根据插入法计算"
+  }
+]

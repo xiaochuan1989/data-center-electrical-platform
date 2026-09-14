@@ -1,0 +1,16 @@
+{
+  "name": "data-center-electrical-design-platform",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node dev_scripts/test_platform_v2.mjs",
+    "test:build": "npm run build && node dev_scripts/check_public_build.mjs"
+  },
+  "devDependencies": {
+    "vite": "^7.1.5"
+  }
+}

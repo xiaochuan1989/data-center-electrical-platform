@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-UPS 智能选型助手 - 测试入口
+数据中心电气设计与选型平台 - 测试入口
 ===========================
 
 整合所有开发验证脚本，统一入口。
@@ -44,7 +44,7 @@ def run_script(script_path: Path, description: str) -> bool:
         return False
 
     try:
-        if script_path.suffix == ".js":
+        if script_path.suffix in {".js", ".mjs"}:
             executable = shutil.which("node")
             if not executable:
                 print("❌ 未找到 Node.js")
@@ -181,7 +181,7 @@ def main():
 
     # 打印标题
     print("="*50)
-    print("⚡ UPS 智能选型助手 - 测试系统")
+    print("⚡ 数据中心电气设计与选型平台 - 测试系统")
     print("="*50)
     print(f"项目路径: {PROJECT_ROOT}")
     print(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -227,6 +227,10 @@ def main():
         )
 
     if args.quick or args.all:
+        results['v2平台'] = run_script(
+            DEV_SCRIPTS_DIR / "test_platform_v2.mjs",
+            "v2 平台与工程计算测试"
+        )
         results['业务规则'] = run_script(
             DEV_SCRIPTS_DIR / "test_business_rules.js",
             "核心业务规则测试"

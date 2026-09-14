@@ -38,14 +38,13 @@ def main() -> int:
         )
 
     docs = [
-        ("README.md", r"\*\*版本\*\*:\s*(v\d+\.\d+\.\d+)"),
-        ("UPS选型助手_开发文档.md", r">\s*版本：\s*(v\d+\.\d+\.\d+)"),
-        ("UPS选型助手_开发说明.md", r">\s*版本：\s*(v\d+\.\d+\.\d+)"),
+        ("README.md", r"\*\*版本\*\*[：:]\s*(v\d+\.\d+\.\d+)"),
+        ("package.json", r'"version"\s*:\s*"(\d+\.\d+\.\d+)"'),
     ]
 
     for path, pattern in docs:
         version = find_required(pattern, read_text(path), path)
-        checks.append((path, version))
+        checks.append((path, f"v{version}" if path == "package.json" else version))
 
     mismatches = [(label, version) for label, version in checks if version != app_version]
     if mismatches:
