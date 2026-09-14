@@ -114,6 +114,38 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .catalog-answer strong { display: block; margin: 5px 0 10px; color: #174a78; font-size: 22px; }
 .catalog-answer pre { max-height: 260px; overflow: auto; margin: 0; padding: 12px; border-radius: 6px; color: #35526c; background: #edf4fa; font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; }
 
+.cable-pane[hidden] { display: none; }
+.cable-tabs button span { margin-left: 4px; opacity: .78; font-size: 11px; }
+.cable-source-note { margin-top: 18px; }
+.cable-inputs label:has(:disabled) { opacity: .66; }
+.cable-inputs select:disabled { cursor: not-allowed; background: #f0f4f7; }
+.cable-factor-preview { min-height: 64px; display: grid; grid-template-columns: 1fr auto; align-content: center; gap: 3px 8px; padding: 9px 12px; border: 1px solid #bfd6ed; border-radius: 8px; color: #587087; background: #f0f7fe; box-sizing: border-box; }
+.cable-factor-preview span, .cable-factor-preview small { grid-column: 1 / -1; font-size: 11px; }
+.cable-factor-preview strong { color: #174f80; font-size: 22px; }
+.cable-result { margin-top: 16px; }
+.cable-result-hero { display: grid; grid-template-columns: 1.2fr repeat(3, 1fr); gap: 12px; }
+.cable-result-hero > div { min-height: 112px; display: flex; flex-direction: column; justify-content: center; padding: 16px 18px; border: 1px solid #d7e4ef; border-radius: 10px; background: #f8fbfe; }
+.cable-result-hero span { color: #687c90; font-size: 12px; }
+.cable-result-hero strong { margin: 6px 0 4px; color: #153f67; font-size: 25px; }
+.cable-result-hero small { color: #6f8295; }
+.cable-best-size { border-color: #9fc1e9 !important; background: #eef6ff !important; }
+.cable-best-size strong { color: #155eef !important; font-size: 29px !important; }
+.cable-load-gauge.safe { border-color: #b8dfca; background: #effaf4; }
+.cable-load-gauge.safe strong { color: #18734a; }
+.cable-load-gauge.warning { border-color: #f0ce83; background: #fff8e6; }
+.cable-load-gauge.warning strong { color: #a26708; }
+.cable-result-detail { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 1px; margin-top: 12px; padding: 1px; border: 1px solid #dbe6ef; border-radius: 8px; overflow: hidden; background: #dbe6ef; }
+.cable-result-detail span { padding: 11px 13px; color: #425b72; background: #fff; font-size: 12px; }
+.cable-result-detail b { display: block; margin-bottom: 4px; color: #718397; font-size: 11px; }
+.awg-query { display: grid; grid-template-columns: minmax(220px, 420px) 140px; gap: 12px; align-items: end; margin-top: 20px; }
+.awg-query label { display: flex; flex-direction: column; gap: 6px; color: #5b6f83; font-size: 12px; }
+.awg-query select { min-height: 39px; padding: 8px 10px; border: 1px solid #ccd9e5; border-radius: 7px; color: #183b5e; background: #fff; }
+.awg-query button { min-height: 39px; border: 1px solid; border-radius: 7px; cursor: pointer; font-weight: 700; }
+.no-result { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.no-result b { flex-basis: 100%; color: #264b6c; }
+.no-result span { color: #677d91; font-size: 12px; }
+.no-result button { min-height: 34px; padding: 0 12px; border: 1px solid #b8cee2; border-radius: 6px; color: #1e5687; background: #fff; cursor: pointer; }
+
 .busbar-tabs button span { margin-left: 4px; opacity: .78; font-size: 11px; }
 .busbar-source-note { display: flex; gap: 12px; align-items: flex-start; margin-top: 18px; padding: 13px 15px; border-left: 4px solid #3979bd; border-radius: 7px; color: #526b82; background: #f1f7fd; font-size: 12px; line-height: 1.6; }
 .busbar-source-note b { flex: none; color: #214f78; }
@@ -190,7 +222,8 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .tool-grid { grid-template-columns: repeat(2, minmax(210px, 1fr)); }
   .project-flow { grid-template-columns: repeat(7, 145px); }
   .delivery-summary dl { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
-  .busbar-result-hero, .busbar-formula-strip { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+  .busbar-result-hero, .busbar-formula-strip, .cable-result-hero { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+  .cable-result-detail { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
 }
 
 @media (max-width: 900px) {
@@ -208,6 +241,7 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .platform-form-grid, .platform-form-grid.cols-2, .platform-form-grid.cols-4 { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
   .platform-metrics, .result-grid { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
   .busbar-result-hero { grid-template-columns: 1fr; }
+  .cable-result-hero { grid-template-columns: 1fr; }
   .busbar-formula-strip { grid-template-columns: 1fr; }
   .busbar-catalog-toolbar { grid-template-columns: 1fr 1fr; }
   .busbar-table-summary { padding-top: 0; }
@@ -220,4 +254,5 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .platform-section-head { padding: 17px 15px 14px; }
   .project-toolbar label { min-width: 100%; }
   .busbar-catalog-toolbar { grid-template-columns: 1fr; }
+  .cable-result-detail, .awg-query { grid-template-columns: 1fr; }
 }

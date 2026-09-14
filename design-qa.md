@@ -1,71 +1,44 @@
-# Copper Busbar Page and Collapsible Sidebar — Design QA
+# Design QA — 电缆选型 v2.2.0
 
-## Evidence
+- Source visual truth: `C:/Users/woaig/AppData/Local/Temp/codex-clipboard-b5864b99-697a-4811-a6f1-1267c74f0cfe.png`
+- Implementation screenshot: `D:/Claude 安装/UPS选型助手_开发包/output/playwright/cable-selection-v2.2.0.png`
+- Viewport: 1600 × 900 CSS px
+- Source pixels: 1997 × 362; implementation pixels: 1600 × 900
+- Density normalization: both images reviewed at CSS scale 1; the source is a wide cropped content view, so comparison focused on the page header, form rhythm, warning treatment and primary action rather than identical full-frame geometry.
+- State: authenticated desktop view, 电缆智能选型 tab, YJV 三芯/五芯、35℃、400A、2 根并联、2 根并列，calculated result visible.
 
-- Source data table: `C:/Users/woaig/AppData/Local/Temp/codex-clipboard-5ab43b10-357e-4b66-928f-bbaec2f78523.png` (675 × 1158 px).
-- Source calculation layout and values: `C:/Users/woaig/AppData/Local/Temp/codex-clipboard-51aba6f2-ff08-4ed2-9217-f9ecda228c94.png` (816 × 984 px).
-- Source sidebar state: `C:/Users/woaig/AppData/Local/Temp/codex-clipboard-dbe949e2-8333-48ba-9134-fbf8062d3cc2.png` (1136 × 1097 px).
-- Formula source: `工具模板/铜排载流量-A03.xlsx`, sheets `Calc!A1:C22` and `Data!A1:G98`.
-- Implementation: `http://localhost:4173/`, captured in Chromium through Playwright at 1440 × 900 CSS pixels with device scale factor 1.
-- Implementation screenshots: `output/playwright/sidebar-expanded-v211.png` and `output/playwright/sidebar-collapsed-v211.png` (both 1440 × 900 px).
-- State: authenticated desktop project-workbench view, with the new explicit sidebar control tested in expanded and collapsed states. The earlier copper-busbar calculator evidence remains valid.
-- Density normalization: the 1136 × 1097 source screenshot and 1440 × 900 implementation are different desktop crops, so comparison focused on the app-owned left navigation region and interaction state rather than pixel-for-pixel page width.
+## Full-view comparison evidence
 
-## Full-view comparison
+The implementation preserves the existing platform shell, white card surface, blue primary action, four-column form rhythm and amber engineering warning shown in the source. The old wide three-field strip has been intentionally expanded to the Excel-required parameter set. The result remains visible in the first desktop viewport and the left navigation does not overlap the workspace.
 
-- The new page follows the existing platform's navy, blue, white and pale-gray design tokens, card radii, input sizing and table density.
-- The calculator preserves the four A03 inputs and makes the previously hidden coefficient and lookup-current steps visible without adding unsupported engineering assumptions.
-- The data table retains all seven source columns, uses a sticky header and has its own vertical and horizontal scrolling region.
-- The expanded sidebar matches the supplied platform structure and now starts with an unmistakable “收起导航” control. The collapsed state reduces it from 232px to a measured 70px icon rail, changes the control to a right-facing expand affordance, and preserves active-item highlighting and title tooltips.
+## Focused region comparison evidence
 
-## Focused comparison
-
-- `1600A + 通风 + 光裸/全镀锡 + IEC增强(50K)` returned `80 x 10`, `单片`, `1240A`, `800mm²`, `400mm² PE`, coefficient `1.3`, lookup current `1230.8A`, and load rate `99.3%`, matching the A03 cached workbook values within display precision.
-- The first data rows and the `80 x 10` row match the supplied Data-sheet screenshot. Filtering `80 x 10` returned the single, double, triple and quadruple configurations (4 of 97 records).
-- Fonts and typography: passed. Existing Chinese system-font stack, sizes and hierarchy are preserved; no unexpected wrapping was visible.
-- Spacing and layout rhythm: passed. Inputs align in four columns, results remain above the fold at the checked desktop size, and the collapsed rail releases useful table width.
-- Colors and tokens: passed. Existing platform tokens are reused; the load-rate warning uses the established amber semantic treatment.
-- Image and asset fidelity: passed. Existing iTeaQ brand artwork is preserved; navigation uses the application's existing Tabler icon sprite, with no placeholder image assets.
-- Copy and content: passed. Labels match the A03 terminology and explain the data basis, interpolation records and Icw review boundary.
-- Sidebar focused region: passed. Compared the supplied left-navigation screenshot with both saved implementation screenshots; font hierarchy, blue active state, white navigation surface and compact icon rhythm remain consistent, while the new control is an intentional functional addition.
-
-## v2.1.2 Best-specification follow-up
-
-- Source visual truth: `C:/Users/woaig/AppData/Local/Temp/codex-clipboard-4bd4508a-f5a4-4225-a230-1385f07b8d8b.png` (1295 × 947 px), showing the A03 4000A result with `4 x 100 x 5` as the best specification and `3 x 100 x 10` as the structure-priority result.
-- Rendered implementation: `output/playwright/busbar-best-spec-v212.png` (1600 × 900 px), Chromium viewport 1600 × 900 CSS pixels at device scale factor 1.
-- State: authenticated desktop view, Copper Busbar page, 4000A, ventilated, bare/tinned, IEC enhanced 50K, calculation completed.
-- Full-view comparison: the implementation preserves the established platform shell and keeps the complete input-to-result flow above the fold. Four result cards remain readable without clipping.
-- Focused comparison: the visible values match the source workbook: best specification `4 x 100 x 5`, four bars, rated current 3190A, total area 2000mm², load rate 96.5%, and PE area 500mm². The separate structure-priority card shows `3 x 100 x 10`, three bars.
-- Fidelity surfaces: typography uses the existing Chinese system-font hierarchy; spacing follows the platform card rhythm; blue marks the best specification, green distinguishes the structure-priority comparison, and amber retains the load warning; no new image assets were required; copy clearly distinguishes the two selection rules.
-
-## Primary interactions tested
-
-- Opened the dedicated Copper Busbar page from the left navigation.
-- Calculated the 1600A reference case.
-- Switched between calculation and the 97-record data table.
-- Filtered the table by `80 x 10` and verified four matching configurations.
-- Collapsed the desktop sidebar and verified the table remained readable with the icon rail visible.
-- Expanded the sidebar again and measured the rendered widths: 70px collapsed and 232px expanded.
-- Automated module tests and the public-build privacy gate passed. No interaction failure was observed in the browser flow.
-- Browser console check returned 0 errors and 0 warnings for the tested flow.
-- Entered 4000A and confirmed both best-specification and structure-priority cards update together with their dependent rated-current, area, load-rate and PE results.
+The form and result region was reviewed at original resolution. Labels, disabled states and correction-factor feedback remain legible; the primary result is visually dominant without hiding supporting inputs. The source contains no raster imagery beyond the existing brand asset, so no image substitution was required.
 
 ## Findings
 
-- P0: none.
-- P1: none.
-- P2: none.
-- P3: none.
+- No actionable P0/P1/P2 visual differences remain.
+- Fonts and typography: existing platform family, weights and hierarchy are consistent; long cable-type labels remain readable.
+- Spacing and layout rhythm: controls align to the existing four-column grid; result cards and the warning preserve clear vertical rhythm.
+- Colors and visual tokens: existing navy, blue, pale-blue, green and amber semantic tokens are reused.
+- Image quality and asset fidelity: the existing iTeaQ brand asset remains sharp; no placeholder imagery or handcrafted replacement was introduced.
+- Copy and content: the title now states “电缆选型”; the page explicitly identifies B-电缆选型-A00 and explains that conductor selection was removed.
+
+## Interaction checks
+
+- Navigation to 电缆选型.
+- Cable type/core/system dependent control states.
+- Correction factor changes from 0.8 to 0.9 for the checked multi-core combination.
+- Calculation result matches the Excel case: 70 mm², 224A base, 0.9 factor, 403.2A corrected capacity.
+- 中美线规查询 tab opens and displays all six source fields.
+- Browser console contains no application errors; only pre-existing password-field advisory messages.
 
 ## Comparison history
 
-- First calculator capture: the 1600A result matched the workbook values and no P0/P1/P2 issue was found.
-- Table capture: all columns were visible, the internal scrollbar worked, and no P0/P1/P2 issue was found.
-- Earlier collapsed-sidebar capture: the icon rail worked, but the only desktop entry was an unlabeled top-bar icon, which the user correctly found insufficiently obvious.
-- Fix: moved the desktop control into the top of the sidebar, added “收起导航 / 展开导航” state copy, directional icon rotation, and retained a separate top-bar trigger only for mobile.
-- Post-fix evidence: `sidebar-expanded-v211.png` visibly shows the labeled control; `sidebar-collapsed-v211.png` shows the 70px rail and right-facing expand control. Playwright confirmed the rail expands back to 232px and the console remained clean.
-- Best-specification iteration: the earlier page exposed only the structure-priority selection as “推荐规格,” which omitted Excel B14. The calculation now owns both outputs separately; post-fix browser evidence shows the 4000A values and labels match the reference with no console errors.
+- Initial rendered pass: no P0/P1/P2 issues found, so no visual fix iteration was required.
 
-## Final result
+## Follow-up polish
 
-passed
+- None required for this scope.
+
+final result: passed

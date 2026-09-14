@@ -54,22 +54,9 @@ def extract_busbars() -> list[dict]:
     return result
 
 
-def extract_conductors_and_cables() -> tuple[list[dict], list[dict], list[dict]]:
-    workbook = load_workbook(find_one("A-导体电缆选型-A05.xlsx"), data_only=True, read_only=True)
-    conductors = []
-    for row in workbook["导体数据库"].iter_rows(min_row=2, values_only=True):
-        if not row or not row[0] or not isinstance(row[4] if len(row) > 4 else None, (int, float)):
-            continue
-        conductors.append({
-            "type": clean(row[0]),
-            "parallelCount": clean(row[1]),
-            "orientation": clean(row[2]),
-            "ambientC": clean(row[3]),
-            "current70A": clean(row[4]),
-            "current105A": clean(row[5]),
-            "size": clean(row[7]) if len(row) > 7 else ""
-        })
-
+def extract_cables() -> tuple[list[dict], list[dict]]:
+    """以 B-电缆选型-A00 为唯一来源提取电缆和中美线规数据。"""
+    workbook = load_workbook(find_one("B-电缆选型-A00.xlsx"), data_only=True, read_only=True)
     cables = []
     for row in workbook["电缆数据库"].iter_rows(min_row=2, values_only=True):
         if not row or not row[0] or not isinstance(row[4] if len(row) > 4 else None, (int, float)):
@@ -85,24 +72,27 @@ def extract_conductors_and_cables() -> tuple[list[dict], list[dict], list[dict]]
         })
 
     awg = []
-    awg_sheet = next((sheet for sheet in workbook.worksheets if "线规" in sheet.title or "AWG" in sheet.title.upper()), None)
-    if awg_sheet:
-        for row in awg_sheet.iter_rows(values_only=True):
-            cells = [clean(value) for value in row]
-            if not cells or not isinstance(cells[0], (int, float, str)):
-                continue
-            text = " ".join(str(value) for value in cells if value is not None)
-            if text and any(isinstance(value, (int, float)) for value in cells):
-                awg.append({"values": cells})
+    awg_sheet = workbook["中美线规对照表"]
+    for row in awg_sheet.iter_rows(min_row=3, max_row=52, max_col=7, values_only=True):
+        if row[0] is None:
+            continue
+        awg.append({
+            "awg": clean(row[0]),
+            "diameterMm": clean(row[1]),
+            "cwgDiameterMm": clean(row[2]),
+            "areaMm2": clean(row[3]),
+            "resistanceOhmKm": clean(row[4]),
+            "normalCurrentA": clean(row[5]),
+            "maximumCurrentA": clean(row[6])
+        })
     workbook.close()
-    return conductors, cables, awg
+    return cables, awg
 
 
 def main() -> int:
     busbars = extract_busbars()
-    conductors, cables, awg = extract_conductors_and_cables()
+    cables, awg = extract_cables()
     write_json("busbar-catalog.json", busbars)
-    write_json("conductor-catalog.json", conductors)
     write_json("cable-catalog.json", cables)
     write_json("awg-catalog.json", awg)
     return 0

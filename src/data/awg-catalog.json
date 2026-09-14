@@ -1,552 +1,452 @@
 [
   {
-    "values": [
-      "0000",
-      11.684,
-      "/",
-      107.22,
-      0.17,
-      423.2,
-      482.6
-    ]
+    "awg": "0000",
+    "diameterMm": 11.684,
+    "cwgDiameterMm": "/",
+    "areaMm2": 107.22,
+    "resistanceOhmKm": 0.17,
+    "normalCurrentA": 423.2,
+    "maximumCurrentA": 482.6
   },
   {
-    "values": [
-      "000",
-      10.404,
-      "/",
-      85.01,
-      0.21,
-      335.5,
-      382.6
-    ]
+    "awg": "000",
+    "diameterMm": 10.404,
+    "cwgDiameterMm": "/",
+    "areaMm2": 85.01,
+    "resistanceOhmKm": 0.21,
+    "normalCurrentA": 335.5,
+    "maximumCurrentA": 382.6
   },
   {
-    "values": [
-      "00",
-      9.266,
-      9,
-      67.43,
-      0.26,
-      266.2,
-      303.5
-    ]
+    "awg": "00",
+    "diameterMm": 9.266,
+    "cwgDiameterMm": 9,
+    "areaMm2": 67.43,
+    "resistanceOhmKm": 0.26,
+    "normalCurrentA": 266.2,
+    "maximumCurrentA": 303.5
   },
   {
-    "values": [
-      0,
-      8.252,
-      8,
-      53.49,
-      0.33,
-      211.1,
-      240.7
-    ]
+    "awg": 0,
+    "diameterMm": 8.252,
+    "cwgDiameterMm": 8,
+    "areaMm2": 53.49,
+    "resistanceOhmKm": 0.33,
+    "normalCurrentA": 211.1,
+    "maximumCurrentA": 240.7
   },
   {
-    "values": [
-      1,
-      7.348,
-      7.1,
-      42.41,
-      0.42,
-      167.4,
-      190.9
-    ]
+    "awg": 1,
+    "diameterMm": 7.348,
+    "cwgDiameterMm": 7.1,
+    "areaMm2": 42.41,
+    "resistanceOhmKm": 0.42,
+    "normalCurrentA": 167.4,
+    "maximumCurrentA": 190.9
   },
   {
-    "values": [
-      2,
-      6.543,
-      6.3,
-      33.62,
-      0.53,
-      132.7,
-      151.3
-    ]
+    "awg": 2,
+    "diameterMm": 6.543,
+    "cwgDiameterMm": 6.3,
+    "areaMm2": 33.62,
+    "resistanceOhmKm": 0.53,
+    "normalCurrentA": 132.7,
+    "maximumCurrentA": 151.3
   },
   {
-    "values": [
-      3,
-      5.827,
-      5.6,
-      26.67,
-      0.66,
-      105.2,
-      120
-    ]
+    "awg": 3,
+    "diameterMm": 5.827,
+    "cwgDiameterMm": 5.6,
+    "areaMm2": 26.67,
+    "resistanceOhmKm": 0.66,
+    "normalCurrentA": 105.2,
+    "maximumCurrentA": 120
   },
   {
-    "values": [
-      4,
-      5.189,
-      5,
-      21.15,
-      0.84,
-      83.5,
-      95.2
-    ]
+    "awg": 4,
+    "diameterMm": 5.189,
+    "cwgDiameterMm": 5,
+    "areaMm2": 21.15,
+    "resistanceOhmKm": 0.84,
+    "normalCurrentA": 83.5,
+    "maximumCurrentA": 95.2
   },
   {
-    "values": [
-      5,
-      4.62,
-      4.5,
-      16.77,
-      1.06,
-      66.2,
-      75.5
-    ]
+    "awg": 5,
+    "diameterMm": 4.62,
+    "cwgDiameterMm": 4.5,
+    "areaMm2": 16.77,
+    "resistanceOhmKm": 1.06,
+    "normalCurrentA": 66.2,
+    "maximumCurrentA": 75.5
   },
   {
-    "values": [
-      6,
-      4.115,
-      4,
-      13.3,
-      1.33,
-      52.5,
-      59.9
-    ]
+    "awg": 6,
+    "diameterMm": 4.115,
+    "cwgDiameterMm": 4,
+    "areaMm2": 13.3,
+    "resistanceOhmKm": 1.33,
+    "normalCurrentA": 52.5,
+    "maximumCurrentA": 59.9
   },
   {
-    "values": [
-      7,
-      3.665,
-      3.55,
-      10.55,
-      1.68,
-      41.6,
-      47.5
-    ]
+    "awg": 7,
+    "diameterMm": 3.665,
+    "cwgDiameterMm": 3.55,
+    "areaMm2": 10.55,
+    "resistanceOhmKm": 1.68,
+    "normalCurrentA": 41.6,
+    "maximumCurrentA": 47.5
   },
   {
-    "values": [
-      8,
-      3.264,
-      3.15,
-      8.37,
-      2.11,
-      33,
-      37.7
-    ]
+    "awg": 8,
+    "diameterMm": 3.264,
+    "cwgDiameterMm": 3.15,
+    "areaMm2": 8.37,
+    "resistanceOhmKm": 2.11,
+    "normalCurrentA": 33,
+    "maximumCurrentA": 37.7
   },
   {
-    "values": [
-      9,
-      2.906,
-      2.8,
-      6.63,
-      2.67,
-      26.2,
-      29.8
-    ]
+    "awg": 9,
+    "diameterMm": 2.906,
+    "cwgDiameterMm": 2.8,
+    "areaMm2": 6.63,
+    "resistanceOhmKm": 2.67,
+    "normalCurrentA": 26.2,
+    "maximumCurrentA": 29.8
   },
   {
-    "values": [
-      10,
-      2.588,
-      2.5,
-      5.26,
-      3.36,
-      20.8,
-      23.7
-    ]
+    "awg": 10,
+    "diameterMm": 2.588,
+    "cwgDiameterMm": 2.5,
+    "areaMm2": 5.26,
+    "resistanceOhmKm": 3.36,
+    "normalCurrentA": 20.8,
+    "maximumCurrentA": 23.7
   },
   {
-    "values": [
-      11,
-      2.304,
-      2.54,
-      4.17,
-      4.24,
-      16.5,
-      18.8
-    ]
+    "awg": 11,
+    "diameterMm": 2.304,
+    "cwgDiameterMm": 2.54,
+    "areaMm2": 4.17,
+    "resistanceOhmKm": 4.24,
+    "normalCurrentA": 16.5,
+    "maximumCurrentA": 18.8
   },
   {
-    "values": [
-      12,
-      2.052,
-      2,
-      3.332,
-      5.31,
-      13.1,
-      14.9
-    ]
+    "awg": 12,
+    "diameterMm": 2.052,
+    "cwgDiameterMm": 2,
+    "areaMm2": 3.332,
+    "resistanceOhmKm": 5.31,
+    "normalCurrentA": 13.1,
+    "maximumCurrentA": 14.9
   },
   {
-    "values": [
-      13,
-      1.829,
-      1.8,
-      2.627,
-      6.69,
-      10.4,
-      11.8
-    ]
+    "awg": 13,
+    "diameterMm": 1.829,
+    "cwgDiameterMm": 1.8,
+    "areaMm2": 2.627,
+    "resistanceOhmKm": 6.69,
+    "normalCurrentA": 10.4,
+    "maximumCurrentA": 11.8
   },
   {
-    "values": [
-      14,
-      1.628,
-      1.6,
-      2.075,
-      8.45,
-      8.2,
-      9.4
-    ]
+    "awg": 14,
+    "diameterMm": 1.628,
+    "cwgDiameterMm": 1.6,
+    "areaMm2": 2.075,
+    "resistanceOhmKm": 8.45,
+    "normalCurrentA": 8.2,
+    "maximumCurrentA": 9.4
   },
   {
-    "values": [
-      15,
-      1.45,
-      1.4,
-      1.646,
-      10.6,
-      6.5,
-      7.4
-    ]
+    "awg": 15,
+    "diameterMm": 1.45,
+    "cwgDiameterMm": 1.4,
+    "areaMm2": 1.646,
+    "resistanceOhmKm": 10.6,
+    "normalCurrentA": 6.5,
+    "maximumCurrentA": 7.4
   },
   {
-    "values": [
-      16,
-      1.29,
-      1.25,
-      1.318,
-      13.5,
-      5.2,
-      5.9
-    ]
+    "awg": 16,
+    "diameterMm": 1.29,
+    "cwgDiameterMm": 1.25,
+    "areaMm2": 1.318,
+    "resistanceOhmKm": 13.5,
+    "normalCurrentA": 5.2,
+    "maximumCurrentA": 5.9
   },
   {
-    "values": [
-      17,
-      1.151,
-      1.12,
-      1.026,
-      16.3,
-      4.1,
-      4.7
-    ]
+    "awg": 17,
+    "diameterMm": 1.151,
+    "cwgDiameterMm": 1.12,
+    "areaMm2": 1.026,
+    "resistanceOhmKm": 16.3,
+    "normalCurrentA": 4.1,
+    "maximumCurrentA": 4.7
   },
   {
-    "values": [
-      18,
-      1.024,
-      1,
-      0.817,
-      21.4,
-      3.2,
-      3.7
-    ]
+    "awg": 18,
+    "diameterMm": 1.024,
+    "cwgDiameterMm": 1,
+    "areaMm2": 0.817,
+    "resistanceOhmKm": 21.4,
+    "normalCurrentA": 3.2,
+    "maximumCurrentA": 3.7
   },
   {
-    "values": [
-      19,
-      0.912,
-      0.9,
-      0.5667,
-      26.9,
-      2.6,
-      2.9
-    ]
+    "awg": 19,
+    "diameterMm": 0.912,
+    "cwgDiameterMm": 0.9,
+    "areaMm2": 0.5667,
+    "resistanceOhmKm": 26.9,
+    "normalCurrentA": 2.6,
+    "maximumCurrentA": 2.9
   },
   {
-    "values": [
-      20,
-      0.813,
-      0.8,
-      0.5189,
-      33.9,
-      2,
-      2.3
-    ]
+    "awg": 20,
+    "diameterMm": 0.813,
+    "cwgDiameterMm": 0.8,
+    "areaMm2": 0.5189,
+    "resistanceOhmKm": 33.9,
+    "normalCurrentA": 2,
+    "maximumCurrentA": 2.3
   },
   {
-    "values": [
-      21,
-      0.724,
-      0.71,
-      0.4116,
-      42.7,
-      1.6,
-      1.9
-    ]
+    "awg": 21,
+    "diameterMm": 0.724,
+    "cwgDiameterMm": 0.71,
+    "areaMm2": 0.4116,
+    "resistanceOhmKm": 42.7,
+    "normalCurrentA": 1.6,
+    "maximumCurrentA": 1.9
   },
   {
-    "values": [
-      22,
-      0.643,
-      0.63,
-      0.3247,
-      48.5,
-      1.28,
-      1.46
-    ]
+    "awg": 22,
+    "diameterMm": 0.643,
+    "cwgDiameterMm": 0.63,
+    "areaMm2": 0.3247,
+    "resistanceOhmKm": 48.5,
+    "normalCurrentA": 1.28,
+    "maximumCurrentA": 1.46
   },
   {
-    "values": [
-      23,
-      0.574,
-      0.56,
-      0.2588,
-      54.3,
-      1.022,
-      1.165
-    ]
+    "awg": 23,
+    "diameterMm": 0.574,
+    "cwgDiameterMm": 0.56,
+    "areaMm2": 0.2588,
+    "resistanceOhmKm": 54.3,
+    "normalCurrentA": 1.022,
+    "maximumCurrentA": 1.165
   },
   {
-    "values": [
-      24,
-      0.511,
-      0.5,
-      0.2047,
-      79.6,
-      0.808,
-      0.921
-    ]
+    "awg": 24,
+    "diameterMm": 0.511,
+    "cwgDiameterMm": 0.5,
+    "areaMm2": 0.2047,
+    "resistanceOhmKm": 79.6,
+    "normalCurrentA": 0.808,
+    "maximumCurrentA": 0.921
   },
   {
-    "values": [
-      25,
-      0.455,
-      0.45,
-      0.1624,
-      89.4,
-      0.641,
-      0.731
-    ]
+    "awg": 25,
+    "diameterMm": 0.455,
+    "cwgDiameterMm": 0.45,
+    "areaMm2": 0.1624,
+    "resistanceOhmKm": 89.4,
+    "normalCurrentA": 0.641,
+    "maximumCurrentA": 0.731
   },
   {
-    "values": [
-      26,
-      0.404,
-      0.4,
-      0.1281,
-      128,
-      0.506,
-      0.577
-    ]
+    "awg": 26,
+    "diameterMm": 0.404,
+    "cwgDiameterMm": 0.4,
+    "areaMm2": 0.1281,
+    "resistanceOhmKm": 128,
+    "normalCurrentA": 0.506,
+    "maximumCurrentA": 0.577
   },
   {
-    "values": [
-      27,
-      0.361,
-      0.355,
-      0.1021,
-      143,
-      0.403,
-      0.46
-    ]
+    "awg": 27,
+    "diameterMm": 0.361,
+    "cwgDiameterMm": 0.355,
+    "areaMm2": 0.1021,
+    "resistanceOhmKm": 143,
+    "normalCurrentA": 0.403,
+    "maximumCurrentA": 0.46
   },
   {
-    "values": [
-      28,
-      0.32,
-      0.315,
-      0.0804,
-      227,
-      0.318,
-      0.362
-    ]
+    "awg": 28,
+    "diameterMm": 0.32,
+    "cwgDiameterMm": 0.315,
+    "areaMm2": 0.0804,
+    "resistanceOhmKm": 227,
+    "normalCurrentA": 0.318,
+    "maximumCurrentA": 0.362
   },
   {
-    "values": [
-      29,
-      0.287,
-      0.28,
-      0.0647,
-      289,
-      0.255,
-      0.291
-    ]
+    "awg": 29,
+    "diameterMm": 0.287,
+    "cwgDiameterMm": 0.28,
+    "areaMm2": 0.0647,
+    "resistanceOhmKm": 289,
+    "normalCurrentA": 0.255,
+    "maximumCurrentA": 0.291
   },
   {
-    "values": [
-      30,
-      0.254,
-      0.25,
-      0.0507,
-      321,
-      0.2,
-      0.288
-    ]
+    "awg": 30,
+    "diameterMm": 0.254,
+    "cwgDiameterMm": 0.25,
+    "areaMm2": 0.0507,
+    "resistanceOhmKm": 321,
+    "normalCurrentA": 0.2,
+    "maximumCurrentA": 0.288
   },
   {
-    "values": [
-      31,
-      0.226,
-      0.244,
-      0.0401,
-      367,
-      0.158,
-      0.181
-    ]
+    "awg": 31,
+    "diameterMm": 0.226,
+    "cwgDiameterMm": 0.244,
+    "areaMm2": 0.0401,
+    "resistanceOhmKm": 367,
+    "normalCurrentA": 0.158,
+    "maximumCurrentA": 0.181
   },
   {
-    "values": [
-      32,
-      0.203,
-      0.2,
-      0.0136,
-      583,
-      0.128,
-      0.146
-    ]
+    "awg": 32,
+    "diameterMm": 0.203,
+    "cwgDiameterMm": 0.2,
+    "areaMm2": 0.0136,
+    "resistanceOhmKm": 583,
+    "normalCurrentA": 0.128,
+    "maximumCurrentA": 0.146
   },
   {
-    "values": [
-      33,
-      0.18,
-      0.18,
-      0.0255,
-      944,
-      0.101,
-      0.115
-    ]
+    "awg": 33,
+    "diameterMm": 0.18,
+    "cwgDiameterMm": 0.18,
+    "areaMm2": 0.0255,
+    "resistanceOhmKm": 944,
+    "normalCurrentA": 0.101,
+    "maximumCurrentA": 0.115
   },
   {
-    "values": [
-      34,
-      0.16,
-      0.16,
-      0.0201,
-      956,
-      0.079,
-      0.091
-    ]
+    "awg": 34,
+    "diameterMm": 0.16,
+    "cwgDiameterMm": 0.16,
+    "areaMm2": 0.0201,
+    "resistanceOhmKm": 956,
+    "normalCurrentA": 0.079,
+    "maximumCurrentA": 0.091
   },
   {
-    "values": [
-      35,
-      0.142,
-      0.14,
-      0.0169,
-      1200,
-      0.063,
-      0.072
-    ]
+    "awg": 35,
+    "diameterMm": 0.142,
+    "cwgDiameterMm": 0.14,
+    "areaMm2": 0.0169,
+    "resistanceOhmKm": 1200,
+    "normalCurrentA": 0.063,
+    "maximumCurrentA": 0.072
   },
   {
-    "values": [
-      36,
-      0.127,
-      0.125,
-      0.0127,
-      1530,
-      0.05,
-      0.057
-    ]
+    "awg": 36,
+    "diameterMm": 0.127,
+    "cwgDiameterMm": 0.125,
+    "areaMm2": 0.0127,
+    "resistanceOhmKm": 1530,
+    "normalCurrentA": 0.05,
+    "maximumCurrentA": 0.057
   },
   {
-    "values": [
-      37,
-      0.144,
-      0.112,
-      0.0098,
-      1377,
-      0.041,
-      0.046
-    ]
+    "awg": 37,
+    "diameterMm": 0.144,
+    "cwgDiameterMm": 0.112,
+    "areaMm2": 0.0098,
+    "resistanceOhmKm": 1377,
+    "normalCurrentA": 0.041,
+    "maximumCurrentA": 0.046
   },
   {
-    "values": [
-      38,
-      0.102,
-      "/",
-      0.0081,
-      2400,
-      0.032,
-      0.036
-    ]
+    "awg": 38,
+    "diameterMm": 0.102,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.0081,
+    "resistanceOhmKm": 2400,
+    "normalCurrentA": 0.032,
+    "maximumCurrentA": 0.036
   },
   {
-    "values": [
-      39,
-      0.089,
-      "/",
-      0.0062,
-      2100,
-      0.025,
-      0.028
-    ]
+    "awg": 39,
+    "diameterMm": 0.089,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.0062,
+    "resistanceOhmKm": 2100,
+    "normalCurrentA": 0.025,
+    "maximumCurrentA": 0.028
   },
   {
-    "values": [
-      40,
-      0.079,
-      "/",
-      0.0049,
-      4080,
-      0.019,
-      0.022
-    ]
+    "awg": 40,
+    "diameterMm": 0.079,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.0049,
+    "resistanceOhmKm": 4080,
+    "normalCurrentA": 0.019,
+    "maximumCurrentA": 0.022
   },
   {
-    "values": [
-      41,
-      0.071,
-      "/",
-      0.004,
-      3685,
-      0.016,
-      0.018
-    ]
+    "awg": 41,
+    "diameterMm": 0.071,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.004,
+    "resistanceOhmKm": 3685,
+    "normalCurrentA": 0.016,
+    "maximumCurrentA": 0.018
   },
   {
-    "values": [
-      42,
-      0.064,
-      "/",
-      0.0032,
-      6300,
-      0.013,
-      0.014
-    ]
+    "awg": 42,
+    "diameterMm": 0.064,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.0032,
+    "resistanceOhmKm": 6300,
+    "normalCurrentA": 0.013,
+    "maximumCurrentA": 0.014
   },
   {
-    "values": [
-      43,
-      0.056,
-      "/",
-      0.0025,
-      5544,
-      0.01,
-      0.011
-    ]
+    "awg": 43,
+    "diameterMm": 0.056,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.0025,
+    "resistanceOhmKm": 5544,
+    "normalCurrentA": 0.01,
+    "maximumCurrentA": 0.011
   },
   {
-    "values": [
-      44,
-      0.051,
-      "/",
-      0.002,
-      10200,
-      0.008,
-      0.009
-    ]
+    "awg": 44,
+    "diameterMm": 0.051,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.002,
+    "resistanceOhmKm": 10200,
+    "normalCurrentA": 0.008,
+    "maximumCurrentA": 0.009
   },
   {
-    "values": [
-      45,
-      0.046,
-      "/",
-      0.0016,
-      9180,
-      0.006,
-      0.007
-    ]
+    "awg": 45,
+    "diameterMm": 0.046,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.0016,
+    "resistanceOhmKm": 9180,
+    "normalCurrentA": 0.006,
+    "maximumCurrentA": 0.007
   },
   {
-    "values": [
-      46,
-      0.041,
-      "/",
-      0.0013,
-      16300,
-      0.005,
-      0.006
-    ]
+    "awg": 46,
+    "diameterMm": 0.041,
+    "cwgDiameterMm": "/",
+    "areaMm2": 0.0013,
+    "resistanceOhmKm": 16300,
+    "normalCurrentA": 0.005,
+    "maximumCurrentA": 0.006
   }
 ]

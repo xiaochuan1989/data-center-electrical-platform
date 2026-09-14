@@ -2,16 +2,16 @@ import {
   calculateApf,
   calculateBranch,
   calculateBusbarSelection,
+  calculateCableSelection,
   calculateBusway,
   calculateLoadSummary,
   calculateSmartBusway,
-  calculateSvg,
-  selectCatalogItem
+  calculateSvg
 } from '../modules/engineering-calculators.js';
 import { allTools, TEMPLATE_CATALOG, TOOL_GROUPS } from './tool-registry.js';
 import busbarCatalog from '../data/busbar-catalog.json';
 import cableCatalog from '../data/cable-catalog.json';
-import conductorCatalog from '../data/conductor-catalog.json';
+import awgCatalog from '../data/awg-catalog.json';
 import {
   copyProject,
   createAndSaveProject,
@@ -29,7 +29,7 @@ const SIDEBAR_PREF_KEY = 'dc_platform_sidebar_collapsed';
 
 const state = {
   project: null,
-  catalogs: { busbars: [], conductors: [], cables: [] },
+  catalogs: { busbars: [], cables: [], awg: [] },
   activeView: 'project'
 };
 
@@ -84,7 +84,7 @@ function buildSidebar() {
     ${navButton('db', '产品数据库', 'database')}
     <div class="platform-nav-label">工程设计</div>
     ${navButton('load', '负荷与配电', 'chart-dots-3')}
-    ${navButton('conductor', '电缆与导体', 'plug')}
+    ${navButton('cable', '电缆选型', 'plug')}
     ${navButton('busbar', '铜排计算', 'stack-2')}
     ${navButton('busway', '母线系统', 'device-desktop-analytics')}
     ${navButton('power-quality', '电能质量', 'calculator')}
@@ -97,7 +97,7 @@ function buildSidebar() {
 function projectView() {
   const steps = [
     ['项目信息', 'project'], ['负荷计算', 'load'], ['UPS与电池', 'battery'], ['配电设备', 'load'],
-    ['电缆/铜排/母线', 'busbar'], ['电能质量', 'power-quality'], ['编码与成果输出', 'delivery']
+    ['电缆/铜排/母线', 'cable'], ['电能质量', 'power-quality'], ['编码与成果输出', 'delivery']
   ];
   return viewPanel('project', '项目工作台', '一个项目、一套参数，计算结果可在模块之间复用。', `
     <div class="project-toolbar">
@@ -172,16 +172,41 @@ function loadView() {
     </div><p class="engineering-warning">⚠ ${ENGINEERING_WARNING}</p>`);
 }
 
-function conductorView() {
-  return viewPanel('conductor', '电缆与导体选型', '合并电缆和导体数据库；铜排已拆分为独立计算页面。', `
-    <div class="platform-form-grid cols-4">
-      <label>对象<select id="conductor-kind"><option value="cable">电缆</option><option value="conductor">导体</option></select></label>
-      <label>所需载流量(A)<input id="conductor-current" type="number" value="400"></label>
-      <label>环境温度(°C)<input id="conductor-ambient" type="number" value="30"></label>
-      <div class="field-action"><button id="calculate-conductor" class="primary">查询当前数据库</button></div>
+function cableView() {
+  const typeYj = 'YJV、YJLV、YJY、YJLY型(铜芯)';
+  return viewPanel('cable', '电缆选型', '按 B-电缆选型-A00 工作簿进行电缆计算；导体选型已移除，铜排请使用独立计算页。', `
+    <div class="engineering-tabs cable-tabs" role="tablist" aria-label="电缆工具">
+      <button class="active" role="tab" aria-selected="true" data-cable-tab="calculator">电缆智能选型</button>
+      <button role="tab" aria-selected="false" data-cable-tab="awg">中美线规查询 <span>${awgCatalog.length} 条</span></button>
     </div>
-    <div id="conductor-result" class="catalog-result"></div>
-    <p class="engineering-warning">⚠ 并联根数、敷设方式、桥架层数、环境温度及绝缘温度均会影响最终结果。当前结果只用于初步筛选。</p>`);
+    <div class="cable-pane" data-cable-pane="calculator">
+      <div class="busbar-source-note cable-source-note"><b>计算口径</b><span>基础载流量、输入条件和推荐逻辑均来自 B-电缆选型-A00；修正系数采用 GB 50217-2018 表 D.0.5、D.0.6。</span></div>
+      <div class="platform-form-grid cols-4 cable-inputs">
+        <label>电缆类型<select id="cable-type"><option>BV、BVR型(铜芯)</option><option selected>${typeYj}</option></select></label>
+        <label>芯数<select id="cable-core-count"><option>单芯</option><option>三芯/五芯</option></select></label>
+        <label>敷设方式<select id="cable-installation" disabled><option>明敷</option></select></label>
+        <label>环境温度(℃)<select id="cable-ambient"><option>25</option><option>30</option><option selected>35</option><option>40</option></select></label>
+        <label>负载电流(A)<input id="cable-current" type="number" min="1" max="1600" step="1" value="400"></label>
+        <label>并联根数<select id="cable-parallel-count"><option>1</option><option>2</option><option selected>3</option><option>4</option></select></label>
+        <label>并列根数（S=d）<select id="cable-group-count"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option></select></label>
+        <label>电源系统<select id="cable-system"><option>交流</option><option>直流</option></select></label>
+        <label>单芯排列方式<select id="cable-arrangement"><option>品字形</option><option>水平形</option><option>不考虑</option></select></label>
+        <label>桥架类别<select id="cable-tray-type"><option>梯架</option><option>托盘</option></select></label>
+        <label>叠置电缆层数<select id="cable-stacked-layers"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+        <div class="cable-factor-preview" id="cable-factor-preview" aria-live="polite"></div>
+      </div>
+      <button id="calculate-cable" class="platform-primary-action">计算推荐线径</button>
+      <div id="cable-result" class="cable-result" aria-live="polite"></div>
+      <p class="engineering-warning">⚠ 空气中单层并列系数不适用于三相交流系统单芯电缆；超过 1600A 建议采用密集母线。最终选型仍需校核电压降、短路热稳定和实际敷设条件。</p>
+    </div>
+    <div class="cable-pane" data-cable-pane="awg" hidden>
+      <div class="awg-query">
+        <label>美国线规线号（AWG）<select id="awg-size">${awgCatalog.map(item => `<option value="${htmlEscape(item.awg)}">${htmlEscape(item.awg)}</option>`).join('')}</select></label>
+        <button id="query-awg" class="primary">查询线规</button>
+      </div>
+      <div id="awg-result" class="result-grid"></div>
+      <p class="busbar-table-footnote">线径、截面积、阻值及载流量来自 B-电缆选型-A00 的“中美线规对照表”。</p>
+    </div>`);
 }
 
 function busbarView() {
@@ -256,7 +281,7 @@ function templatesView() {
 }
 
 function shellViews() {
-  return [projectView(), toolsView(), loadView(), conductorView(), busbarView(), buswayView(), powerQualityView(), deliveryView(), templatesView()].join('');
+  return [projectView(), toolsView(), loadView(), cableView(), busbarView(), buswayView(), powerQualityView(), deliveryView(), templatesView()].join('');
 }
 
 function resultCards(items) {
@@ -266,8 +291,8 @@ function resultCards(items) {
 async function loadCatalogs() {
   state.catalogs = {
     busbars: busbarCatalog,
-    conductors: conductorCatalog,
-    cables: cableCatalog
+    cables: cableCatalog,
+    awg: awgCatalog
   };
 }
 
@@ -424,20 +449,78 @@ function calculateDistribution() {
   ]);
 }
 
-function calculateConductorSelection() {
-  const kind = document.getElementById('conductor-kind').value;
-  const required = numberValue('conductor-current');
-  const ambient = numberValue('conductor-ambient', 30);
-  let item;
-  if (kind === 'conductor') item = selectCatalogItem(state.catalogs.conductors, required, 'current70A', ambient ? { ambientC: ambient } : {});
-  else item = selectCatalogItem(state.catalogs.cables, required, 'currentA', ambient ? { ambientC: ambient } : {});
-  const result = document.getElementById('conductor-result');
-  if (!item) {
-    result.innerHTML = `<div class="no-result">当前筛选条件下没有满足 ${format(required)}A 的数据，请调整温度或改用工程复核。</div>`;
+function readCableInput() {
+  return {
+    type: document.getElementById('cable-type').value,
+    coreCount: document.getElementById('cable-core-count').value,
+    installation: '明敷',
+    ambientC: numberValue('cable-ambient', 35),
+    requiredCurrentA: numberValue('cable-current'),
+    parallelCount: numberValue('cable-parallel-count', 1),
+    groupCount: numberValue('cable-group-count', 1),
+    system: document.getElementById('cable-system').value,
+    arrangement: document.getElementById('cable-arrangement').value,
+    trayType: document.getElementById('cable-tray-type').value,
+    stackedLayers: numberValue('cable-stacked-layers', 1)
+  };
+}
+
+function updateCableControls() {
+  const type = document.getElementById('cable-type').value;
+  const system = document.getElementById('cable-system').value;
+  const core = document.getElementById('cable-core-count');
+  const arrangement = document.getElementById('cable-arrangement');
+  const groupCount = document.getElementById('cable-group-count');
+  const trayType = document.getElementById('cable-tray-type');
+  const layers = numberValue('cable-stacked-layers', 1);
+  const mustUseSingleCore = type === 'BV、BVR型(铜芯)' || system === '直流';
+  if (mustUseSingleCore) core.value = '单芯';
+  core.disabled = mustUseSingleCore;
+  const usesArrangement = type === 'YJV、YJLV、YJY、YJLY型(铜芯)' && core.value === '单芯';
+  if (!usesArrangement) arrangement.value = '不考虑';
+  arrangement.disabled = !usesArrangement;
+  const usesAirFactor = layers === 1 && (system === '直流' || (system === '交流' && core.value === '三芯/五芯'));
+  groupCount.disabled = !usesAirFactor;
+  trayType.disabled = usesAirFactor;
+  const preview = calculateCableSelection(state.catalogs.cables, { ...readCableInput(), requiredCurrentA: 1 });
+  document.getElementById('cable-factor-preview').innerHTML = `<span>当前修正系数</span><strong>${format(preview.correctionFactor, 2)}</strong><small>${htmlEscape(preview.correctionMode || '—')}</small>`;
+}
+
+function calculateCable() {
+  const calculation = calculateCableSelection(state.catalogs.cables, readCableInput());
+  const result = document.getElementById('cable-result');
+  if (calculation.error) {
+    result.innerHTML = `<div class="no-result"><b>${htmlEscape(calculation.error)}</b>${calculation.maximumCurrentA ? `<span>当前组合最大修正载流量：${format(calculation.maximumCurrentA)}A。</span>` : ''}${calculation.useBusway ? '<button type="button" data-platform-view="busway">前往母线系统</button>' : ''}</div>`;
     return;
   }
-  state.project.cables = { kind, requiredCurrentA: required, ambientC: ambient, selected: item };
-  result.innerHTML = `<div class="catalog-answer"><span>建议起点</span><strong>${htmlEscape(item.size || item.spec || item.type || '匹配项')}</strong><pre>${htmlEscape(JSON.stringify(item, null, 2))}</pre></div>`;
+  state.project.cables = { input: readCableInput(), calculation };
+  const loadClass = calculation.loadRate > 0.92 ? 'warning' : 'safe';
+  result.innerHTML = `
+    <div class="cable-result-hero">
+      <div class="cable-best-size"><span>推荐线径</span><strong>${format(calculation.selected.size, 1)} mm²</strong><small>${calculation.parallelCount} 根并联 · ${htmlEscape(calculation.coreCount)}</small></div>
+      <div><span>单根基础载流量</span><strong>${format(calculation.baseCurrentA, 1)} A</strong><small>${calculation.ambientC}℃ · ${htmlEscape(calculation.arrangement)}</small></div>
+      <div><span>载流量修正系数</span><strong>${format(calculation.correctionFactor, 2)}</strong><small>${htmlEscape(calculation.correctionMode)}</small></div>
+      <div class="cable-load-gauge ${loadClass}"><span>修正后总载流量</span><strong>${format(calculation.correctedCurrentA, 1)} A</strong><small>负载率 ${format(calculation.loadRate * 100, 1)}%</small></div>
+    </div>
+    <div class="cable-result-detail">
+      <span><b>电缆类型</b>${htmlEscape(calculation.type)}</span>
+      <span><b>允许长期工作温度</b>${calculation.workingTemperatureC}℃</span>
+      <span><b>电源与敷设</b>${htmlEscape(calculation.system)} · ${htmlEscape(calculation.installation)}</span>
+      <span><b>桥架条件</b>${htmlEscape(calculation.trayType)} · ${calculation.stackedLayers} 层</span>
+    </div>`;
+}
+
+function renderAwgResult() {
+  const value = document.getElementById('awg-size').value;
+  const item = state.catalogs.awg.find(row => String(row.awg) === value);
+  document.getElementById('awg-result').innerHTML = item ? resultCards([
+    ['美国线径', format(item.diameterMm, 3), 'mm'],
+    ['中国线径', item.cwgDiameterMm === '/' ? '—' : format(item.cwgDiameterMm, 3), 'mm'],
+    ['截面积', format(item.areaMm2, 4), 'mm²'],
+    ['阻值', format(item.resistanceOhmKm, 4), 'Ω/km'],
+    ['正常载流量', format(item.normalCurrentA, 3), 'A'],
+    ['最大载流量', format(item.maximumCurrentA, 3), 'A']
+  ]) : '<div class="no-result">没有找到对应线规数据。</div>';
 }
 
 function renderBusbarCatalog() {
@@ -583,7 +666,11 @@ function bindEvents() {
   document.getElementById('add-load-row').addEventListener('click', () => addLoadRow());
   document.getElementById('calculate-load').addEventListener('click', calculateLoad);
   document.getElementById('calculate-distribution').addEventListener('click', calculateDistribution);
-  document.getElementById('calculate-conductor').addEventListener('click', calculateConductorSelection);
+  document.getElementById('calculate-cable').addEventListener('click', calculateCable);
+  ['cable-type', 'cable-core-count', 'cable-ambient', 'cable-parallel-count', 'cable-group-count', 'cable-system', 'cable-arrangement', 'cable-tray-type', 'cable-stacked-layers']
+    .forEach(id => document.getElementById(id).addEventListener('change', updateCableControls));
+  document.getElementById('query-awg').addEventListener('click', renderAwgResult);
+  document.getElementById('awg-size').addEventListener('change', renderAwgResult);
   document.getElementById('calculate-busbar').addEventListener('click', calculateBusbar);
   document.getElementById('busbar-catalog-configuration').addEventListener('change', renderBusbarCatalog);
   document.getElementById('busbar-catalog-search').addEventListener('input', renderBusbarCatalog);
@@ -602,6 +689,15 @@ function bindEvents() {
     });
     document.querySelectorAll('[data-busbar-pane]').forEach(pane => { pane.hidden = pane.dataset.busbarPane !== button.dataset.busbarTab; });
     if (button.dataset.busbarTab === 'catalog') renderBusbarCatalog();
+  }));
+  document.querySelectorAll('[data-cable-tab]').forEach(button => button.addEventListener('click', () => {
+    document.querySelectorAll('[data-cable-tab]').forEach(item => {
+      const active = item === button;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-selected', String(active));
+    });
+    document.querySelectorAll('[data-cable-pane]').forEach(pane => { pane.hidden = pane.dataset.cablePane !== button.dataset.cableTab; });
+    if (button.dataset.cableTab === 'awg') renderAwgResult();
   }));
   document.getElementById('platform-project-select').addEventListener('change', async event => {
     const projects = await listProjects();
@@ -674,6 +770,8 @@ export async function initializePlatform() {
   await Promise.all([refreshProjectSelect(), loadCatalogs()]);
   fillProjectForm();
   renderBusbarCatalog();
+  updateCableControls();
+  renderAwgResult();
   const migrationElement = document.getElementById('migration-status');
   migrationElement.textContent = `旧版数据已安全复制：${migration.copiedKeys?.length || 0} 项；旧数据仍保留。`;
   bindEvents();

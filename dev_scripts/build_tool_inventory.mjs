@@ -22,7 +22,7 @@ const currentFiles = new Set([
   '智能母线配置与选型.xlsx',
   'A-导体电缆选型-A05.xlsx',
   'APF容量配置.xlsx',
-  'B-电缆选型-A00.xlsm',
+  'B-电缆选型-A00.xlsx',
   '电池监控仪配置器-A02.xlsm',
   '锂电池-选型模板-A00.xlsx',
   'UPS后备时间蓄电池容量速算.xlsx',
@@ -41,7 +41,8 @@ function category(file) {
   const name = file.toLowerCase();
   if (name.includes('ups') || name.includes('电池')) return ['UPS 与电池', '现有成熟功能核对源', 'P0'];
   if (name.includes('负荷') || name.includes('变压器') || name.includes('供配电')) return ['负荷与配电', '工程主链', 'P1'];
-  if (name.includes('电缆') || name.includes('导体') || name.includes('铜排')) return ['电缆与导体', '导体选型', 'P2'];
+  if (name.includes('电缆')) return ['电缆选型', '电缆计算', 'P2'];
+  if (name.includes('导体') || name.includes('铜排')) return ['铜排计算', '铜排选型', 'P2'];
   if (name.includes('母线')) return ['母线系统', '母线配置', 'P2'];
   if (name.includes('apf') || name.includes('svg') || name.includes('电能质量')) return ['电能质量', 'APF/SVG', 'P2'];
   if (name.includes('编码')) return ['编码与交付', '编码输出', 'P3'];

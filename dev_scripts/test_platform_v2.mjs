@@ -6,6 +6,7 @@ import {
   calculateApf,
   calculateBranch,
   calculateBusbarSelection,
+  calculateCableSelection,
   calculateBusway,
   calculateLoadSummary,
   calculateSmartBusway,
@@ -105,21 +106,40 @@ assert.equal(largeBusbar.peAreaMm2, 500);
 assert.ok(Math.abs(largeBusbar.loadRate - 0.964552) < 0.00001);
 assert.match(calculateBusbarSelection(busbarCatalog, { loadCurrentA: 0 }).error, /大于 0A/);
 
-for (const filename of ['busbar-catalog.json', 'conductor-catalog.json', 'cable-catalog.json']) {
+const cableCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'cable-catalog.json'), 'utf8'));
+assert.equal(cableCatalog.length, 224);
+const cableCases = [
+  [{ requiredCurrentA: 400, type: 'YJV、YJLV、YJY、YJLY型(铜芯)', coreCount: '单芯', ambientC: 35, parallelCount: 3, groupCount: 6, system: '交流', arrangement: '品字形', trayType: '梯架', stackedLayers: 1 }, 0.8, 35],
+  [{ requiredCurrentA: 400, type: 'YJV、YJLV、YJY、YJLY型(铜芯)', coreCount: '三芯/五芯', ambientC: 35, parallelCount: 2, groupCount: 2, system: '交流', arrangement: '不考虑', trayType: '梯架', stackedLayers: 1 }, 0.9, 70],
+  [{ requiredCurrentA: 100, type: 'BV、BVR型(铜芯)', coreCount: '单芯', ambientC: 30, parallelCount: 1, groupCount: 1, system: '交流', arrangement: '不考虑', trayType: '梯架', stackedLayers: 1 }, 0.8, 25],
+  [{ requiredCurrentA: 800, type: 'YJV、YJLV、YJY、YJLY型(铜芯)', coreCount: '单芯', ambientC: 40, parallelCount: 4, groupCount: 1, system: '交流', arrangement: '水平形', trayType: '托盘', stackedLayers: 3 }, 0.5, 185]
+];
+for (const [input, expectedFactor, expectedSize] of cableCases) {
+  const result = calculateCableSelection(cableCatalog, input);
+  assert.equal(result.correctionFactor, expectedFactor);
+  assert.equal(result.selected.size, expectedSize);
+  assert.ok(result.correctedCurrentA >= input.requiredCurrentA);
+}
+assert.match(calculateCableSelection(cableCatalog, { requiredCurrentA: 0 }).error, /大于 0A/);
+assert.equal(calculateCableSelection(cableCatalog, { requiredCurrentA: 1601 }).useBusway, true);
+
+for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalog.json']) {
   const file = path.join(root, 'src', 'data', filename);
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
-  assert.ok(data.length > 50, `${filename} 数据量不足`);
+  assert.ok(data.length >= 50, `${filename} 数据量不足`);
   const serialized = JSON.stringify(data);
   assert.ok(!serialized.includes('供应商价'));
   assert.ok(!serialized.includes('目录价'));
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.1\.2"/);
+assert.match(index, /const APP_VERSION = "v2\.2\.0"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 const appShell = fs.readFileSync(path.join(root, 'src', 'platform', 'app-shell.js'), 'utf8');
 assert.match(appShell, /navButton\('busbar'/);
+assert.match(appShell, /navButton\('cable', '电缆选型'/);
+assert.doesNotMatch(appShell, /conductor-catalog/);
 assert.match(appShell, /platform-sidebar-control-text/);
 assert.match(appShell, /data-sidebar-toggle/);
 

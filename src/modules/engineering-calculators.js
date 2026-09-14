@@ -4,6 +4,11 @@ export const BREAKER_STANDARDS = [16, 20, 32, 40, 50, 63, 80, 100, 125, 160, 200
 export const BUSWAY_STANDARDS = [160, 250, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6300];
 export const TRANSFORMER_STANDARDS = [100, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150];
 export const BUSBAR_CONFIGURATION_PRIORITY = ['单片', '双拼', '三拼', '四拼'];
+export const CABLE_AIR_GROUP_FACTORS = { 1: 1, 2: 0.9, 3: 0.85, 4: 0.82, 5: 0.81, 6: 0.8 };
+export const CABLE_TRAY_LAYER_FACTORS = {
+  梯架: { 1: 0.8, 2: 0.65, 3: 0.55, 4: 0.5 },
+  托盘: { 1: 0.7, 2: 0.55, 3: 0.5, 4: 0.45 }
+};
 
 function number(value, fallback = 0) {
   const parsed = Number(value);
@@ -177,10 +182,72 @@ export function calculateBusbarSelection(catalog, input = {}) {
   };
 }
 
-export function selectCatalogItem(catalog, requiredCurrentA, currentField = 'currentA', filters = {}) {
-  const target = Math.max(0, number(requiredCurrentA));
-  return catalog
-    .filter(item => Object.entries(filters).every(([key, value]) => !value || String(item[key]) === String(value)))
-    .filter(item => number(item[currentField]) >= target)
-    .sort((a, b) => number(a[currentField]) - number(b[currentField]))[0] || null;
+export function calculateCableSelection(catalog, input = {}) {
+  const requiredCurrentA = Math.max(0, number(input.requiredCurrentA));
+  if (requiredCurrentA <= 0) return { error: '请输入大于 0A 的电流' };
+  if (requiredCurrentA > 1600) {
+    return { error: '电流超过工作簿的 1600A 适用上限，建议改用密集母线', requiredCurrentA, useBusway: true };
+  }
+
+  const type = input.type || 'YJV、YJLV、YJY、YJLY型(铜芯)';
+  const system = input.system === '直流' ? '直流' : '交流';
+  const coreCount = system === '直流' || type === 'BV、BVR型(铜芯)' ? '单芯' : (input.coreCount === '三芯/五芯' ? '三芯/五芯' : '单芯');
+  const arrangement = type === 'YJV、YJLV、YJY、YJLY型(铜芯)' && coreCount === '单芯'
+    ? (['品字形', '水平形'].includes(input.arrangement) ? input.arrangement : '不考虑')
+    : '不考虑';
+  const ambientC = [25, 30, 35, 40].includes(number(input.ambientC)) ? number(input.ambientC) : 35;
+  const parallelCount = Math.round(clamp(input.parallelCount ?? 1, 1, 4));
+  const groupCount = Math.round(clamp(input.groupCount ?? 1, 1, 6));
+  const trayType = input.trayType === '托盘' ? '托盘' : '梯架';
+  const stackedLayers = Math.round(clamp(input.stackedLayers ?? 1, 1, 4));
+  const useAirGroupFactor = stackedLayers === 1 && (system === '直流' || (system === '交流' && coreCount === '三芯/五芯'));
+  const correctionFactor = useAirGroupFactor
+    ? CABLE_AIR_GROUP_FACTORS[groupCount]
+    : CABLE_TRAY_LAYER_FACTORS[trayType][stackedLayers];
+
+  const matches = catalog
+    .filter(item => item.type === type
+      && item.coreCount === coreCount
+      && item.installation === '明敷'
+      && number(item.ambientC) === ambientC
+      && item.arrangement === arrangement)
+    .map(item => ({
+      ...item,
+      correctedCurrentA: number(item.currentA) * correctionFactor * parallelCount
+    }))
+    .sort((a, b) => number(a.size) - number(b.size));
+  const selected = matches.find(item => item.correctedCurrentA >= requiredCurrentA) || null;
+
+  if (!selected) {
+    const maximumCurrentA = matches.reduce((maximum, item) => Math.max(maximum, item.correctedCurrentA), 0);
+    return {
+      error: matches.length ? '当前组合没有满足电流的表列线径，请增加并联根数或调整敷设条件' : '当前组合在工作簿数据库中没有对应数据',
+      requiredCurrentA,
+      maximumCurrentA,
+      correctionFactor,
+      correctionMode: useAirGroupFactor ? '空气中单层多根并行' : '桥架多层无间距',
+      useBusway: requiredCurrentA >= 1600
+    };
+  }
+
+  return {
+    requiredCurrentA,
+    type,
+    coreCount,
+    installation: '明敷',
+    ambientC,
+    system,
+    arrangement,
+    parallelCount,
+    groupCount,
+    trayType,
+    stackedLayers,
+    correctionFactor,
+    correctionMode: useAirGroupFactor ? '空气中单层多根并行' : '桥架多层无间距',
+    selected,
+    baseCurrentA: number(selected.currentA),
+    correctedCurrentA: selected.correctedCurrentA,
+    loadRate: requiredCurrentA / selected.correctedCurrentA,
+    workingTemperatureC: type === 'BV、BVR型(铜芯)' ? 70 : 90
+  };
 }
