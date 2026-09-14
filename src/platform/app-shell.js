@@ -199,7 +199,8 @@ function busbarView() {
         <label>温升标准<select id="busbar-temperature-rise"><option value="iec50">IEC增强 (50K)</option><option value="din30">DIN保守 (30K)</option></select></label>
       </div>
       <div class="busbar-formula-strip" aria-label="计算说明">
-        <span><b>结构顺序</b> 单片 → 双拼 → 三拼 → 四拼</span>
+        <span><b>最佳规格</b> 全表取满足需求的最接近规格</span>
+        <span><b>主母线优先</b> 单片 → 双拼 → 三拼 → 四拼</span>
         <span><b>50K系数</b> 通风 1.3，密封 1.0</span>
         <span><b>PE截面</b> 按 S、16、S/2 或 S/4</span>
       </div>
@@ -471,9 +472,11 @@ function calculateBusbar() {
 
   state.project.busbars = { ...state.project.busbars, calculation: result };
   const warningClass = result.loadRate > 1 ? 'danger' : result.loadRate > 0.92 ? 'warning' : 'safe';
+  const priorityMatchesBest = result.prioritySelected?.spec === result.selected.spec;
   target.innerHTML = `
     <div class="busbar-result-hero">
-      <div><span>推荐规格</span><strong>${htmlEscape(result.selected.spec)}</strong><small>${htmlEscape(result.selected.configuration)}</small></div>
+      <div class="busbar-best-spec"><span>最佳规格</span><strong>${htmlEscape(result.selected.spec)}</strong><small>${htmlEscape(result.selected.configuration)} · 全表最接近需求</small></div>
+      <div class="busbar-priority-spec"><span>主母线结构优先</span><strong>${htmlEscape(result.prioritySelected.spec)}</strong><small>${htmlEscape(result.prioritySelected.configuration)}${priorityMatchesBest ? ' · 与最佳规格相同' : ' · 按结构顺序推荐'}</small></div>
       <div class="busbar-capacity"><span>系统额定载流</span><strong>${format(result.ratedCurrentA, 0)} A</strong><small>${result.currentField === 'bareCurrentA' ? '裸排载流量列' : '涂层载流量列'}</small></div>
       <div class="busbar-load-gauge ${warningClass}"><span>负载率</span><strong>${format(result.loadRate * 100, 1)}%</strong><small>${htmlEscape(result.loadWarning)}</small></div>
     </div>

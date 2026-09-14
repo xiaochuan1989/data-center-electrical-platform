@@ -125,12 +125,16 @@ export function calculateBusbarSelection(catalog, input = {}) {
   const lookupCurrentA = loadCurrentA / totalFactor;
   const currentField = surfaceTreatment === 'heat-shrink' ? 'coatedCurrentA' : 'bareCurrentA';
 
-  let selected = null;
+  const selected = catalog
+    .filter(item => number(item[currentField]) >= lookupCurrentA)
+    .sort((a, b) => number(a[currentField]) - number(b[currentField]))[0] || null;
+
+  let prioritySelected = null;
   for (const configuration of BUSBAR_CONFIGURATION_PRIORITY) {
-    selected = catalog
+    prioritySelected = catalog
       .filter(item => item.configuration === configuration && number(item[currentField]) >= lookupCurrentA)
       .sort((a, b) => number(a[currentField]) - number(b[currentField]) || number(a.areaMm2) - number(b.areaMm2))[0] || null;
-    if (selected) break;
+    if (prioritySelected) break;
   }
 
   if (!selected) {
@@ -162,6 +166,7 @@ export function calculateBusbarSelection(catalog, input = {}) {
     lookupCurrentA,
     currentField,
     selected,
+    prioritySelected,
     ratedCurrentA,
     areaMm2,
     loadRate,

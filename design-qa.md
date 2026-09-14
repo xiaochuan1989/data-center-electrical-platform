@@ -29,6 +29,15 @@
 - Copy and content: passed. Labels match the A03 terminology and explain the data basis, interpolation records and Icw review boundary.
 - Sidebar focused region: passed. Compared the supplied left-navigation screenshot with both saved implementation screenshots; font hierarchy, blue active state, white navigation surface and compact icon rhythm remain consistent, while the new control is an intentional functional addition.
 
+## v2.1.2 Best-specification follow-up
+
+- Source visual truth: `C:/Users/woaig/AppData/Local/Temp/codex-clipboard-4bd4508a-f5a4-4225-a230-1385f07b8d8b.png` (1295 × 947 px), showing the A03 4000A result with `4 x 100 x 5` as the best specification and `3 x 100 x 10` as the structure-priority result.
+- Rendered implementation: `output/playwright/busbar-best-spec-v212.png` (1600 × 900 px), Chromium viewport 1600 × 900 CSS pixels at device scale factor 1.
+- State: authenticated desktop view, Copper Busbar page, 4000A, ventilated, bare/tinned, IEC enhanced 50K, calculation completed.
+- Full-view comparison: the implementation preserves the established platform shell and keeps the complete input-to-result flow above the fold. Four result cards remain readable without clipping.
+- Focused comparison: the visible values match the source workbook: best specification `4 x 100 x 5`, four bars, rated current 3190A, total area 2000mm², load rate 96.5%, and PE area 500mm². The separate structure-priority card shows `3 x 100 x 10`, three bars.
+- Fidelity surfaces: typography uses the existing Chinese system-font hierarchy; spacing follows the platform card rhythm; blue marks the best specification, green distinguishes the structure-priority comparison, and amber retains the load warning; no new image assets were required; copy clearly distinguishes the two selection rules.
+
 ## Primary interactions tested
 
 - Opened the dedicated Copper Busbar page from the left navigation.
@@ -39,6 +48,7 @@
 - Expanded the sidebar again and measured the rendered widths: 70px collapsed and 232px expanded.
 - Automated module tests and the public-build privacy gate passed. No interaction failure was observed in the browser flow.
 - Browser console check returned 0 errors and 0 warnings for the tested flow.
+- Entered 4000A and confirmed both best-specification and structure-priority cards update together with their dependent rated-current, area, load-rate and PE results.
 
 ## Findings
 
@@ -54,6 +64,7 @@
 - Earlier collapsed-sidebar capture: the icon rail worked, but the only desktop entry was an unlabeled top-bar icon, which the user correctly found insufficiently obvious.
 - Fix: moved the desktop control into the top of the sidebar, added “收起导航 / 展开导航” state copy, directional icon rotation, and retained a separate top-bar trigger only for mobile.
 - Post-fix evidence: `sidebar-expanded-v211.png` visibly shows the labeled control; `sidebar-collapsed-v211.png` shows the 70px rail and right-facing expand control. Playwright confirmed the rail expands back to 232px and the console remained clean.
+- Best-specification iteration: the earlier page exposed only the structure-priority selection as “推荐规格,” which omitted Excel B14. The calculation now owns both outputs separately; post-fix browser evidence shows the 4000A values and labels match the reference with no console errors.
 
 ## Final result
 

@@ -90,6 +90,19 @@ assert.equal(calculateBusbarSelection(busbarCatalog, {
   surfaceTreatment: 'bare-or-tinned',
   temperatureRise: 'din30'
 }).selected.configuration, '双拼');
+const largeBusbar = calculateBusbarSelection(busbarCatalog, {
+  loadCurrentA: 4000,
+  installationEnvironment: 'ventilated',
+  surfaceTreatment: 'bare-or-tinned',
+  temperatureRise: 'iec50'
+});
+assert.equal(largeBusbar.selected.spec, '4 x 100 x 5');
+assert.equal(largeBusbar.selected.configuration, '四拼');
+assert.equal(largeBusbar.prioritySelected.spec, '3 x 100 x 10');
+assert.equal(largeBusbar.ratedCurrentA, 3190);
+assert.equal(largeBusbar.areaMm2, 2000);
+assert.equal(largeBusbar.peAreaMm2, 500);
+assert.ok(Math.abs(largeBusbar.loadRate - 0.964552) < 0.00001);
 assert.match(calculateBusbarSelection(busbarCatalog, { loadCurrentA: 0 }).error, /大于 0A/);
 
 for (const filename of ['busbar-catalog.json', 'conductor-catalog.json', 'cable-catalog.json']) {
@@ -102,7 +115,7 @@ for (const filename of ['busbar-catalog.json', 'conductor-catalog.json', 'cable-
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.1\.1"/);
+assert.match(index, /const APP_VERSION = "v2\.1\.2"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 const appShell = fs.readFileSync(path.join(root, 'src', 'platform', 'app-shell.js'), 'utf8');

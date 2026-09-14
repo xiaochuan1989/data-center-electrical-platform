@@ -117,17 +117,19 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .busbar-tabs button span { margin-left: 4px; opacity: .78; font-size: 11px; }
 .busbar-source-note { display: flex; gap: 12px; align-items: flex-start; margin-top: 18px; padding: 13px 15px; border-left: 4px solid #3979bd; border-radius: 7px; color: #526b82; background: #f1f7fd; font-size: 12px; line-height: 1.6; }
 .busbar-source-note b { flex: none; color: #214f78; }
-.busbar-formula-strip { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 10px; margin-top: 14px; }
+.busbar-formula-strip { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 10px; margin-top: 14px; }
 .busbar-formula-strip span { padding: 10px 12px; border: 1px solid #dce6ef; border-radius: 7px; color: #61758a; background: #fbfdff; font-size: 12px; }
 .busbar-formula-strip b { display: block; margin-bottom: 3px; color: #264e72; }
 .busbar-result { margin-top: 16px; }
-.busbar-result-hero { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 12px; }
+.busbar-result-hero { display: grid; grid-template-columns: 1.2fr 1.2fr 1fr 1fr; gap: 12px; }
 .busbar-result-hero > div { min-height: 116px; display: flex; flex-direction: column; justify-content: center; padding: 17px 19px; border: 1px solid #d7e4ef; border-radius: 10px; background: #f8fbfe; }
 .busbar-result-hero span { color: #687c90; font-size: 12px; }
 .busbar-result-hero strong { margin: 6px 0 4px; color: #153f67; font-size: 25px; }
 .busbar-result-hero small { color: #6f8295; }
-.busbar-result-hero > div:first-child { border-color: #9fc1e9; background: #eef6ff; }
-.busbar-result-hero > div:first-child strong { color: #155eef; font-size: 30px; }
+.busbar-best-spec { border-color: #9fc1e9 !important; background: #eef6ff !important; }
+.busbar-best-spec strong { color: #155eef !important; font-size: 30px !important; }
+.busbar-priority-spec { border-color: #bad7ca !important; background: #f1faf5 !important; }
+.busbar-priority-spec strong { color: #18734a !important; }
 .busbar-load-gauge.safe { border-color: #b8dfca; background: #effaf4; }
 .busbar-load-gauge.safe strong { color: #18734a; }
 .busbar-load-gauge.warning { border-color: #f0ce83; background: #fff8e6; }
@@ -188,6 +190,7 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .tool-grid { grid-template-columns: repeat(2, minmax(210px, 1fr)); }
   .project-flow { grid-template-columns: repeat(7, 145px); }
   .delivery-summary dl { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+  .busbar-result-hero, .busbar-formula-strip { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
 }
 
 @media (max-width: 900px) {
