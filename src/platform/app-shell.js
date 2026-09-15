@@ -302,8 +302,8 @@ function busbarView() {
       <details class="busbar-advanced">
         <summary>高级热工参数 <span>默认值来自原 Excel，可展开查看和修改</span></summary>
         <div class="platform-form-grid cols-3 compact">
-          <label>表面参数模式<select id="busbar-ampacity-surface-mode"><option value="excel">Excel默认：镀锡/轻微氧化</option><option value="custom">自定义发射率</option></select></label>
-          <label>表面发射率 ε<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.35" disabled></label>
+          <label>表面状态 / 发射率<select id="busbar-ampacity-surface-mode"><option value="excel">Excel原始默认（状态未注明，ε=0.35）</option><option value="bright-tin">新亮镀锡参考（ε=0.06）</option><option value="custom">自定义发射率</option></select><small>发射率随表面氧化、粗糙度和温度变化</small></label>
+          <label>计算采用的发射率 ε<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.35" disabled><small>选择“自定义”后可直接输入</small></label>
           <label>对流换热系数 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5"><small>W/(m²·K)，属于工程假设</small></label>
           <label>20℃铜电阻率 ρ₂₀<input id="busbar-ampacity-resistivity" type="number" min="0" max="0.000001" step="0.0000000001" value="0.0000000172"><small>Ω·m</small></label>
           <label>电阻温度系数 α<input id="busbar-ampacity-temperature-coefficient" type="number" min="0" max="0.02" step="0.00001" value="0.00393"><small>/℃</small></label>
@@ -703,15 +703,17 @@ function syncBusbarAmpacityControls() {
   const currentType = document.getElementById('busbar-ampacity-current-type');
   const acFactor = document.getElementById('busbar-ampacity-ac-factor');
   if (!surfaceMode || !emissivity || !currentType || !acFactor) return;
-  const usesExcelSurface = surfaceMode.value === 'excel';
-  if (usesExcelSurface) emissivity.value = '0.35';
-  emissivity.disabled = usesExcelSurface;
+  const surfacePresets = { excel: '0.35', 'bright-tin': '0.06' };
+  const usesSurfacePreset = Object.hasOwn(surfacePresets, surfaceMode.value);
+  if (usesSurfacePreset) emissivity.value = surfacePresets[surfaceMode.value];
+  emissivity.disabled = usesSurfacePreset;
   const usesAcFactor = currentType.value === 'ac';
   if (!usesAcFactor) acFactor.value = '1';
   acFactor.disabled = !usesAcFactor;
 }
 
 function calculateBusbarAmpacityResult() {
+  const surfaceModeElement = document.getElementById('busbar-ampacity-surface-mode');
   const result = calculateBusbarAmpacity(state.catalogs.busbars, {
     widthMm: numberValue('busbar-ampacity-width'),
     thicknessMm: numberValue('busbar-ampacity-thickness'),
@@ -733,7 +735,11 @@ function calculateBusbarAmpacityResult() {
     return;
   }
 
-  state.project.busbars = { ...state.project.busbars, ampacityCalculation: result };
+  const surfaceLabel = surfaceModeElement.selectedOptions[0]?.textContent || '自定义发射率';
+  state.project.busbars = {
+    ...state.project.busbars,
+    ampacityCalculation: { ...result, surfaceMode: surfaceModeElement.value, surfaceLabel }
+  };
   const dinLabel = result.dinReferenceField === 'coatedCurrentA' ? '涂层' : '裸排';
   const differenceClass = result.dinDifferencePercent === null
     ? 'neutral'
@@ -771,6 +777,7 @@ function calculateBusbarAmpacityResult() {
     <details class="busbar-calculation-details">
       <summary>查看完整计算方法</summary>
       <div class="busbar-calculation-flow">
+        <p><b>表面参数：</b>${htmlEscape(surfaceLabel)}；计算采用 ε=${format(result.emissivity, 2)}</p>
         <p><b>截面积：</b>${format(result.widthMm, 1)} × ${format(result.thicknessMm, 1)} = ${format(result.areaMm2, 1)}mm²</p>
         <p><b>内部环境：</b>${format(result.roomTemperatureC, 1)} + ${format(result.internalTemperatureRiseC, 1)} = ${format(result.internalAmbientTemperatureC, 1)}℃</p>
         <p><b>对流散热：</b>h × As × ΔT = ${format(result.convectionLossWPerM, 2)}W/m</p>

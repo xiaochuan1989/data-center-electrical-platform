@@ -203,7 +203,7 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.6\.0"/);
+assert.match(index, /const APP_VERSION = "v2\.6\.1"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
@@ -213,6 +213,9 @@ assert.match(appShell, /navButton\('busbar'/);
 assert.match(appShell, /按电流选铜排/);
 assert.match(appShell, /按规格算载流量/);
 assert.match(appShell, /id="calculate-busbar-ampacity"/);
+assert.match(appShell, /新亮镀锡参考（ε=0\.06）/);
+assert.match(appShell, /Excel原始默认（状态未注明，ε=0\.35）/);
+assert.match(appShell, /'bright-tin': '0\.06'/);
 assert.match(appShell, /GB\/T 24276-2025/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);
 assert.doesNotMatch(appShell, /conductor-catalog/);
