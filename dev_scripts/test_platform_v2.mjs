@@ -11,6 +11,7 @@ import {
   calculateCableSelection,
   calculateBusway,
   calculateLoadSummary,
+  calculateLithiumBatteryA00,
   calculateSmartBusway,
   calculateSvg,
   nextStandard
@@ -51,6 +52,33 @@ assert.equal(apf.recommendedA, 450);
 const svg = calculateSvg({ activePowerKw: 800, currentPowerFactor: 0.8, targetPowerFactor: 0.95 });
 assert.ok(Math.abs(svg.compensationKvar - 337.05) < 0.1);
 assert.equal(svg.recommendedKvar, 350);
+
+const lithiumA00 = calculateLithiumBatteryA00({
+  loadPowerKw: 500,
+  upsPowerKva: 600,
+  nominalVoltageV: 512,
+  groupCount: 2,
+  powerFactor: 0.8,
+  dischargeTimeH: 0.25,
+  batteryOutputEfficiency: 0.95
+});
+assert.equal(lithiumA00.cellSeriesCount, 160);
+assert.equal(lithiumA00.inverterEfficiency, 0.95);
+assert.equal(lithiumA00.dischargeRateC, 4);
+assert.equal(lithiumA00.cellPlatformVoltageV, 3.05);
+assert.ok(Math.abs(lithiumA00.calculatedCapacityAh - 141.90999500476818) < 1e-10);
+assert.equal(lithiumA00.excelDisplayCapacityAh, 142);
+const lithiumFallback = calculateLithiumBatteryA00({ ...lithiumA00, loadPowerKw: '', upsPowerKva: 100, nominalVoltageV: 512, groupCount: 2, powerFactor: 0.8, dischargeTimeH: 1, batteryOutputEfficiency: 0.95 });
+assert.equal(lithiumFallback.inverterEfficiency, 0.93);
+assert.equal(lithiumFallback.designPowerKw, 80);
+assert.equal(calculateLithiumBatteryA00({ ...lithiumA00, loadPowerKw: '', upsPowerKva: 100.1, nominalVoltageV: 512, groupCount: 2, powerFactor: 0.8, dischargeTimeH: 1, batteryOutputEfficiency: 0.95 }).inverterEfficiency, 0.95);
+assert.equal(calculateLithiumBatteryA00({ ...lithiumA00, loadPowerKw: 0 }).designPowerKw, 0);
+assert.equal(calculateLithiumBatteryA00({ ...lithiumA00, dischargeTimeH: 1 }).cellPlatformVoltageV, 3.15);
+assert.equal(calculateLithiumBatteryA00({ ...lithiumA00, dischargeTimeH: 0.5 }).cellPlatformVoltageV, 3.12);
+assert.equal(calculateLithiumBatteryA00({ ...lithiumA00, dischargeTimeH: 0.2 }).cellPlatformVoltageV, 3.05);
+assert.equal(calculateLithiumBatteryA00({ ...lithiumA00, dischargeTimeH: 0.1 }).cellPlatformVoltageV, 3.02);
+assert.equal(calculateLithiumBatteryA00({ ...lithiumA00, dischargeTimeH: 0.3 }).excelFormulaGap, true);
+assert.match(calculateLithiumBatteryA00({ ...lithiumA00, groupCount: '' }).error, /电池组/);
 
 const smartBusway = calculateSmartBusway({
   row1: { cabinets600: 10, cabinets800: 0, ac300: 0, ac600: 2 },
@@ -139,9 +167,11 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.4\.0"/);
+assert.match(index, /const APP_VERSION = "v2\.5\.0"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
+assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
+assert.match(index, /原表 J2 的 IFS 公式未定义 3C～4C 区间/);
 const appShell = fs.readFileSync(path.join(root, 'src', 'platform', 'app-shell.js'), 'utf8');
 assert.match(appShell, /navButton\('busbar'/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);

@@ -1,5 +1,8 @@
 import './css/platform-v2.css';
 import { initializePlatform } from './platform/app-shell.js';
+import { calculateLithiumBatteryA00 } from './modules/engineering-calculators.js';
+
+window.calculateLithiumBatteryA00 = calculateLithiumBatteryA00;
 
 function start() {
   initializePlatform().catch(error => {

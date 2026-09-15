@@ -6,7 +6,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232d6a9f'/%3E%3Cpath d='M36 4 14 36h16l-2 24 22-34H34z' fill='%23fff'/%3E%3C/svg%3E">
 <title>数据中心电气设计与选型平台</title>
 <script>
-const APP_VERSION = "v2.4.0";
+const APP_VERSION = "v2.5.0";
 const DEBUG_MODE = false;
 const CLIENT_SIDE_ACCESS_CODE = '173205';
 const PRICE_VIEW_CODE = '314159';
@@ -965,60 +965,100 @@ function checkAuth(){
 
     <!-- 锂电池面板 -->
     <div id="batt-lithium-panel" style="display:none">
-      <div style="background:#fff8e1;border:1.5px solid #ffcc80;border-radius:10px;padding:16px">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div class="lithium-a00-intro">
+        <strong>计算口径：锂电池-选型模板-A00.xlsx</strong>
+        <span>网页字段、自动取值和容量公式逐项对应“锂电池选型”工作表第 2 行。</span>
+      </div>
+      <div class="lithium-a00-input-card">
+        <div class="lithium-a00-input-grid">
           <div class="field">
-            <label>负载功率 (kW)</label>
-            <input type="number" id="li-load-kw" placeholder="选填">
+            <label for="li-load-kw">负载功率 A2（kW，选填）</label>
+            <input type="number" id="li-load-kw" value="500" min="0" step="0.1" placeholder="留空时按UPS容量×功率因数">
+            <small>填写后优先采用；留空才按 UPS 容量计算</small>
           </div>
           <div class="field">
-            <label>UPS容量 (kVA)</label>
-            <input type="number" id="li-ups-kva" placeholder="必填">
+            <label for="li-ups-kva">UPS 功率 B2（kVA）</label>
+            <input type="number" id="li-ups-kva" value="600" min="0.1" step="0.1" oninput="syncLithiumBatteryPreview()">
+            <small>同时决定逆变器效率：≤100kVA 取 0.93，&gt;100kVA 取 0.95</small>
           </div>
           <div class="field">
-            <label>功率因数</label>
-            <input type="number" id="li-pf" value="0.8" step="0.01">
+            <label for="li-nominal-voltage">标称电压 L2（V）</label>
+            <input type="number" id="li-nominal-voltage" value="512" min="0.1" step="0.1" oninput="syncLithiumBatteryPreview()">
+            <small>电芯串联数 C2 = 标称电压 ÷ 3.2V</small>
           </div>
           <div class="field">
-            <label>电池组数</label>
-            <input type="number" id="li-group-num" value="2">
+            <label for="li-group-num">电池组数量 D2</label>
+            <select id="li-group-num">
+              <option value="">请选择</option>
+              <option value="1">1 组</option>
+              <option value="2" selected>2 组</option>
+              <option value="3">3 组</option>
+              <option value="4">4 组</option>
+            </select>
           </div>
           <div class="field">
-            <label>放电时间 (h)</label>
-            <input type="number" id="li-time" value="0.25" step="0.01">
+            <label for="li-pf">功率因数 E2（0.8～1）</label>
+            <input type="number" id="li-pf" value="0.8" min="0.8" max="1" step="0.01">
           </div>
           <div class="field">
-            <label>电芯串联数</label>
-            <input type="number" id="li-cell-num" value="160">
+            <label for="li-time">放电时间 H2（h）</label>
+            <input type="number" id="li-time" value="0.25" min="0.01" step="0.01" oninput="syncLithiumBatteryPreview()">
+            <small>电芯放电倍率 I2 = 1 ÷ 放电时间</small>
           </div>
           <div class="field">
-            <label>逆变器效率</label>
-            <input type="number" id="li-eff" value="0.95" step="0.01">
+            <label for="li-batt-eff">电池输出效率 G2（0.9～1）</label>
+            <input type="number" id="li-batt-eff" value="0.95" min="0.9" max="1" step="0.01">
           </div>
           <div class="field">
-            <label>电池输出效率</label>
-            <input type="number" id="li-batt-eff" value="0.95" step="0.01">
+            <label for="li-eff">逆变器效率 F2（自动）</label>
+            <input type="number" id="li-eff" value="0.95" step="0.01" readonly aria-readonly="true">
+            <small>严格按 IF(B2&gt;100, 0.95, 0.93) 自动取值</small>
           </div>
         </div>
-        <button class="save-btn" onclick="calcLithiumBattery()" style="margin-top:12px;padding:10px 24px;background:#ff9800;border-color:#f57c00">计算锂电池</button>
+        <div class="lithium-a00-derived" aria-label="Excel 自动计算字段">
+          <div><span>3.2V 电芯串联数 C2</span><strong id="li-preview-cell-num">160</strong></div>
+          <div><span>逆变器效率 F2</span><strong id="li-preview-eff">0.95</strong></div>
+          <div><span>电芯放电倍率 I2</span><strong id="li-preview-rate">4.00 C</strong></div>
+          <div><span>电芯平台电压 J2</span><strong id="li-preview-platform">3.05 V</strong></div>
+        </div>
+        <button class="save-btn lithium-a00-calc-button" onclick="calcLithiumBattery()">按 Excel A00 计算</button>
       </div>
+
+      <details class="lithium-a00-method" open>
+        <summary>计算方法说明与 Excel 单元格对应关系</summary>
+        <div class="lithium-a00-method-body">
+          <p><strong>功率取值：</strong>A2（负载功率）不为空时采用 A2；A2 为空时采用 B2 × E2（UPS 功率 × 功率因数）。</p>
+          <p><strong>自动参数：</strong>C2 = L2 ÷ 3.2；F2 = IF(B2&gt;100, 0.95, 0.93)；I2 = 1 ÷ H2。</p>
+          <p><strong>平台电压 J2：</strong>≤1C 取 3.15V；&gt;1C 且 ≤3C 取 3.12V；≥4C 且 ≤6C 取 3.05V；&gt;6C 取 3.02V。</p>
+          <p><strong>容量 K2：</strong>功率(kW) × 1000 × H2 ÷ (F2 × C2 × D2 × G2 × J2)。结果为每组所需计算容量，Excel 单元格显示为整数 Ah。</p>
+          <div class="lithium-a00-warning">原表 J2 的 IFS 公式未定义 3C～4C 区间；网页遇到该区间会明确提示，不会擅自补值。</div>
+        </div>
+      </details>
 
       <!-- 计算结果 -->
       <div id="li-result" style="display:none;margin-top:16px">
-        <div style="background:#fff3e0;border:1px solid #ffb74d;border-radius:10px;padding:16px">
-          <div style="font-weight:600;margin-bottom:12px;color:#e65100">📊 计算结果</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
-            <div style="text-align:center;padding:12px;background:white;border-radius:8px">
-              <div style="font-size:12px;color:#888">标称电压</div>
-              <div style="font-size:24px;font-weight:600;color:#e65100"><span id="li-nominal-volts">-</span> V</div>
+        <div class="lithium-a00-result-card">
+          <div class="lithium-a00-result-title">Excel A00 对照结果</div>
+          <div class="lithium-a00-result-grid">
+            <div class="lithium-a00-result-primary">
+              <span>单组计算容量 K2（Excel 显示值）</span>
+              <strong><span id="li-capacity">-</span> Ah</strong>
+              <small>未取整计算值：<span id="li-capacity-precise">-</span> Ah</small>
             </div>
-            <div style="text-align:center;padding:12px;background:white;border-radius:8px">
-              <div style="font-size:12px;color:#888">放电倍率</div>
-              <div style="font-size:18px;font-weight:600;color:#e65100"><span id="li-rate">-</span></div>
+            <div>
+              <span>计算采用功率</span>
+              <strong><span id="li-design-power">-</span> kW</strong>
+              <small id="li-power-source">-</small>
             </div>
-            <div style="text-align:center;padding:12px;background:white;border-radius:8px">
-              <div style="font-size:12px;color:#888">电池容量</div>
-              <div style="font-size:24px;font-weight:600;color:#e65100"><span id="li-capacity">-</span> Ah</div>
+            <div>
+              <span>3.2V 电芯串联数 C2</span>
+              <strong><span id="li-cell-series">-</span></strong>
+              <small><span id="li-nominal-volts">-</span> V ÷ 3.2V</small>
+            </div>
+            <div>
+              <span>放电倍率 / 平台电压</span>
+              <strong><span id="li-rate">-</span></strong>
+              <small id="li-platform-rule">-</small>
             </div>
           </div>
           <div id="li-calc-notes" style="margin-top:12px"></div>
@@ -3627,6 +3667,7 @@ function switchBattV1Tab(tab) {
   // 显示对应面板
   document.getElementById('batt-lead-panel').style.display = tab === 'lead' ? 'block' : 'none';
   document.getElementById('batt-lithium-panel').style.display = tab === 'lithium' ? 'block' : 'none';
+  if (tab === 'lithium') syncLithiumBatteryPreview();
 }
 
 const MONITOR_PRODUCTS = [
@@ -30033,75 +30074,87 @@ function renderBatteryDataTable() {
 }
 function filterBatteryDataTable(){renderBatteryDataTable();}
 
-// 锂电池配置计算
+function getLithiumPlatformVoltage(rate) {
+  if (rate <= 1) return { voltage: 3.15, rule: '≤1C' };
+  if (rate > 1 && rate <= 3) return { voltage: 3.12, rule: '>1C 且 ≤3C' };
+  if (rate >= 4 && rate <= 6) return { voltage: 3.05, rule: '≥4C 且 ≤6C' };
+  if (rate > 6) return { voltage: 3.02, rule: '>6C' };
+  return { voltage: null, rule: '3C～4C：Excel 未定义' };
+}
+
+function syncLithiumBatteryPreview() {
+  const upsKva = Number(document.getElementById('li-ups-kva')?.value);
+  const nominalVoltage = Number(document.getElementById('li-nominal-voltage')?.value);
+  const time = Number(document.getElementById('li-time')?.value);
+  const inverterEfficiency = Number.isFinite(upsKva) && upsKva > 100 ? 0.95 : 0.93;
+  const cellSeries = Number.isFinite(nominalVoltage) && nominalVoltage > 0 ? nominalVoltage / 3.2 : null;
+  const rate = Number.isFinite(time) && time > 0 ? 1 / time : null;
+  const platform = rate === null ? { voltage: null, rule: '' } : getLithiumPlatformVoltage(rate);
+
+  const effInput = document.getElementById('li-eff');
+  if (effInput) effInput.value = inverterEfficiency.toFixed(2);
+  const cellEl = document.getElementById('li-preview-cell-num');
+  const effEl = document.getElementById('li-preview-eff');
+  const rateEl = document.getElementById('li-preview-rate');
+  const platformEl = document.getElementById('li-preview-platform');
+  if (cellEl) cellEl.textContent = cellSeries === null ? '—' : Number.isInteger(cellSeries) ? String(cellSeries) : cellSeries.toFixed(2);
+  if (effEl) effEl.textContent = inverterEfficiency.toFixed(2);
+  if (rateEl) rateEl.textContent = rate === null ? '—' : rate.toFixed(2) + ' C';
+  if (platformEl) platformEl.textContent = platform.voltage === null ? (platform.rule || '—') : platform.voltage.toFixed(2) + ' V';
+}
+
+// 锂电池配置计算：完整复现《锂电池-选型模板-A00.xlsx》第二行口径。
 function calcLithiumBattery() {
-  const loadKw = parseFloat(document.getElementById('li-load-kw').value);
-  const upsKva = parseFloat(document.getElementById('li-ups-kva').value) || 0;
-  const pf = parseFloat(document.getElementById('li-pf').value) || 0.8;
-  const groupNum = parseFloat(document.getElementById('li-group-num').value) || 2;
-  const time = parseFloat(document.getElementById('li-time').value) || 0.25;
-  const cellNum = parseFloat(document.getElementById('li-cell-num').value) || 160;
-  const eff = parseFloat(document.getElementById('li-eff').value) || 0.95;
-  const battEff = parseFloat(document.getElementById('li-batt-eff').value) || 0.95;
-
-  // IF公式：如果负载功率为空，则使用 UPS功率 × cosφ
-  const powerW = (loadKw === 0 || isNaN(loadKw)) ? (upsKva * pf * 1000) : (loadKw * 1000);
-
-  if (!groupNum || !time) {
-    showToast('请填写完整的锂电池参数');
+  if (typeof window.calculateLithiumBatteryA00 !== 'function') {
+    showToast('锂电池计算模块尚未加载，请刷新页面后重试');
     return;
   }
 
-  // 根据公式计算：
-  // 1. 电池放电倍率 = 1 / 放电时间
-  const batteryRate = 1 / time;
+  const result = window.calculateLithiumBatteryA00({
+    loadPowerKw: document.getElementById('li-load-kw').value,
+    upsPowerKva: document.getElementById('li-ups-kva').value,
+    nominalVoltageV: document.getElementById('li-nominal-voltage').value,
+    groupCount: document.getElementById('li-group-num').value,
+    powerFactor: document.getElementById('li-pf').value,
+    dischargeTimeH: document.getElementById('li-time').value,
+    batteryOutputEfficiency: document.getElementById('li-batt-eff').value
+  });
 
-  // 2. 根据电池放电倍率确定电芯平台电压（查表）
-  //    ≤1C：3.15V，1C~3C：3.12V，4C~6C：3.05V，>6C：3.02V
-  let cellVolts;
-  if (batteryRate <= 1) {
-    cellVolts = 3.15;
-  } else if (batteryRate <= 3) {
-    cellVolts = 3.12;
-  } else if (batteryRate <= 6) {
-    cellVolts = 3.05;
-  } else {
-    cellVolts = 3.02;
+  if (result.error) {
+    document.getElementById('li-result').style.display = 'none';
+    showToast(result.error);
+    syncLithiumBatteryPreview();
+    return;
   }
 
-  // 3. 标称电压 = 电芯串联数量 × 3.2V
-  const nominalVolts = cellNum * 3.2;
+  const format = (value, digits = 2) => Number(value).toLocaleString('zh-CN', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: digits
+  });
+  document.getElementById('li-capacity').textContent = format(result.excelDisplayCapacityAh, 0);
+  document.getElementById('li-capacity-precise').textContent = format(result.calculatedCapacityAh, 2);
+  document.getElementById('li-design-power').textContent = format(result.designPowerKw, 3);
+  document.getElementById('li-power-source').textContent = '取值来源：' + result.sourcePowerLabel;
+  document.getElementById('li-cell-series').textContent = format(result.cellSeriesCount, 2);
+  document.getElementById('li-nominal-volts').textContent = format(result.nominalVoltageV, 2);
+  document.getElementById('li-rate').textContent = format(result.dischargeRateC, 2) + ' C / ' + result.cellPlatformVoltageV.toFixed(2) + ' V';
+  document.getElementById('li-platform-rule').textContent = 'J2 条件：' + result.platformVoltageRule;
+  document.getElementById('li-eff').value = result.inverterEfficiency.toFixed(2);
 
-  // 4. 计算电池容量(Ah) = 负载功率(kW) × 1000 × 放电时间 / (μ × S × N × η × U)
-  // 公式来源: Excel = A2*1000*H2/(F2*C2*D2*G2*J2)
-  const calcCapacity = (powerW * time) / (eff * cellNum * groupNum * battEff * cellVolts);
+  const powerExpression = result.hasLoadPower
+    ? `${format(result.loadPowerKw, 3)} × 1000`
+    : `${format(result.upsPowerKva, 3)} × ${format(result.powerFactor, 2)} × 1000`;
+  const capacityExpression = `${format(result.designPowerKw * 1000, 2)} × ${format(result.dischargeTimeH, 3)} ÷ (${result.inverterEfficiency.toFixed(2)} × ${format(result.cellSeriesCount, 2)} × ${format(result.groupCount, 0)} × ${result.batteryOutputEfficiency.toFixed(2)} × ${result.cellPlatformVoltageV.toFixed(2)})`;
+  document.getElementById('li-calc-notes').innerHTML = `
+    <div class="lithium-a00-substitution">
+      <div class="lithium-a00-substitution-title">本次代入过程</div>
+      <div><span>功率：</span><code>${powerExpression}</code><strong>= ${format(result.designPowerKw * 1000, 2)} W</strong></div>
+      <div><span>C2：</span><code>${format(result.nominalVoltageV, 2)} ÷ 3.2</code><strong>= ${format(result.cellSeriesCount, 2)}</strong></div>
+      <div><span>I2：</span><code>1 ÷ ${format(result.dischargeTimeH, 3)}</code><strong>= ${format(result.dischargeRateC, 2)} C</strong></div>
+      <div><span>K2：</span><code>${capacityExpression}</code><strong>= ${format(result.calculatedCapacityAh, 2)} Ah（显示 ${format(result.excelDisplayCapacityAh, 0)} Ah）</strong></div>
+    </div>`;
 
-  // 显示结果
-  document.getElementById('li-nominal-volts').textContent = nominalVolts.toFixed(0);
-  document.getElementById('li-rate').textContent = batteryRate.toFixed(2) + 'C (电芯平台电压:' + cellVolts + 'V)';
-  document.getElementById('li-capacity').textContent = calcCapacity.toFixed(2);
-
-  // 计算说明
-  const calcNotes = `
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #d0e8ff;font-size:12px;line-height:1.8;color:#555">
-      <div style="font-weight:600;margin-bottom:8px">📐 计算说明</div>
-      <ul style="margin:0;padding-left:20px">
-        <li>功率(W) = ${loadKw && !isNaN(loadKw) ? loadKw + '×1000' : upsKva + '×' + pf + '×1000'} = ${powerW.toFixed(0)} W</li>
-        <li>电池放电倍率 = 1 / ${time} = ${batteryRate.toFixed(2)} C</li>
-        <li>电芯平台电压 (查表) = ${cellVolts} V (${batteryRate <= 1 ? '≤1C' : batteryRate <= 3 ? '1~3C' : batteryRate <= 6 ? '4~6C' : '>6C'})</li>
-        <li>标称电压 = ${cellNum} × 3.2V = ${nominalVolts.toFixed(0)} V</li>
-        <li>计算电池容量 = ${powerW.toFixed(0)}×${time} / (${eff}×${cellNum}×${groupNum}×${battEff}×${cellVolts}) = ${calcCapacity.toFixed(2)} Ah</li>
-      </ul>
-      <div style="margin-top:8px;padding:8px;background:#f5f5f5;border-radius:6px">
-        <strong>公式：</strong><br>
-        功率 = 负载功率×1000 或 UPS功率×cosφ×1000<br>
-        计算电池容量 = 功率×T(h) / (μ×S×N×η×U)<br>
-        其中：μ=逆变器效率，S=电芯串联数量，N=电池组数量，η=电池输出效率，U=电芯平台电压
-      </div>
-    </div>
-  `;
-  document.getElementById('li-calc-notes').innerHTML = calcNotes;
-
+  syncLithiumBatteryPreview();
   document.getElementById('li-result').style.display = 'block';
 }
 

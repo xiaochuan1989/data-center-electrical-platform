@@ -1,34 +1,41 @@
-# Design QA — v2.4.0
+# Design QA — v2.5.0 锂电池 A00
 
-Status: PASS
+## 对照证据
 
-## Reference and implementation
+- source visual truth path：`C:\Users\woaig\AppData\Local\Temp\codex-clipboard-0384212c-2bf3-4689-98cd-549040cf3ecc.png`
+- implementation screenshot path：`D:\Claude 安装\UPS选型助手_开发包\output\playwright\lithium-a00-v2.5.0-panel.png`
+- viewport screenshot path：`D:\Claude 安装\UPS选型助手_开发包\output\playwright\lithium-a00-v2.5.0-viewport.png`
+- viewport：1600 × 1000 CSS px，devicePixelRatio 1
+- source pixels：2179 × 647；implementation panel pixels：1297 × 1170；viewport pixels：1600 × 1000
+- normalization：均以 1× 密度查看；源图用于确认原页面信息缺口，不要求按其高度复刻。实现截图按实际锂电池面板边界完整截取。
+- state：已通过前端访问门槛，进入“电池方法一 / 锂电”并切换到“锂电池”，采用 Excel 默认示例完成计算，计算方法保持展开。
 
-- Reference: disabled/empty “并列根数（S=d）” control in the supplied cable screenshot.
-- Implementation: the control is an enabled 1–6 dropdown, matching Excel `G4`, with contextual text explaining whether it participates in the current correction formula.
-- Reference: product database card followed by a large blank page area and tables that could not reach the final row.
-- Implementation: the database card occupies the remaining viewport; each table owns its vertical scrolling and reaches its final row.
+## 全视图与重点区域比较
 
-## Layout
+- 全视图：原页面只有 8 个输入项且下方大面积空白；新页面在相同现有框架内形成“来源说明 → 输入 → 自动字段 → 方法说明 → 结果与代入过程”的完整纵向信息结构，没有横向溢出或内容截断。
+- 重点区域：输入区、四个自动字段、方法说明和结果卡片在同一面板截图中均可清晰读取，因此不再单独裁剪小图。
 
-- 1600×900: body scroll height equals viewport height (900px); database scroll panes are 284px high and both final rows are visible after scrolling.
-- 1366×768: body scroll height equals viewport height (768px); database scroll panes are 218px high and both final rows are visible after scrolling.
-- Sidebar stays fixed and readable; the database card fills the workspace without the previous lower-page dead space.
+## Findings
 
-## Typography and hierarchy
+- 未发现可执行的 P0/P1/P2 问题。
+- 字体与排版：沿用平台现有中文字体、标签字号、输入高度与层级；容量结果采用更大的工程结果字号，长说明不出现异常换行。
+- 间距与布局节奏：四列输入和四列结果对齐，卡片间距、圆角和边框与平台工程模块一致；1180px 以下切换两列，600px 以下切换单列。
+- 颜色与视觉标记：沿用平台蓝色与橙色锂电池语义色，警告只用于 Excel 3C～4C 公式缺口；对比度和主次关系清楚。
+- 图片与资产：本次页面没有新增图片资产；保留现有品牌和导航资产，没有用临时占位图替换。
+- 文案与内容：输入、自动字段、Excel 单元格、公式、变量和结果显示精度均与 A00 工作表一致；“每组容量”和“Excel 显示值”含义明确。
 
-- Existing platform type scale, spacing, colors and card hierarchy are preserved.
-- The new dropdown hint uses secondary text styling and does not compete with the current correction-factor card.
+## 交互与计算证据
 
-## Interaction and accessibility
+- 默认样例结果：C2=160、F2=0.95、I2=4C、J2=3.05V、K2 精确值=141.91Ah、Excel 整数显示=142Ah。
+- 计算结果区域可见；计算方法默认展开。
+- 页面和锂电池面板均无横向溢出。
+- 浏览器控制台错误：0。
+- 主要交互：切换模块、切换锂电池标签、按 Excel A00 计算、展开状态检查。
 
-- “并联根数” remains a 1–4 dropdown; “并列根数（S=d）” is selectable from 1–6 under every condition.
-- Selecting a value under an inapplicable condition leaves the current formula unchanged and provides an explicit explanation.
-- Product information and technical-specification tables retain independent horizontal and vertical scrolling.
-- The sidebar, project flow and tool center expose no “编码与交付” entry; the template center remains available.
-- Browser console: 0 errors, 0 warnings during the verified flows.
+## 比较历史
 
-## Intentional differences
+- 初始源图缺口：电芯串联数方向与 Excel 相反、逆变器效率可手填、缺少标称电压/自动字段/公式说明/详细结果。
+- 修复：改为标称电压输入并自动计算串联数；自动按 UPS 容量取逆变器效率；补齐倍率和平台电压逻辑、公式说明、实际代入和双精度结果展示。
+- 修复后证据：`lithium-a00-v2.5.0-panel.png`；未发现新的 P0/P1/P2 差异。
 
-- The Excel workbook can retain a value that is ignored by its conditional formula. The web UI makes that state visible with a hint, instead of disabling the input or silently accepting it.
-- “编码与交付” is hidden from current navigation by product decision; its implementation is retained for later restoration.
+final result: passed

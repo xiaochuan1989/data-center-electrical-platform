@@ -234,6 +234,40 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .publish-state { padding: 3px 7px; border-radius: 10px; color: #8a5e10; background: #fff3d9; }
 .publish-state.yes { color: #18613e; background: #e5f6ec; }
 
+.lithium-a00-intro { display: flex; flex-wrap: wrap; gap: 5px 12px; margin-bottom: 12px; padding: 11px 14px; border-left: 4px solid #d98b16; border-radius: 7px; color: #6d521d; background: #fff8e8; font-size: 12px; line-height: 1.55; }
+.lithium-a00-intro strong { color: #704a08; }
+.lithium-a00-input-card { padding: 16px; border: 1px solid #f0c66e; border-radius: 10px; background: #fffbf2; }
+.lithium-a00-input-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 14px 12px; }
+.lithium-a00-input-grid .field { min-width: 0; }
+.lithium-a00-input-grid .field label { min-height: 18px; color: #52677b; font-size: 12px; }
+.lithium-a00-input-grid .field input, .lithium-a00-input-grid .field select { width: 100%; min-height: 39px; box-sizing: border-box; }
+.lithium-a00-input-grid .field input[readonly] { color: #315677; background: #eef4f9; cursor: default; }
+.lithium-a00-input-grid .field small { display: block; min-height: 30px; margin-top: 5px; color: #7b8792; font-size: 11px; line-height: 1.4; }
+.lithium-a00-derived { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
+.lithium-a00-derived > div { min-height: 61px; display: flex; flex-direction: column; justify-content: center; padding: 10px 12px; border: 1px solid #dbe6ef; border-radius: 8px; background: #fff; }
+.lithium-a00-derived span { color: #6b7e90; font-size: 11px; }
+.lithium-a00-derived strong { margin-top: 4px; color: #1b4e78; font-size: 17px; }
+.lithium-a00-calc-button { min-height: 40px; margin-top: 14px; padding: 0 20px !important; border-color: #c87908 !important; background: #d7860f !important; }
+.lithium-a00-method { margin-top: 14px; border: 1px solid #dbe5ee; border-radius: 9px; background: #fff; overflow: hidden; }
+.lithium-a00-method summary { padding: 12px 15px; color: #284c6d; background: #f4f8fc; cursor: pointer; font-size: 13px; font-weight: 700; }
+.lithium-a00-method-body { padding: 13px 16px 15px; color: #50677d; font-size: 12px; line-height: 1.65; }
+.lithium-a00-method-body p { margin: 0 0 7px; }
+.lithium-a00-warning { margin-top: 10px; padding: 9px 11px; border: 1px solid #f1d18c; border-radius: 6px; color: #7c560b; background: #fff7df; }
+.lithium-a00-result-card { padding: 16px; border: 1px solid #f0bd64; border-radius: 10px; background: #fff8e8; }
+.lithium-a00-result-title { margin-bottom: 12px; color: #7d4c06; font-weight: 700; }
+.lithium-a00-result-grid { display: grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 12px; }
+.lithium-a00-result-grid > div { min-height: 94px; display: flex; flex-direction: column; justify-content: center; padding: 14px; border: 1px solid #e3e8ed; border-radius: 9px; background: #fff; }
+.lithium-a00-result-grid span { color: #6c7e8f; font-size: 12px; }
+.lithium-a00-result-grid strong { margin: 6px 0 4px; color: #194a73; font-size: 22px; }
+.lithium-a00-result-grid small { color: #718295; font-size: 11px; }
+.lithium-a00-result-grid .lithium-a00-result-primary { border-color: #efbc5f; background: #fffdf7; }
+.lithium-a00-result-grid .lithium-a00-result-primary strong { color: #b06000; font-size: 29px; }
+.lithium-a00-substitution { padding-top: 13px; border-top: 1px solid #ead8b9; color: #4d6174; font-size: 12px; }
+.lithium-a00-substitution-title { margin-bottom: 8px; color: #704d13; font-weight: 700; }
+.lithium-a00-substitution > div:not(.lithium-a00-substitution-title) { display: grid; grid-template-columns: 42px minmax(260px, 1fr) auto; gap: 8px; align-items: baseline; padding: 5px 0; }
+.lithium-a00-substitution code { overflow-wrap: anywhere; color: #315571; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+.lithium-a00-substitution strong { color: #284b69; font-weight: 600; }
+
 .global-ai-fab { position: fixed; right: 22px; bottom: 24px; z-index: 70; width: 52px; height: 52px; border: 0; border-radius: 16px; color: #fff; background: #155eef; box-shadow: 0 10px 28px rgba(21,94,239,.35); cursor: pointer; font-weight: 800; }
 .global-ai-drawer { position: fixed; top: 0; right: 0; z-index: 90; width: min(410px, 94vw); height: 100vh; padding: 20px; box-sizing: border-box; border-left: 1px solid #cddae7; background: #fff; box-shadow: -16px 0 45px rgba(18, 50, 78, .18); transform: translateX(105%); transition: transform .24s ease; }
 .global-ai-drawer.open { transform: translateX(0); }
@@ -258,6 +292,7 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .cable-result-detail { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
   .correction-table-grid { grid-template-columns: 1fr; }
   .cable-catalog-toolbar { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
+  .lithium-a00-input-grid, .lithium-a00-derived, .lithium-a00-result-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
 }
 
 @media (max-width: 900px) {
@@ -282,6 +317,8 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .busbar-table-summary { padding-top: 0; }
   .reference-table-summary { padding-top: 0; }
   .platform-v2 .appbar-sub { display: none; }
+  .lithium-a00-substitution > div:not(.lithium-a00-substitution-title) { grid-template-columns: 42px 1fr; }
+  .lithium-a00-substitution strong { grid-column: 2; }
 }
 
 @media (max-width: 600px) {
@@ -292,4 +329,5 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .busbar-catalog-toolbar { grid-template-columns: 1fr; }
   .cable-catalog-toolbar, .awg-catalog-toolbar { grid-template-columns: 1fr; }
   .cable-result-detail, .awg-query { grid-template-columns: 1fr; }
+  .lithium-a00-input-grid, .lithium-a00-derived, .lithium-a00-result-grid { grid-template-columns: 1fr; }
 }

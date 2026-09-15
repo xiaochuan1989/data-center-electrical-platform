@@ -99,6 +99,90 @@ export function calculateSvg({ activePowerKw, currentPowerFactor = 0.8, targetPo
   return { compensationKvar, recommendedKvar: Math.ceil(compensationKvar / 25) * 25 };
 }
 
+/**
+ * 锂电池容量计算（逐项对应《锂电池-选型模板-A00.xlsx》“锂电池选型”第 2 行）。
+ *
+ * Excel 对应关系：
+ * C2=L2/3.2；F2=IF(B2>100,0.95,0.93)；I2=1/H2；
+ * J2=IFS(I2<=1,3.15,AND(I2>1,I2<=3),3.12,AND(I2>=4,I2<=6),3.05,I2>6,3.02)；
+ * K2=IF(A2="",B2*E2*1000*H2/(F2*C2*D2*G2*J2),A2*1000*H2/(F2*C2*D2*G2*J2))。
+ */
+export function calculateLithiumBatteryA00(input = {}) {
+  const loadText = input.loadPowerKw === undefined || input.loadPowerKw === null
+    ? ''
+    : String(input.loadPowerKw).trim();
+  const hasLoadPower = loadText !== '';
+  const loadPowerKw = hasLoadPower ? Number(loadText) : null;
+  const upsPowerKva = Number(input.upsPowerKva);
+  const nominalVoltageV = Number(input.nominalVoltageV);
+  const groupCount = Number(input.groupCount);
+  const powerFactor = Number(input.powerFactor);
+  const dischargeTimeH = Number(input.dischargeTimeH);
+  const batteryOutputEfficiency = Number(input.batteryOutputEfficiency);
+
+  if (hasLoadPower && (!Number.isFinite(loadPowerKw) || loadPowerKw < 0)) {
+    return { error: '负载功率必须为大于或等于 0 的数字，留空时按 UPS 容量计算' };
+  }
+  if (!Number.isFinite(upsPowerKva) || upsPowerKva <= 0) return { error: '请输入大于 0kVA 的 UPS 容量' };
+  if (!Number.isFinite(nominalVoltageV) || nominalVoltageV <= 0) return { error: '请输入大于 0V 的标称电压' };
+  if (!Number.isFinite(groupCount) || groupCount <= 0) return { error: '请选择有效的电池组数量' };
+  if (!Number.isFinite(powerFactor) || powerFactor < 0.8 || powerFactor > 1) return { error: '功率因数必须在 0.8～1 之间' };
+  if (!Number.isFinite(dischargeTimeH) || dischargeTimeH <= 0) return { error: '放电时间必须大于 0 小时' };
+  if (!Number.isFinite(batteryOutputEfficiency) || batteryOutputEfficiency < 0.9 || batteryOutputEfficiency > 1) {
+    return { error: '电池输出效率必须在 0.9～1 之间' };
+  }
+
+  const cellSeriesCount = nominalVoltageV / 3.2;
+  const inverterEfficiency = upsPowerKva > 100 ? 0.95 : 0.93;
+  const dischargeRateC = 1 / dischargeTimeH;
+  let cellPlatformVoltageV = null;
+  let platformVoltageRule = '';
+
+  if (dischargeRateC <= 1) {
+    cellPlatformVoltageV = 3.15;
+    platformVoltageRule = '≤1C';
+  } else if (dischargeRateC > 1 && dischargeRateC <= 3) {
+    cellPlatformVoltageV = 3.12;
+    platformVoltageRule = '>1C 且 ≤3C';
+  } else if (dischargeRateC >= 4 && dischargeRateC <= 6) {
+    cellPlatformVoltageV = 3.05;
+    platformVoltageRule = '≥4C 且 ≤6C';
+  } else if (dischargeRateC > 6) {
+    cellPlatformVoltageV = 3.02;
+    platformVoltageRule = '>6C';
+  } else {
+    return {
+      error: 'A00 Excel 的平台电压公式在 3C～4C 区间没有定义，请调整放电时间或确认平台电压口径',
+      dischargeRateC,
+      excelFormulaGap: true
+    };
+  }
+
+  const designPowerKw = hasLoadPower ? loadPowerKw : upsPowerKva * powerFactor;
+  const calculatedCapacityAh = designPowerKw * 1000 * dischargeTimeH
+    / (inverterEfficiency * cellSeriesCount * groupCount * batteryOutputEfficiency * cellPlatformVoltageV);
+
+  return {
+    hasLoadPower,
+    sourcePowerLabel: hasLoadPower ? '负载功率' : 'UPS容量 × 功率因数',
+    loadPowerKw,
+    upsPowerKva,
+    nominalVoltageV,
+    cellSeriesCount,
+    groupCount,
+    powerFactor,
+    inverterEfficiency,
+    batteryOutputEfficiency,
+    dischargeTimeH,
+    dischargeRateC,
+    cellPlatformVoltageV,
+    platformVoltageRule,
+    designPowerKw,
+    calculatedCapacityAh,
+    excelDisplayCapacityAh: Math.round(calculatedCapacityAh)
+  };
+}
+
 export function calculateSmartBusway(input) {
   const rowLength = row => Math.ceil((600 * number(row?.cabinets600) + 800 * number(row?.cabinets800) + 300 * number(row?.ac300) + 600 * number(row?.ac600)) / 1000);
   const row1LengthM = rowLength(input.row1);

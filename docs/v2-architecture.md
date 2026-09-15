@@ -1,6 +1,6 @@
 # v2 平台架构与数据边界
 
-> 当前版本：v2.4.0 · 更新：2026-09-15
+> 当前版本：v2.5.0 · 更新：2026-09-15
 
 ## 架构策略
 
@@ -34,7 +34,7 @@ flowchart LR
 | `src/platform/project-schema.js` | 统一项目格式和归一化 |
 | `src/platform/project-store.js` | IndexedDB、JSON 导入导出、旧数据复制迁移 |
 | `src/platform/tool-registry.js` | 工具中心唯一入口、来源和治理状态 |
-| `src/modules/engineering-calculators.js` | 无 DOM 的纯计算函数 |
+| `src/modules/engineering-calculators.js` | 无 DOM 的纯计算函数，包括 Excel A00 等价的锂电池容量计算 |
 | `src/data/busbar-catalog.json` | 97 条铜排载流量数据 |
 | `src/data/cable-catalog.json` | 224 条电缆基础数据 |
 | `src/data/awg-catalog.json` | 50 条中美线规对照数据 |
@@ -78,3 +78,4 @@ Vite 只从 `index.html` 和 `src/` 生成 `dist/`。`工具模板/`、原始 Ex
 4. 1366×768、1920×1080 和平板宽度浏览器回归。
 5. 产品数据库双表能分别滚动到最后一行，控制台无 error。
 6. 文档版本、应用版本和包版本一致。
+7. 锂电池 Excel 示例（500kW、600kVA、512V、2组、PF0.8、0.25h、输出效率0.95）应得到 C2=160、F2=0.95、I2=4C、J2=3.05V、K2=141.909995Ah，页面整数显示 142Ah。
