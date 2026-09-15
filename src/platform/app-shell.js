@@ -267,11 +267,11 @@ function busbarView() {
       <button role="tab" aria-selected="false" data-busbar-tab="catalog">载流量数据表 <span>${busbarCatalog.length} 条</span></button>
     </div>
     <div class="busbar-pane" data-busbar-pane="selection">
-      <div class="busbar-source-note"><b>计算口径</b><span>基础载流量来自 DIN43671-1975，环境温度 35°C；A03 工作簿中的温升、安装环境和表面处理规则均已保留。</span></div>
+      <div class="busbar-source-note"><b>计算口径</b><span>基础载流量来自 DIN43671-1975，环境温度 35°C。A03 原表的“涂层”列不再等同于热缩套管；全镀锡、热缩或特殊结构请转到“按规格算载流量”并填写经验证的热工参数。</span></div>
       <div class="platform-form-grid cols-4 busbar-inputs">
         <label>负载电流(A)<input id="busbar-load-current" type="number" min="1" max="20000" step="1" value="1600"></label>
         <label>安装环境<select id="busbar-environment"><option value="ventilated">通风</option><option value="sealed">IP54 / 密封</option></select></label>
-        <label>表面处理<select id="busbar-surface"><option value="bare-or-tinned">光裸 / 全镀锡</option><option value="heat-shrink">热缩套管</option></select></label>
+        <label>载流量数据列<select id="busbar-surface"><option value="bare">裸排列（A03 原表）</option><option value="coated">涂层列（A03 原表，非热缩）</option></select></label>
         <label>选型温升口径<select id="busbar-temperature-rise"><option value="iec50">50K 温升修正（通风 × 1.3）</option><option value="din30">30K 温升基准（DIN 原值）</option></select></label>
       </div>
       <div class="busbar-formula-strip" aria-label="计算说明">
@@ -289,6 +289,10 @@ function busbarView() {
         <b>温升口径</b>
         <span>70K 是铜排相对外部环境的工程控制温升：35 + 70 = 105℃。若柜内空气比房间再高 15K，则柜内空气为 50℃，铜排对柜内空气的有效散热温差为 105 − 50 = 55K；它与 DIN 表的 30K 查表条件不是同一个量。</span>
       </div>
+      <div class="busbar-ampacity-scope">
+        <b>适用边界</b>
+        <span>本模型只适用于单片、非并联、四个表面均可自然散热的初步估算。并排互热、柜壁遮挡、热缩绝缘、接头损耗、强迫风冷及实际交流附加损耗必须另行校核；柜内空气温升应优先采用项目实测或整柜温升计算结果。</span>
+      </div>
       <div class="platform-form-grid cols-4 busbar-inputs busbar-ampacity-inputs">
         <label>铜排宽度 (mm)<input id="busbar-ampacity-width" type="number" min="1" max="500" step="1" value="120"></label>
         <label>铜排厚度 (mm)<input id="busbar-ampacity-thickness" type="number" min="0.5" max="100" step="0.5" value="10"></label>
@@ -297,16 +301,16 @@ function busbarView() {
         <label>铜排最高温度 (℃)<input id="busbar-ampacity-maximum-temperature" type="number" value="105" readonly><small>外部环境温度 + 工程控制温升（自动计算）</small></label>
         <label>柜内空气温升 (K)<input id="busbar-ampacity-internal-rise" type="number" min="0" max="100" step="1" value="15"><small>密闭柜体 Excel 默认 15K；开放空气可填 0K</small></label>
         <label>电流类型<select id="busbar-ampacity-current-type"><option value="dc">直流 / 忽略交流附加损耗</option><option value="ac">交流（使用修正系数）</option></select></label>
-        <label>设计裕量系数<select id="busbar-ampacity-design-factor"><option value="0.7">70%</option><option value="0.8" selected>80%（Excel默认）</option><option value="0.9">90%</option><option value="1">100%（无裕量）</option></select></label>
-        <label>DIN同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量</option><option value="coatedCurrentA">涂层载流量</option></select></label>
+        <label>设计裕量系数<select id="busbar-ampacity-design-factor"><option value="0.7">70%</option><option value="0.8" selected>80%（建议默认）</option><option value="0.9">90%</option><option value="1">100%（热平衡极限，不推荐）</option></select></label>
+        <label>DIN同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量</option><option value="coatedCurrentA">涂层载流量（非热缩）</option></select></label>
       </div>
       <details class="busbar-advanced">
-        <summary>高级热工参数 <span>默认值来自原 Excel，可展开查看和修改</span></summary>
+        <summary>高级热工参数 <span>建议值已复核，可展开查看和修改</span></summary>
         <div class="platform-form-grid cols-3 compact">
-          <label>表面状态 / 发射率<select id="busbar-ampacity-surface-mode"><option value="excel">Excel原始默认（状态未注明，ε=0.35）</option><option value="bright-tin">新亮镀锡参考（ε=0.06）</option><option value="custom">自定义发射率</option></select><small>发射率随表面氧化、粗糙度和温度变化</small></label>
-          <label>计算采用的发射率 ε<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.35" disabled><small>选择“自定义”后可直接输入</small></label>
-          <label>对流换热系数 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5"><small>W/(m²·K)，属于工程假设</small></label>
-          <label>20℃铜电阻率 ρ₂₀<input id="busbar-ampacity-resistivity" type="number" min="0" max="0.000001" step="0.0000000001" value="0.0000000172"><small>Ω·m</small></label>
+          <label>表面状态 / 发射率<select id="busbar-ampacity-surface-mode"><option value="bright-tin" selected>新亮全镀锡（ε=0.05，建议默认）</option><option value="conservative-tin">电镀铜保守校核（ε=0.03）</option><option value="excel">原 Excel 历史参数（状态未注明，ε=0.35）</option><option value="custom">自定义发射率</option></select><small>0.35 不代表镀锡；氧化、粗糙或特殊表面须依据实测</small></label>
+          <label>计算采用的发射率 ε<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.05" disabled><small>这是辐射散热参数，不是铜排电阻发热系数</small></label>
+          <label>对流换热系数 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5"><small>W/(m²·K)；5 为自然对流初算值，并非统一常数</small></label>
+          <label>20℃铜电阻率 ρ₂₀<input id="busbar-ampacity-resistivity" type="number" min="0" max="0.000001" step="0.000000000001" value="0.000000017241"><small>Ω·m；按高导电退火铜，材料不明时应保守提高</small></label>
           <label>电阻温度系数 α<input id="busbar-ampacity-temperature-coefficient" type="number" min="0" max="0.02" step="0.00001" value="0.00393"><small>/℃</small></label>
           <label>交流电阻修正系数<input id="busbar-ampacity-ac-factor" type="number" min="1" max="5" step="0.01" value="1" disabled><small>1.00 表示尚未计入交流附加损耗</small></label>
         </div>
@@ -708,7 +712,7 @@ function syncBusbarAmpacityControls() {
   const riseLimit = document.getElementById('busbar-ampacity-rise-limit');
   const maximumTemperature = document.getElementById('busbar-ampacity-maximum-temperature');
   if (!surfaceMode || !emissivity || !currentType || !acFactor) return;
-  const surfacePresets = { excel: '0.35', 'bright-tin': '0.06' };
+  const surfacePresets = { excel: '0.35', 'bright-tin': '0.05', 'conservative-tin': '0.03' };
   const usesSurfacePreset = Object.hasOwn(surfacePresets, surfaceMode.value);
   if (usesSurfacePreset) emissivity.value = surfacePresets[surfaceMode.value];
   emissivity.disabled = usesSurfacePreset;
@@ -744,6 +748,7 @@ function calculateBusbarAmpacityResult() {
   }
 
   const surfaceLabel = surfaceModeElement.selectedOptions[0]?.textContent || '自定义发射率';
+  const isThermalLimit = result.designFactor >= 0.999;
   state.project.busbars = {
     ...state.project.busbars,
     ampacityCalculation: { ...result, surfaceMode: surfaceModeElement.value, surfaceLabel }
@@ -754,19 +759,19 @@ function calculateBusbarAmpacityResult() {
     : Math.abs(result.dinDifferencePercent) > 0.15 ? 'warning' : 'safe';
   const differenceText = result.dinDifferencePercent === null
     ? 'DIN数据表中没有完全相同的单片规格'
-    : `${result.recommendedCurrentA >= result.dinCurrentA ? '高于' : '低于'}DIN ${dinLabel}数据 ${format(Math.abs(result.dinDifferencePercent) * 100, 1)}%`;
+    : `${result.thermalBalanceCurrentA >= result.dinCurrentA ? '高于' : '低于'}DIN ${dinLabel}数据 ${format(Math.abs(result.dinDifferencePercent) * 100, 1)}%`;
   const dinComparison = result.dinMatch
     ? `<div class="busbar-din-comparison ${differenceClass}">
         <div><span>DIN同规格</span><strong>${htmlEscape(result.dinMatch.spec)} · 单片</strong></div>
         <div><span>DIN ${dinLabel}载流量</span><strong>${format(result.dinCurrentA, 0)} A</strong></div>
-        <div><span>模型建议值差异</span><strong>${htmlEscape(differenceText)}</strong></div>
+        <div><span>热平衡值差异</span><strong>${htmlEscape(differenceText)}</strong></div>
         <p>两者温升、散热和表面条件不同，只用于交叉核对，不能互相替代。</p>
       </div>`
     : `<div class="busbar-din-comparison neutral"><p>${htmlEscape(differenceText)}；仍可使用热平衡结果，但无法完成DIN同规格对照。</p></div>`;
 
   target.innerHTML = `
     <div class="busbar-result-hero busbar-ampacity-hero">
-      <div class="busbar-best-spec"><span>建议持续工作电流</span><strong>${format(result.recommendedCurrentA, 0)} A</strong><small>热平衡值 × ${format(result.designFactor * 100, 0)}%设计裕量</small></div>
+      <div class="busbar-best-spec"><span>${isThermalLimit ? '热平衡极限电流' : '建议持续工作电流'}</span><strong>${format(result.recommendedCurrentA, 0)} A</strong><small>${isThermalLimit ? '100%无设计裕量，不建议直接作为额定值' : `热平衡值 × ${format(result.designFactor * 100, 0)}%设计裕量`}</small></div>
       <div class="busbar-capacity"><span>热平衡估算载流量</span><strong>${format(result.thermalBalanceCurrentA, 0)} A</strong><small>不是经型式试验验证的额定值</small></div>
       <div><span>设计电流下估算温度</span><strong>${format(result.estimatedOperatingTemperatureC, 1)} ℃</strong><small>内部环境 ${format(result.internalAmbientTemperatureC, 1)}℃</small></div>
       <div><span>建议电流密度</span><strong>${format(result.currentDensityAmm2, 2)} A/mm²</strong><small>铜排截面 ${format(result.areaMm2, 0)}mm²</small></div>
@@ -799,6 +804,8 @@ function calculateBusbarAmpacityResult() {
     </details>
     <div class="busbar-notices">
       <p class="neutral">70K 为本项目采用的工程控制口径，并非所有母线场景的统一限值；实际最高温度还应受端子、绝缘、连接件、相邻元件和验证条件中的最低限值约束。</p>
+      <p class="${surfaceModeElement.value === 'excel' ? 'warning' : 'neutral'}">${surfaceModeElement.value === 'excel' ? '当前使用原 Excel 的 ε=0.35 历史参数，其表面状态和依据未注明；它不代表新亮镀锡铜排，可能使载流量估算偏高。' : '新亮镀锡默认采用 ε=0.05；需要更保守时可选择 ε=0.03，其他表面状态应采用实测或验证值。'}</p>
+      <p class="${isThermalLimit ? 'warning' : 'neutral'}">${isThermalLimit ? '当前选择100%：结果是达到最高温度时的理论热平衡极限，没有连续运行设计裕量。' : `当前已采用 ${format(result.designFactor * 100, 0)}% 设计系数；该系数是工程裕量，不是标准统一规定。`}</p>
       <p class="warning">“内部温升、换热系数、发射率和设计裕量”均会显著影响结果，请按实际结构或验证数据填写。</p>
       <p class="${result.requiresAcVerification ? 'warning' : 'neutral'}">${result.requiresAcVerification ? '当前选择交流，但交流电阻修正系数仍为1.00，尚未计入集肤、邻近和谐波附加损耗。' : `当前采用${result.currentType === 'ac' ? `交流电阻系数 ${format(result.acResistanceFactor, 2)}` : '直流电阻'}进行计算。`}</p>
       <p class="${result.requiresShortCircuitCheck ? 'warning' : 'neutral'}">${result.requiresShortCircuitCheck ? '建议电流达到4000A及以上，必须专项校核短路耐受能力 Icw。' : '仍须结合项目短路电流、连接件和绝缘支撑条件校核。'}</p>

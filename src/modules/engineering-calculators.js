@@ -213,11 +213,13 @@ export function calculateBusbarSelection(catalog, input = {}) {
   if (loadCurrentA <= 0) return { error: '请输入大于 0A 的负载电流' };
 
   const installationEnvironment = input.installationEnvironment === 'sealed' ? 'sealed' : 'ventilated';
-  const surfaceTreatment = input.surfaceTreatment === 'heat-shrink' ? 'heat-shrink' : 'bare-or-tinned';
+  // A03 的“涂层”列没有证明等同于热缩套管；这里只按原数据列选择，
+  // 不再把热缩套管作为更高载流量涂层的同义词。
+  const surfaceTreatment = input.surfaceTreatment === 'coated' ? 'coated' : 'bare';
   const temperatureRise = input.temperatureRise === 'din30' ? 'din30' : 'iec50';
   const totalFactor = temperatureRise === 'din30' || installationEnvironment === 'sealed' ? 1 : 1.3;
   const lookupCurrentA = loadCurrentA / totalFactor;
-  const currentField = surfaceTreatment === 'heat-shrink' ? 'coatedCurrentA' : 'bareCurrentA';
+  const currentField = surfaceTreatment === 'coated' ? 'coatedCurrentA' : 'bareCurrentA';
 
   const selected = catalog
     .filter(item => number(item[currentField]) >= lookupCurrentA)
@@ -358,7 +360,9 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
   const dinMatch = (catalog || []).find(item => item.configuration === '单片'
     && String(item.spec).replace(/×/g, 'x').replace(/\s+/g, ' ').trim() === normalizedSpec) || null;
   const dinCurrentA = dinMatch ? number(dinMatch[dinReferenceField]) : null;
-  const dinDifferencePercent = dinCurrentA > 0 ? recommendedCurrentA / dinCurrentA - 1 : null;
+  // DIN 数据表是载流量基准，交叉对照应使用热平衡极限值；若使用乘过
+  // 设计裕量的建议值，差异会随用户选择的裕量变化，失去对模型本身的意义。
+  const dinDifferencePercent = dinCurrentA > 0 ? thermalBalanceCurrentA / dinCurrentA - 1 : null;
 
   return {
     widthMm,

@@ -99,7 +99,7 @@ assert.deepEqual(Object.fromEntries(['单片', '双拼', '三拼', '四拼'].map
 const busbar = calculateBusbarSelection(busbarCatalog, {
   loadCurrentA: 1600,
   installationEnvironment: 'ventilated',
-  surfaceTreatment: 'bare-or-tinned',
+  surfaceTreatment: 'bare',
   temperatureRise: 'iec50'
 });
 assert.equal(busbar.totalFactor, 1.3);
@@ -113,19 +113,19 @@ assert.ok(Math.abs(busbar.loadRate - 0.9925558) < 0.00001);
 assert.equal(calculateBusbarSelection(busbarCatalog, {
   loadCurrentA: 1600,
   installationEnvironment: 'sealed',
-  surfaceTreatment: 'bare-or-tinned',
+  surfaceTreatment: 'bare',
   temperatureRise: 'iec50'
 }).totalFactor, 1);
 assert.equal(calculateBusbarSelection(busbarCatalog, {
   loadCurrentA: 2400,
   installationEnvironment: 'sealed',
-  surfaceTreatment: 'bare-or-tinned',
+  surfaceTreatment: 'bare',
   temperatureRise: 'din30'
 }).selected.configuration, '双拼');
 const largeBusbar = calculateBusbarSelection(busbarCatalog, {
   loadCurrentA: 4000,
   installationEnvironment: 'ventilated',
-  surfaceTreatment: 'bare-or-tinned',
+  surfaceTreatment: 'bare',
   temperatureRise: 'iec50'
 });
 assert.equal(largeBusbar.selected.spec, '4 x 100 x 5');
@@ -163,7 +163,7 @@ assert.equal(busbarAmpacity.internalAmbientTemperatureC, 50);
 assert.equal(busbarAmpacity.effectiveTemperatureRiseK, 55);
 assert.equal(busbarAmpacity.dinMatch.spec, '120 x 10');
 assert.equal(busbarAmpacity.dinCurrentA, 1740);
-assert.ok(Math.abs(busbarAmpacity.dinDifferencePercent - 0.1553390312978669) < 1e-12);
+assert.ok(Math.abs(busbarAmpacity.dinDifferencePercent - 0.44417378912233356) < 1e-12);
 assert.ok(busbarAmpacity.estimatedOperatingTemperatureC > busbarAmpacity.internalAmbientTemperatureC);
 assert.ok(busbarAmpacity.estimatedOperatingTemperatureC < busbarAmpacity.maximumTemperatureC);
 const busbarAmpacityCoated = calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, dinReferenceField: 'coatedCurrentA' });
@@ -176,6 +176,19 @@ assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, wi
 assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, widthMm: 5, thicknessMm: 10 }).error, /输入顺序/);
 assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, permittedTemperatureRiseK: 15 }).error, /必须高于/);
 assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, emissivity: 1.1 }).error, /发射率/);
+
+const reviewedTinBusbar = calculateBusbarAmpacity(busbarCatalog, {
+  ...busbarAmpacityInput,
+  widthMm: 40,
+  thicknessMm: 6,
+  emissivity: 0.05,
+  resistivity20OhmM: 1.7241e-8,
+  designFactor: 0.8
+});
+assert.ok(Math.abs(reviewedTinBusbar.thermalBalanceCurrentA - 538.4877643145713) < 1e-9);
+assert.ok(Math.abs(reviewedTinBusbar.recommendedCurrentA - 430.7902114516571) < 1e-9);
+assert.equal(reviewedTinBusbar.dinCurrentA, 528);
+assert.ok(Math.abs(reviewedTinBusbar.dinDifferencePercent - 0.019863189989718366) < 1e-12);
 
 const cableCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'cable-catalog.json'), 'utf8'));
 assert.equal(cableCatalog.length, 224);
@@ -208,7 +221,7 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.6\.3"/);
+assert.match(index, /const APP_VERSION = "v2\.6\.4"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
@@ -218,14 +231,17 @@ assert.match(appShell, /navButton\('busbar'/);
 assert.match(appShell, /按电流选铜排/);
 assert.match(appShell, /按规格算载流量/);
 assert.match(appShell, /id="calculate-busbar-ampacity"/);
-assert.match(appShell, /新亮镀锡参考（ε=0\.06）/);
-assert.match(appShell, /Excel原始默认（状态未注明，ε=0\.35）/);
+assert.match(appShell, /新亮全镀锡（ε=0\.05，建议默认）/);
+assert.match(appShell, /原 Excel 历史参数（状态未注明，ε=0\.35）/);
 assert.match(appShell, /id="busbar-ampacity-rise-limit"/);
 assert.match(appShell, /35 \+ 70 = 105℃/);
 assert.match(appShell, /50K 温升修正（通风 × 1\.3）/);
 assert.match(appShell, /30K 温升基准（DIN 原值）/);
 assert.doesNotMatch(appShell, />A03 修正口径/);
-assert.match(appShell, /'bright-tin': '0\.06'/);
+assert.match(appShell, /'bright-tin': '0\.05'/);
+assert.match(appShell, /'conservative-tin': '0\.03'/);
+assert.match(appShell, /100%（热平衡极限，不推荐）/);
+assert.doesNotMatch(appShell, /value="heat-shrink"/);
 assert.match(appShell, /GB\/T 24276-2025/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);
 assert.doesNotMatch(appShell, /conductor-catalog/);
