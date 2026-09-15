@@ -33,9 +33,13 @@ body.platform-v2 { background: var(--platform-bg); }
 .platform-sidebar-collapsed .platform-nav-item + .platform-nav-label { margin-top: 18px; }
 .platform-sidebar-collapsed .platform-sidebar-control { justify-content: center; padding-left: 8px; padding-right: 8px; }
 .platform-sidebar-collapsed .platform-sidebar-control .ti { transform: rotate(-90deg); }
-.platform-workspace { min-width: 0; }
+.platform-workspace { min-width: 0; min-height: 0; }
 .platform-v2 .container { width: auto; max-width: none; margin: 0; padding: 24px 28px 60px; }
-.platform-v2.db-view-active .container { padding-left: 20px; padding-right: 20px; }
+.platform-v2.db-view-active { height: 100dvh; overflow: hidden; }
+.platform-v2.db-view-active .platform-layout { height: calc(100dvh - 64px); min-height: 0; }
+.platform-v2.db-view-active .platform-workspace { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.platform-v2.db-view-active .container { flex: 1 1 0; min-height: 0; overflow: hidden; padding: 18px 20px; }
+.platform-v2.db-view-active .footer { display: none; }
 .platform-sidebar-toggle { width: 36px; height: 36px; display: none; place-items: center; flex: 0 0 36px; border: 1px solid rgba(255,255,255,.28); border-radius: 8px; color: #fff; background: transparent; font-size: 19px; cursor: pointer; }
 .platform-sidebar-toggle:hover { background: rgba(255,255,255,.1); }
 .platform-sidebar-toggle .platform-nav-icon { color: currentColor; }
@@ -59,7 +63,7 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .project-status-card { border-left: 4px solid #5c8fd8; background: #f3f8fe; }
 .project-status-card p { color: #526b82; font-size: 13px; line-height: 1.7; }
 .migration-status { margin-top: 14px; padding: 9px 10px; border-radius: 6px; color: #176541; background: #eaf8f1; font-size: 12px; }
-.project-flow { display: grid; grid-template-columns: repeat(7, minmax(110px, 1fr)); gap: 1px; margin-top: 20px; padding: 1px; border: 1px solid #dbe5ee; border-radius: 9px; overflow-x: auto; background: #dbe5ee; }
+.project-flow { display: grid; grid-template-columns: repeat(6, minmax(110px, 1fr)); gap: 1px; margin-top: 20px; padding: 1px; border: 1px solid #dbe5ee; border-radius: 9px; overflow-x: auto; background: #dbe5ee; }
 .project-flow button { min-height: 78px; display: flex; gap: 8px; align-items: center; padding: 10px; border: 0; color: #34516b; background: #fff; cursor: pointer; white-space: nowrap; }
 .project-flow button:hover { background: #eef5ff; }
 .project-flow span { width: 24px; height: 24px; display: inline-grid; place-items: center; flex: none; border-radius: 50%; color: #fff; background: #4d7fb8; font-size: 11px; }
@@ -121,6 +125,7 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .cable-source-note { margin-top: 18px; }
 .cable-inputs label:has(:disabled) { opacity: .66; }
 .cable-inputs select:disabled { cursor: not-allowed; background: #f0f4f7; }
+.cable-field-hint { min-height: 16px; color: #718397; font-size: 10px; line-height: 1.45; }
 .cable-factor-preview { min-height: 64px; display: grid; grid-template-columns: 1fr auto; align-content: center; gap: 3px 8px; padding: 9px 12px; border: 1px solid #bfd6ed; border-radius: 8px; color: #587087; background: #f0f7fe; box-sizing: border-box; }
 .cable-factor-preview span, .cable-factor-preview small { grid-column: 1 / -1; font-size: 11px; }
 .cable-factor-preview strong { color: #174f80; font-size: 22px; }
@@ -247,7 +252,7 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .platform-v2 .container { padding: 20px; }
   .platform-form-grid.cols-4 { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
   .tool-grid { grid-template-columns: repeat(2, minmax(210px, 1fr)); }
-  .project-flow { grid-template-columns: repeat(7, 145px); }
+  .project-flow { grid-template-columns: repeat(6, 145px); }
   .delivery-summary dl { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
   .busbar-result-hero, .busbar-formula-strip, .cable-result-hero { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
   .cable-result-detail { grid-template-columns: repeat(2, minmax(150px, 1fr)); }

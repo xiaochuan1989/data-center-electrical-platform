@@ -1,10 +1,17 @@
 # 数据中心电气设计与选型平台
 
-**版本**：v2.3.0 · **线上地址**：https://xiaochuan1989.github.io/data-center-electrical-platform/
+**版本**：v2.4.0 · **线上地址**：https://xiaochuan1989.github.io/data-center-electrical-platform/
 
-面向销售、售前和技术工程人员的静态工程工具平台。采用“项目工作台 + 工具中心”双入口，把项目参数沿负荷、UPS与电池、配电、导体、母线、电能质量及成果输出贯通。
+面向销售、售前和技术工程人员的静态工程工具平台。采用“项目工作台 + 工具中心”双入口，把项目参数沿负荷、UPS与电池、配电、电缆、铜排、母线和电能质量贯通。“编码与交付”目前按业务决定暂时隐藏，底层代码保留，后续确认后再开放。
 
 平台继续使用免费的 GitHub Pages，不建设服务器、Docker 或账号系统。项目数据、用户填写价格和 AI 配置只保存在本机浏览器；现有访问密码仅作为提示性门槛，不代表真正的数据保密能力。
+
+## v2.4.0 优化
+
+- 对照 `B-电缆选型-A00.xlsx` 恢复并列根数 1～6 下拉；所有条件均可选择，不适用时明确提示“当前不采用并列系数”。
+- 产品数据库改为占满浏览器剩余可视区域，产品信息和技术规格各自完整纵向滚动，移除页面底部无效空白。
+- 暂时隐藏侧栏、项目流程和工具中心中的“编码与交付”入口；相关实现未删除。
+- README、产品技术文档、工程开发手册、架构说明和工具治理清单同步到 v2.4.0。
 
 ## v2.3.0 优化
 
@@ -71,7 +78,7 @@ python dev_scripts/test.py --all
 - `src/main.js`：Vite 应用入口。
 - `src/platform/`：平台外壳、项目格式、IndexedDB 存储、工具注册表。
 - `src/modules/`：与界面分离的纯计算函数。
-- `src/data/`：从当前有效工具提取的无价格工程基础数据。
+- `src/data/`：从当前有效工具提取的工程基础数据，包括 97 条铜排、224 条电缆及 50 条线规数据。
 - `src/css/platform-v2.css`：新版平台布局和响应式样式。
 - `dev_scripts/extract_engineering_catalogs.py`：从 Excel 核对源重建非价格基础数据。
 - `dev_scripts/build_tool_inventory.mjs`：重建 70 个来源文件的治理主清单。
@@ -85,7 +92,9 @@ GitHub Actions 先运行 Python/Node 质量检查，再执行 `npm ci && npm run
 
 v1.8.39 已建立 Git 标签，作为升级前回退基线。
 
-## 历史文档
+## 开发文档
 
-- [UPS选型助手_开发文档.md](UPS选型助手_开发文档.md)：v1 成熟 UPS/电池功能与计算说明。
-- [UPS选型助手_开发说明.md](UPS选型助手_开发说明.md)：v1 工程维护和回归资料。
+- [UPS选型助手_开发文档.md](UPS选型助手_开发文档.md)：当前平台产品能力、模块、数据和关键计算口径。
+- [UPS选型助手_开发说明.md](UPS选型助手_开发说明.md)：当前工程目录、开发流程、测试、浏览器回归和发布说明。
+- [docs/v2-architecture.md](docs/v2-architecture.md)：平台架构、数据存储和公开构建边界。
+- [docs/tool-inventory.md](docs/tool-inventory.md)：工具主清单、当前核对版、迁移状态及暂缓项。

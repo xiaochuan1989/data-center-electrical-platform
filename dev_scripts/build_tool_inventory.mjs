@@ -45,7 +45,7 @@ function category(file) {
   if (name.includes('导体') || name.includes('铜排')) return ['铜排计算', '铜排选型', 'P2'];
   if (name.includes('母线')) return ['母线系统', '母线配置', 'P2'];
   if (name.includes('apf') || name.includes('svg') || name.includes('电能质量')) return ['电能质量', 'APF/SVG', 'P2'];
-  if (name.includes('编码')) return ['编码与交付', '编码输出', 'P3'];
+  if (name.includes('编码')) return ['暂缓功能', '编码与交付（入口暂时隐藏）', 'P3'];
   if (name.includes('报价') || name.includes('商务') || name.includes('价格')) return ['模板中心', '商务成本空模板', 'P3'];
   return ['模板中心', '资料/模板', 'P4'];
 }
@@ -81,7 +81,7 @@ const currentCount = files.filter(file => currentFiles.has(file)).length;
 const restrictedCount = files.filter(file => /带价格|价格|报价/.test(file)).length;
 const document = `# 工具主清单与迁移优先级表
 
-生成日期：2026-09-14
+生成日期：2026-09-15
 
 核对范围：\`工具模板/\` 中除 Excel 临时锁文件外的全部文件。
 合计：**${files.length} 个文件**；已指定当前核对版：**${currentCount} 个**；名称显示价格/报价风险：**${restrictedCount} 个**。
@@ -92,6 +92,8 @@ const document = `# 工具主清单与迁移优先级表
 - 重复版本按业务能力合并，正常入口只显示唯一当前能力；A00～A11、V5～V7 等历史版本进入归档。
 - 原始工作簿不随 GitHub Pages 发布；只发布网页计算逻辑、无价格基础数据及通过检查的脱敏模板。
 - 商务成本只生成空白格式，不内置目录价、供应商价或历史成交价。名称或内容涉及价格/报价的原件全部标为受限核对源。
+- “编码与交付”自 v2.4.0 起暂时不在侧栏、项目流程和工具中心展示；来源文件及底层实现保留，待业务口径确认后恢复。
+- 电缆以 \`B-电缆选型-A00.xlsx\` 为当前网页核对源；铜排独立使用 \`铜排载流量-A03.xlsx\`，不再提供笼统的“导体选型”入口。
 - “待人工确认”表示尚未完成公式逐项等价验证，不代表文件无价值。
 
 ## 主清单

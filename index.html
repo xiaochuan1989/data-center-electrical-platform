@@ -6,7 +6,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232d6a9f'/%3E%3Cpath d='M36 4 14 36h16l-2 24 22-34H34z' fill='%23fff'/%3E%3C/svg%3E">
 <title>数据中心电气设计与选型平台</title>
 <script>
-const APP_VERSION = "v2.3.0";
+const APP_VERSION = "v2.4.0";
 const DEBUG_MODE = false;
 const CLIENT_SIDE_ACCESS_CODE = '173205';
 const PRICE_VIEW_CODE = '314159';
@@ -252,9 +252,9 @@ document.addEventListener("DOMContentLoaded", function() {
   .db-empty-row td { height:92px;text-align:center;color:#94a3b8;background:#f8fafc !important;font-size:13px; }
   .db-split-layout { display:flex;flex-direction:column;height:clamp(620px,calc(100vh - 250px),920px);min-height:520px; }
   body.db-view-active .container { flex:1 1 0;display:flex;flex-direction:column;min-height:0; }
-  body.db-view-active #data-table-panel { flex:1 1 0;display:flex !important;flex-direction:column;min-height:620px;margin-bottom:0; }
-  body.db-view-active .db-split-layout { flex:1 1 0;height:auto;min-height:520px; }
-  .db-pane { display:flex;flex-direction:column;min-height:160px;min-width:0; }
+  body.db-view-active #data-table-panel { flex:1 1 0;display:flex !important;flex-direction:column;min-height:0;margin-bottom:0;overflow:hidden; }
+  body.db-view-active .db-split-layout { flex:1 1 0;height:auto;min-height:0;overflow:hidden; }
+  .db-pane { display:flex;flex-direction:column;min-height:120px;min-width:0;overflow:hidden; }
   .db-pane-top { flex:0 0 calc(50% - 10px); }
   .db-pane-bottom { flex:1 1 0; }
   .db-pane-title { flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;font-weight:700;padding:6px 9px;margin-bottom:5px;border-radius:0 5px 5px 0; }

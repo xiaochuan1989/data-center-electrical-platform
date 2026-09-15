@@ -90,8 +90,7 @@ function buildSidebar() {
     ${navButton('busbar', '铜排计算', 'stack-2')}
     ${navButton('busway', '母线系统', 'device-desktop-analytics')}
     ${navButton('power-quality', '电能质量', 'calculator')}
-    <div class="platform-nav-label">成果管理</div>
-    ${navButton('delivery', '编码与交付', 'device-floppy')}
+    <div class="platform-nav-label">资料管理</div>
     ${navButton('templates', '模板中心', 'clipboard-data')}
   </aside>`;
 }
@@ -99,7 +98,7 @@ function buildSidebar() {
 function projectView() {
   const steps = [
     ['项目信息', 'project'], ['负荷计算', 'load'], ['UPS与电池', 'battery'], ['配电设备', 'load'],
-    ['电缆/铜排/母线', 'cable'], ['电能质量', 'power-quality'], ['编码与成果输出', 'delivery']
+    ['电缆/铜排/母线', 'cable'], ['电能质量', 'power-quality']
   ];
   return viewPanel('project', '项目工作台', '一个项目、一套参数，计算结果可在模块之间复用。', `
     <div class="project-toolbar">
@@ -194,7 +193,7 @@ function cableView() {
         <label>环境温度(℃)<select id="cable-ambient"><option>25</option><option>30</option><option selected>35</option><option>40</option></select></label>
         <label>负载电流(A)<input id="cable-current" type="number" min="1" max="1600" step="1" value="400"></label>
         <label>并联根数<select id="cable-parallel-count"><option>1</option><option>2</option><option selected>3</option><option>4</option></select></label>
-        <label>并列根数（S=d）<select id="cable-group-count"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option></select></label>
+        <label>并列根数（S=d）<select id="cable-group-count"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option></select><small id="cable-group-hint" class="cable-field-hint"></small></label>
         <label>电源系统<select id="cable-system"><option>交流</option><option>直流</option></select></label>
         <label>单芯排列方式<select id="cable-arrangement"><option>品字形</option><option>水平形</option><option>不考虑</option></select></label>
         <label>桥架类别<select id="cable-tray-type"><option>梯架</option><option>托盘</option></select></label>
@@ -530,8 +529,11 @@ function updateCableControls() {
   if (!usesArrangement) arrangement.value = '不考虑';
   arrangement.disabled = !usesArrangement;
   const usesAirFactor = layers === 1 && (system === '直流' || (system === '交流' && core.value === '三芯/五芯'));
-  groupCount.disabled = !usesAirFactor;
+  groupCount.disabled = false;
   trayType.disabled = usesAirFactor;
+  document.getElementById('cable-group-hint').textContent = usesAirFactor
+    ? '当前参与空气中单层并列修正'
+    : '可按原表选择；当前条件不采用并列系数';
   const preview = calculateCableSelection(state.catalogs.cables, { ...readCableInput(), requiredCurrentA: 1 });
   document.getElementById('cable-factor-preview').innerHTML = `<span>当前修正系数</span><strong>${format(preview.correctionFactor, 2)}</strong><small>${htmlEscape(preview.correctionMode || '—')}</small>`;
 }

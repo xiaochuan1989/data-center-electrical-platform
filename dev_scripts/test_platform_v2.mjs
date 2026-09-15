@@ -139,7 +139,7 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.3\.0"/);
+assert.match(index, /const APP_VERSION = "v2\.4\.0"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 const appShell = fs.readFileSync(path.join(root, 'src', 'platform', 'app-shell.js'), 'utf8');
@@ -153,5 +153,14 @@ assert.match(appShell, /id="cable-catalog-body"/);
 assert.match(appShell, /id="awg-catalog-body"/);
 assert.match(appShell, /platform-sidebar-control-text/);
 assert.match(appShell, /data-sidebar-toggle/);
+assert.match(appShell, /id="cable-group-count"/);
+assert.match(appShell, /groupCount\.disabled = false/);
+assert.doesNotMatch(appShell, /navButton\('delivery'/);
+assert.doesNotMatch(appShell, /编码与成果输出/);
+const toolRegistry = fs.readFileSync(path.join(root, 'src', 'platform', 'tool-registry.js'), 'utf8');
+assert.doesNotMatch(toolRegistry, /id: 'delivery'/);
+const platformCss = fs.readFileSync(path.join(root, 'src', 'css', 'platform-v2.css'), 'utf8');
+assert.match(platformCss, /db-view-active \.platform-workspace \{ display: flex/);
+assert.match(platformCss, /db-view-active \.footer \{ display: none/);
 
 console.log('✅ v2 平台计算、数据脱敏与入口检查通过');

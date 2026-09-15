@@ -22,9 +22,8 @@ export const TOOL_GROUPS = [
     ]
   },
   {
-    id: 'delivery', name: '编码与交付', icon: '▤',
+    id: 'templates', name: '资料与模板', icon: '▤',
     tools: [
-      { id: 'delivery', name: '项目汇总与标准输出', status: 'foundation', source: '统一项目数据' },
       { id: 'templates', name: '模板中心', status: 'governed', source: '仅发布已脱敏当前有效版' }
     ]
   }
