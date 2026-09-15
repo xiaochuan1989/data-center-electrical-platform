@@ -208,7 +208,7 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.6\.2"/);
+assert.match(index, /const APP_VERSION = "v2\.6\.3"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
@@ -222,7 +222,9 @@ assert.match(appShell, /新亮镀锡参考（ε=0\.06）/);
 assert.match(appShell, /Excel原始默认（状态未注明，ε=0\.35）/);
 assert.match(appShell, /id="busbar-ampacity-rise-limit"/);
 assert.match(appShell, /35 \+ 70 = 105℃/);
-assert.match(appShell, /A03 修正口径 \(50K\)/);
+assert.match(appShell, /50K 温升修正（通风 × 1\.3）/);
+assert.match(appShell, /30K 温升基准（DIN 原值）/);
+assert.doesNotMatch(appShell, />A03 修正口径/);
 assert.match(appShell, /'bright-tin': '0\.06'/);
 assert.match(appShell, /GB\/T 24276-2025/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);

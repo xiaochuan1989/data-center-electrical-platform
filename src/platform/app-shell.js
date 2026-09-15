@@ -272,12 +272,12 @@ function busbarView() {
         <label>负载电流(A)<input id="busbar-load-current" type="number" min="1" max="20000" step="1" value="1600"></label>
         <label>安装环境<select id="busbar-environment"><option value="ventilated">通风</option><option value="sealed">IP54 / 密封</option></select></label>
         <label>表面处理<select id="busbar-surface"><option value="bare-or-tinned">光裸 / 全镀锡</option><option value="heat-shrink">热缩套管</option></select></label>
-        <label>选型温升口径<select id="busbar-temperature-rise"><option value="iec50">A03 修正口径 (50K)</option><option value="din30">DIN 基准口径 (30K)</option></select></label>
+        <label>选型温升口径<select id="busbar-temperature-rise"><option value="iec50">50K 温升修正（通风 × 1.3）</option><option value="din30">30K 温升基准（DIN 原值）</option></select></label>
       </div>
       <div class="busbar-formula-strip" aria-label="计算说明">
         <span><b>最佳规格</b> 全表取满足需求的最接近规格</span>
         <span><b>主母线优先</b> 单片 → 双拼 → 三拼 → 四拼</span>
-        <span><b>A03 50K修正</b> 通风 1.3，密封 1.0</span>
+        <span><b>50K温升修正</b> 通风 × 1.3，密封 × 1.0</span>
         <span><b>PE截面</b> 按 S、16、S/2 或 S/4</span>
       </div>
       <button id="calculate-busbar" class="platform-primary-action">计算铜排配置</button>
