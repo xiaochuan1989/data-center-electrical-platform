@@ -284,8 +284,11 @@ export function calculateBusbarSelection(catalog, input = {}) {
 export function calculateBusbarAmpacity(catalog, input = {}) {
   const widthMm = number(input.widthMm, NaN);
   const thicknessMm = number(input.thicknessMm, NaN);
-  const maximumTemperatureC = number(input.maximumTemperatureC, NaN);
   const roomTemperatureC = number(input.roomTemperatureC, NaN);
+  const permittedTemperatureRiseK = Number.isFinite(number(input.permittedTemperatureRiseK, NaN))
+    ? number(input.permittedTemperatureRiseK, NaN)
+    : number(input.maximumTemperatureC, NaN) - roomTemperatureC;
+  const maximumTemperatureC = roomTemperatureC + permittedTemperatureRiseK;
   const internalTemperatureRiseC = number(input.internalTemperatureRiseC, NaN);
   const convectionCoefficient = number(input.convectionCoefficient, NaN);
   const emissivity = number(input.emissivity, NaN);
@@ -300,6 +303,7 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
   if (!Number.isFinite(thicknessMm) || thicknessMm <= 0 || thicknessMm > 100) return { error: '铜排厚度必须大于 0mm 且不超过 100mm' };
   if (widthMm < thicknessMm) return { error: '铜排宽度应不小于厚度，请确认规格输入顺序' };
   if (!Number.isFinite(roomTemperatureC) || roomTemperatureC < -50 || roomTemperatureC > 100) return { error: '房间环境温度必须在 -50～100℃ 之间' };
+  if (!Number.isFinite(permittedTemperatureRiseK) || permittedTemperatureRiseK <= 0 || permittedTemperatureRiseK > 105) return { error: '工程控制温升必须大于 0K 且不超过 105K' };
   if (!Number.isFinite(internalTemperatureRiseC) || internalTemperatureRiseC < 0 || internalTemperatureRiseC > 100) return { error: '内部环境温升必须在 0～100K 之间' };
   if (!Number.isFinite(maximumTemperatureC) || maximumTemperatureC < -20 || maximumTemperatureC > 250) return { error: '铜排允许最高温度必须在 -20～250℃ 之间' };
   if (!Number.isFinite(convectionCoefficient) || convectionCoefficient <= 0 || convectionCoefficient > 100) return { error: '对流换热系数必须大于 0 且不超过 100W/(m²·K)' };
@@ -362,6 +366,7 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
     normalizedSpec,
     maximumTemperatureC,
     roomTemperatureC,
+    permittedTemperatureRiseK,
     internalTemperatureRiseC,
     internalAmbientTemperatureC,
     effectiveTemperatureRiseK,

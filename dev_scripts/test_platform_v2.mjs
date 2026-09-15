@@ -142,6 +142,7 @@ const busbarAmpacityInput = {
   thicknessMm: 10,
   maximumTemperatureC: 105,
   roomTemperatureC: 35,
+  permittedTemperatureRiseK: 70,
   internalTemperatureRiseC: 15,
   convectionCoefficient: 5,
   emissivity: 0.35,
@@ -156,6 +157,10 @@ const busbarAmpacity = calculateBusbarAmpacity(busbarCatalog, busbarAmpacityInpu
 assert.ok(Math.abs(busbarAmpacity.thermalBalanceCurrentA - 2512.8623930728604) < 1e-9);
 assert.ok(Math.abs(busbarAmpacity.recommendedCurrentA - 2010.2899144582884) < 1e-9);
 assert.equal(busbarAmpacity.areaMm2, 1200);
+assert.equal(busbarAmpacity.maximumTemperatureC, 105);
+assert.equal(busbarAmpacity.permittedTemperatureRiseK, 70);
+assert.equal(busbarAmpacity.internalAmbientTemperatureC, 50);
+assert.equal(busbarAmpacity.effectiveTemperatureRiseK, 55);
 assert.equal(busbarAmpacity.dinMatch.spec, '120 x 10');
 assert.equal(busbarAmpacity.dinCurrentA, 1740);
 assert.ok(Math.abs(busbarAmpacity.dinDifferencePercent - 0.1553390312978669) < 1e-12);
@@ -169,7 +174,7 @@ assert.equal(busbarAmpacityAc.requiresAcVerification, false);
 assert.equal(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, currentType: 'ac', acResistanceFactor: 1 }).requiresAcVerification, true);
 assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, widthMm: 0 }).error, /宽度/);
 assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, widthMm: 5, thicknessMm: 10 }).error, /输入顺序/);
-assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, maximumTemperatureC: 50 }).error, /必须高于/);
+assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, permittedTemperatureRiseK: 15 }).error, /必须高于/);
 assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, emissivity: 1.1 }).error, /发射率/);
 
 const cableCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'cable-catalog.json'), 'utf8'));
@@ -203,7 +208,7 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.6\.1"/);
+assert.match(index, /const APP_VERSION = "v2\.6\.2"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
@@ -215,6 +220,9 @@ assert.match(appShell, /按规格算载流量/);
 assert.match(appShell, /id="calculate-busbar-ampacity"/);
 assert.match(appShell, /新亮镀锡参考（ε=0\.06）/);
 assert.match(appShell, /Excel原始默认（状态未注明，ε=0\.35）/);
+assert.match(appShell, /id="busbar-ampacity-rise-limit"/);
+assert.match(appShell, /35 \+ 70 = 105℃/);
+assert.match(appShell, /A03 修正口径 \(50K\)/);
 assert.match(appShell, /'bright-tin': '0\.06'/);
 assert.match(appShell, /GB\/T 24276-2025/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);

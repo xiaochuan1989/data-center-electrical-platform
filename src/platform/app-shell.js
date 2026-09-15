@@ -272,29 +272,30 @@ function busbarView() {
         <label>负载电流(A)<input id="busbar-load-current" type="number" min="1" max="20000" step="1" value="1600"></label>
         <label>安装环境<select id="busbar-environment"><option value="ventilated">通风</option><option value="sealed">IP54 / 密封</option></select></label>
         <label>表面处理<select id="busbar-surface"><option value="bare-or-tinned">光裸 / 全镀锡</option><option value="heat-shrink">热缩套管</option></select></label>
-        <label>温升标准<select id="busbar-temperature-rise"><option value="iec50">IEC增强 (50K)</option><option value="din30">DIN保守 (30K)</option></select></label>
+        <label>选型温升口径<select id="busbar-temperature-rise"><option value="iec50">A03 修正口径 (50K)</option><option value="din30">DIN 基准口径 (30K)</option></select></label>
       </div>
       <div class="busbar-formula-strip" aria-label="计算说明">
         <span><b>最佳规格</b> 全表取满足需求的最接近规格</span>
         <span><b>主母线优先</b> 单片 → 双拼 → 三拼 → 四拼</span>
-        <span><b>50K系数</b> 通风 1.3，密封 1.0</span>
+        <span><b>A03 50K修正</b> 通风 1.3，密封 1.0</span>
         <span><b>PE截面</b> 按 S、16、S/2 或 S/4</span>
       </div>
       <button id="calculate-busbar" class="platform-primary-action">计算铜排配置</button>
       <div id="busbar-result" class="busbar-result" aria-live="polite"></div>
     </div>
     <div class="busbar-pane" data-busbar-pane="ampacity" hidden>
-      <div class="busbar-source-note"><b>公式来源</b><span>依据《铜排载流量工程计算器-A00.xlsx》的单片铜排热平衡模型；标准提示按现行 GB/T 7251.1-2023、GB/T 24276-2025 更新。结果用于工程估算，不替代成套温升试验。</span></div>
+      <div class="busbar-source-note"><b>公式来源</b><span>依据《铜排载流量工程计算器-A00.xlsx》的单片铜排热平衡模型；默认按外部环境 35℃、工程控制温升 70K，自动得到铜排最高温度 105℃。标准提示按现行 GB/T 7251.1-2023、GB/T 24276-2025 更新；结果用于工程估算，不替代成套温升试验。</span></div>
       <div class="busbar-ampacity-scope">
-        <b>适用范围</b>
-        <span>单片、非并联矩形铜排；自然对流稳态估算。并排铜排、相间互热、接头损耗、集肤/邻近效应及谐波须另行验证。</span>
+        <b>温升口径</b>
+        <span>70K 是铜排相对外部环境的工程控制温升：35 + 70 = 105℃。若柜内空气比房间再高 15K，则柜内空气为 50℃，铜排对柜内空气的有效散热温差为 105 − 50 = 55K；它与 DIN 表的 30K 查表条件不是同一个量。</span>
       </div>
       <div class="platform-form-grid cols-4 busbar-inputs busbar-ampacity-inputs">
         <label>铜排宽度 (mm)<input id="busbar-ampacity-width" type="number" min="1" max="500" step="1" value="120"></label>
         <label>铜排厚度 (mm)<input id="busbar-ampacity-thickness" type="number" min="0.5" max="100" step="0.5" value="10"></label>
-        <label>房间环境温度 (℃)<input id="busbar-ampacity-room-temperature" type="number" min="-50" max="100" step="1" value="35"></label>
-        <label>内部环境温升 (K)<input id="busbar-ampacity-internal-rise" type="number" min="0" max="100" step="1" value="15"><small>Excel 默认值；应优先采用项目计算或实测值</small></label>
-        <label>铜排允许最高温度 (℃)<input id="busbar-ampacity-maximum-temperature" type="number" min="-20" max="250" step="1" value="105"><small>须同时满足端子、绝缘件和连接件限制</small></label>
+        <label>外部环境温度 (℃)<input id="busbar-ampacity-room-temperature" type="number" min="-50" max="100" step="1" value="35"><small>GB/T 7251 常用基准环境温度</small></label>
+        <label>工程控制温升 (K)<input id="busbar-ampacity-rise-limit" type="number" min="1" max="105" step="1" value="70"><small>相对外部环境；项目默认采用 70K</small></label>
+        <label>铜排最高温度 (℃)<input id="busbar-ampacity-maximum-temperature" type="number" value="105" readonly><small>外部环境温度 + 工程控制温升（自动计算）</small></label>
+        <label>柜内空气温升 (K)<input id="busbar-ampacity-internal-rise" type="number" min="0" max="100" step="1" value="15"><small>密闭柜体 Excel 默认 15K；开放空气可填 0K</small></label>
         <label>电流类型<select id="busbar-ampacity-current-type"><option value="dc">直流 / 忽略交流附加损耗</option><option value="ac">交流（使用修正系数）</option></select></label>
         <label>设计裕量系数<select id="busbar-ampacity-design-factor"><option value="0.7">70%</option><option value="0.8" selected>80%（Excel默认）</option><option value="0.9">90%</option><option value="1">100%（无裕量）</option></select></label>
         <label>DIN同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量</option><option value="coatedCurrentA">涂层载流量</option></select></label>
@@ -311,7 +312,8 @@ function busbarView() {
         </div>
       </details>
       <div class="busbar-method-strip" aria-label="规格反算方法">
-        <span><b>内部环境温度</b> 房间温度 + 内部温升</span>
+        <span><b>最高温度</b> 外部环境 + 工程控制温升</span>
+        <span><b>柜内空气温度</b> 外部环境 + 柜内空气温升</span>
         <span><b>散热能力</b> 对流散热 + 辐射散热</span>
         <span><b>热平衡电流</b> √(总散热 ÷ 每米电阻)</span>
         <span><b>建议电流</b> 热平衡电流 × 设计裕量</span>
@@ -702,6 +704,9 @@ function syncBusbarAmpacityControls() {
   const emissivity = document.getElementById('busbar-ampacity-emissivity');
   const currentType = document.getElementById('busbar-ampacity-current-type');
   const acFactor = document.getElementById('busbar-ampacity-ac-factor');
+  const roomTemperature = document.getElementById('busbar-ampacity-room-temperature');
+  const riseLimit = document.getElementById('busbar-ampacity-rise-limit');
+  const maximumTemperature = document.getElementById('busbar-ampacity-maximum-temperature');
   if (!surfaceMode || !emissivity || !currentType || !acFactor) return;
   const surfacePresets = { excel: '0.35', 'bright-tin': '0.06' };
   const usesSurfacePreset = Object.hasOwn(surfacePresets, surfaceMode.value);
@@ -710,6 +715,8 @@ function syncBusbarAmpacityControls() {
   const usesAcFactor = currentType.value === 'ac';
   if (!usesAcFactor) acFactor.value = '1';
   acFactor.disabled = !usesAcFactor;
+  const derivedMaximum = Number(roomTemperature?.value) + Number(riseLimit?.value);
+  if (maximumTemperature && Number.isFinite(derivedMaximum)) maximumTemperature.value = String(derivedMaximum);
 }
 
 function calculateBusbarAmpacityResult() {
@@ -718,6 +725,7 @@ function calculateBusbarAmpacityResult() {
     widthMm: numberValue('busbar-ampacity-width'),
     thicknessMm: numberValue('busbar-ampacity-thickness'),
     roomTemperatureC: numberValue('busbar-ampacity-room-temperature'),
+    permittedTemperatureRiseK: numberValue('busbar-ampacity-rise-limit'),
     internalTemperatureRiseC: numberValue('busbar-ampacity-internal-rise'),
     maximumTemperatureC: numberValue('busbar-ampacity-maximum-temperature'),
     currentType: document.getElementById('busbar-ampacity-current-type').value,
@@ -764,8 +772,9 @@ function calculateBusbarAmpacityResult() {
       <div><span>建议电流密度</span><strong>${format(result.currentDensityAmm2, 2)} A/mm²</strong><small>铜排截面 ${format(result.areaMm2, 0)}mm²</small></div>
     </div>
     <div class="result-grid busbar-result-grid busbar-ampacity-process">${resultCards([
+      ['允许总温升', format(result.permittedTemperatureRiseK, 1), 'K'],
+      ['对柜内空气散热温差', format(result.effectiveTemperatureRiseK, 1), 'K'],
       ['每米散热表面积', format(result.surfaceAreaM2PerM, 4), 'm²/m'],
-      ['有效温升', format(result.effectiveTemperatureRiseK, 1), 'K'],
       ['直流电阻', format(result.dcResistanceOhmPerM * 1000, 5), 'mΩ/m'],
       ['计算采用电阻', format(result.usedResistanceOhmPerM * 1000, 5), 'mΩ/m'],
       ['对流散热', format(result.convectionLossWPerM, 1), 'W/m'],
@@ -779,7 +788,9 @@ function calculateBusbarAmpacityResult() {
       <div class="busbar-calculation-flow">
         <p><b>表面参数：</b>${htmlEscape(surfaceLabel)}；计算采用 ε=${format(result.emissivity, 2)}</p>
         <p><b>截面积：</b>${format(result.widthMm, 1)} × ${format(result.thicknessMm, 1)} = ${format(result.areaMm2, 1)}mm²</p>
-        <p><b>内部环境：</b>${format(result.roomTemperatureC, 1)} + ${format(result.internalTemperatureRiseC, 1)} = ${format(result.internalAmbientTemperatureC, 1)}℃</p>
+        <p><b>铜排最高温度：</b>外部环境 ${format(result.roomTemperatureC, 1)}℃ + 工程控制温升 ${format(result.permittedTemperatureRiseK, 1)}K = ${format(result.maximumTemperatureC, 1)}℃</p>
+        <p><b>柜内空气温度：</b>外部环境 ${format(result.roomTemperatureC, 1)}℃ + 柜内空气温升 ${format(result.internalTemperatureRiseC, 1)}K = ${format(result.internalAmbientTemperatureC, 1)}℃</p>
+        <p><b>有效散热温差：</b>${format(result.maximumTemperatureC, 1)} − ${format(result.internalAmbientTemperatureC, 1)} = ${format(result.effectiveTemperatureRiseK, 1)}K</p>
         <p><b>对流散热：</b>h × As × ΔT = ${format(result.convectionLossWPerM, 2)}W/m</p>
         <p><b>辐射散热：</b>ε × σ × As × (Tmax⁴ − Tamb⁴) = ${format(result.radiationLossWPerM, 2)}W/m</p>
         <p><b>热平衡电流：</b>√[(Pconv + Prad) ÷ R] = ${format(result.thermalBalanceCurrentA, 2)}A</p>
@@ -787,6 +798,7 @@ function calculateBusbarAmpacityResult() {
       </div>
     </details>
     <div class="busbar-notices">
+      <p class="neutral">70K 为本项目采用的工程控制口径，并非所有母线场景的统一限值；实际最高温度还应受端子、绝缘、连接件、相邻元件和验证条件中的最低限值约束。</p>
       <p class="warning">“内部温升、换热系数、发射率和设计裕量”均会显著影响结果，请按实际结构或验证数据填写。</p>
       <p class="${result.requiresAcVerification ? 'warning' : 'neutral'}">${result.requiresAcVerification ? '当前选择交流，但交流电阻修正系数仍为1.00，尚未计入集肤、邻近和谐波附加损耗。' : `当前采用${result.currentType === 'ac' ? `交流电阻系数 ${format(result.acResistanceFactor, 2)}` : '直流电阻'}进行计算。`}</p>
       <p class="${result.requiresShortCircuitCheck ? 'warning' : 'neutral'}">${result.requiresShortCircuitCheck ? '建议电流达到4000A及以上，必须专项校核短路耐受能力 Icw。' : '仍须结合项目短路电流、连接件和绝缘支撑条件校核。'}</p>
@@ -897,6 +909,8 @@ function bindEvents() {
   document.getElementById('calculate-busbar-ampacity').addEventListener('click', calculateBusbarAmpacityResult);
   document.getElementById('busbar-ampacity-surface-mode').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-current-type').addEventListener('change', syncBusbarAmpacityControls);
+  document.getElementById('busbar-ampacity-room-temperature').addEventListener('input', syncBusbarAmpacityControls);
+  document.getElementById('busbar-ampacity-rise-limit').addEventListener('input', syncBusbarAmpacityControls);
   document.getElementById('busbar-catalog-configuration').addEventListener('change', renderBusbarCatalog);
   document.getElementById('busbar-catalog-search').addEventListener('input', renderBusbarCatalog);
   document.getElementById('calculate-smart-busway').addEventListener('click', calculateBuswayConfig);
