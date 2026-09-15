@@ -271,6 +271,130 @@ export function calculateBusbarSelection(catalog, input = {}) {
   };
 }
 
+/**
+ * 按铜排规格反算载流量。
+ *
+ * 公式骨架来自《铜排载流量工程计算器-A00.xlsx》：
+ * A=w*t；As=2*(w+t)；ρT=ρ20*[1+α*(T-20)]；R=ρT/A；
+ * Pconv=h*As*ΔT；Prad=ε*σ*As*(Tmax⁴-Tamb⁴)；I=sqrt[(Pconv+Prad)/R]。
+ *
+ * 此函数仅覆盖单片、非并联铜排的稳态热平衡估算。交流附加损耗通过显式系数输入，
+ * 不在缺少项目验证数据时自行假设集肤、邻近或谐波修正值。
+ */
+export function calculateBusbarAmpacity(catalog, input = {}) {
+  const widthMm = number(input.widthMm, NaN);
+  const thicknessMm = number(input.thicknessMm, NaN);
+  const maximumTemperatureC = number(input.maximumTemperatureC, NaN);
+  const roomTemperatureC = number(input.roomTemperatureC, NaN);
+  const internalTemperatureRiseC = number(input.internalTemperatureRiseC, NaN);
+  const convectionCoefficient = number(input.convectionCoefficient, NaN);
+  const emissivity = number(input.emissivity, NaN);
+  const resistivity20OhmM = number(input.resistivity20OhmM, NaN);
+  const temperatureCoefficient = number(input.temperatureCoefficient, NaN);
+  const designFactor = number(input.designFactor, NaN);
+  const currentType = input.currentType === 'ac' ? 'ac' : 'dc';
+  const acResistanceFactor = currentType === 'ac' ? number(input.acResistanceFactor, NaN) : 1;
+  const dinReferenceField = input.dinReferenceField === 'coatedCurrentA' ? 'coatedCurrentA' : 'bareCurrentA';
+
+  if (!Number.isFinite(widthMm) || widthMm <= 0 || widthMm > 500) return { error: '铜排宽度必须大于 0mm 且不超过 500mm' };
+  if (!Number.isFinite(thicknessMm) || thicknessMm <= 0 || thicknessMm > 100) return { error: '铜排厚度必须大于 0mm 且不超过 100mm' };
+  if (widthMm < thicknessMm) return { error: '铜排宽度应不小于厚度，请确认规格输入顺序' };
+  if (!Number.isFinite(roomTemperatureC) || roomTemperatureC < -50 || roomTemperatureC > 100) return { error: '房间环境温度必须在 -50～100℃ 之间' };
+  if (!Number.isFinite(internalTemperatureRiseC) || internalTemperatureRiseC < 0 || internalTemperatureRiseC > 100) return { error: '内部环境温升必须在 0～100K 之间' };
+  if (!Number.isFinite(maximumTemperatureC) || maximumTemperatureC < -20 || maximumTemperatureC > 250) return { error: '铜排允许最高温度必须在 -20～250℃ 之间' };
+  if (!Number.isFinite(convectionCoefficient) || convectionCoefficient <= 0 || convectionCoefficient > 100) return { error: '对流换热系数必须大于 0 且不超过 100W/(m²·K)' };
+  if (!Number.isFinite(emissivity) || emissivity < 0 || emissivity > 1) return { error: '表面发射率必须在 0～1 之间' };
+  if (!Number.isFinite(resistivity20OhmM) || resistivity20OhmM <= 0 || resistivity20OhmM > 1e-6) return { error: '20℃电阻率必须大于 0 且不超过 1×10⁻⁶Ω·m' };
+  if (!Number.isFinite(temperatureCoefficient) || temperatureCoefficient < 0 || temperatureCoefficient > 0.02) return { error: '电阻温度系数必须在 0～0.02/℃ 之间' };
+  if (!Number.isFinite(designFactor) || designFactor < 0.5 || designFactor > 1) return { error: '设计裕量系数必须在 0.5～1 之间' };
+  if (!Number.isFinite(acResistanceFactor) || acResistanceFactor < 1 || acResistanceFactor > 5) return { error: '交流电阻修正系数必须在 1～5 之间' };
+
+  const internalAmbientTemperatureC = roomTemperatureC + internalTemperatureRiseC;
+  if (maximumTemperatureC <= internalAmbientTemperatureC) {
+    return { error: '铜排允许最高温度必须高于房间温度与内部温升之和' };
+  }
+
+  const sigma = 5.67e-8;
+  const areaMm2 = widthMm * thicknessMm;
+  const areaM2 = areaMm2 / 1e6;
+  const surfaceAreaM2PerM = 2 * (widthMm + thicknessMm) / 1000;
+  const effectiveTemperatureRiseK = maximumTemperatureC - internalAmbientTemperatureC;
+  const resistivityAtMaximumOhmM = resistivity20OhmM * (1 + temperatureCoefficient * (maximumTemperatureC - 20));
+  const dcResistanceOhmPerM = resistivityAtMaximumOhmM / areaM2;
+  const usedResistanceOhmPerM = dcResistanceOhmPerM * acResistanceFactor;
+  const convectionLossWPerM = convectionCoefficient * surfaceAreaM2PerM * effectiveTemperatureRiseK;
+  const radiationLossWPerM = emissivity * sigma * surfaceAreaM2PerM
+    * ((maximumTemperatureC + 273.15) ** 4 - (internalAmbientTemperatureC + 273.15) ** 4);
+  const totalDissipationWPerM = convectionLossWPerM + radiationLossWPerM;
+  const thermalBalanceCurrentA = Math.sqrt(totalDissipationWPerM / usedResistanceOhmPerM);
+  const recommendedCurrentA = thermalBalanceCurrentA * designFactor;
+  const currentDensityAmm2 = recommendedCurrentA / areaMm2;
+  const designLossWPerM = recommendedCurrentA ** 2 * usedResistanceOhmPerM;
+
+  const heatBalanceAt = temperatureC => {
+    const temperatureRiseK = temperatureC - internalAmbientTemperatureC;
+    const resistivity = resistivity20OhmM * (1 + temperatureCoefficient * (temperatureC - 20));
+    const resistance = resistivity / areaM2 * acResistanceFactor;
+    const generated = recommendedCurrentA ** 2 * resistance;
+    const convection = convectionCoefficient * surfaceAreaM2PerM * temperatureRiseK;
+    const radiation = emissivity * sigma * surfaceAreaM2PerM
+      * ((temperatureC + 273.15) ** 4 - (internalAmbientTemperatureC + 273.15) ** 4);
+    return convection + radiation - generated;
+  };
+  let lowerTemperatureC = internalAmbientTemperatureC;
+  let upperTemperatureC = maximumTemperatureC;
+  for (let iteration = 0; iteration < 60; iteration += 1) {
+    const midpointC = (lowerTemperatureC + upperTemperatureC) / 2;
+    if (heatBalanceAt(midpointC) >= 0) upperTemperatureC = midpointC;
+    else lowerTemperatureC = midpointC;
+  }
+  const estimatedOperatingTemperatureC = (lowerTemperatureC + upperTemperatureC) / 2;
+
+  const normalizedSpec = `${widthMm} x ${thicknessMm}`;
+  const dinMatch = (catalog || []).find(item => item.configuration === '单片'
+    && String(item.spec).replace(/×/g, 'x').replace(/\s+/g, ' ').trim() === normalizedSpec) || null;
+  const dinCurrentA = dinMatch ? number(dinMatch[dinReferenceField]) : null;
+  const dinDifferencePercent = dinCurrentA > 0 ? recommendedCurrentA / dinCurrentA - 1 : null;
+
+  return {
+    widthMm,
+    thicknessMm,
+    normalizedSpec,
+    maximumTemperatureC,
+    roomTemperatureC,
+    internalTemperatureRiseC,
+    internalAmbientTemperatureC,
+    effectiveTemperatureRiseK,
+    convectionCoefficient,
+    emissivity,
+    resistivity20OhmM,
+    temperatureCoefficient,
+    currentType,
+    acResistanceFactor,
+    designFactor,
+    areaMm2,
+    areaM2,
+    surfaceAreaM2PerM,
+    resistivityAtMaximumOhmM,
+    dcResistanceOhmPerM,
+    usedResistanceOhmPerM,
+    convectionLossWPerM,
+    radiationLossWPerM,
+    totalDissipationWPerM,
+    thermalBalanceCurrentA,
+    recommendedCurrentA,
+    currentDensityAmm2,
+    designLossWPerM,
+    estimatedOperatingTemperatureC,
+    dinReferenceField,
+    dinMatch,
+    dinCurrentA,
+    dinDifferencePercent,
+    requiresAcVerification: currentType === 'ac' && acResistanceFactor === 1,
+    requiresShortCircuitCheck: recommendedCurrentA >= 4000
+  };
+}
+
 export function calculateCableSelection(catalog, input = {}) {
   const requiredCurrentA = Math.max(0, number(input.requiredCurrentA));
   if (requiredCurrentA <= 0) return { error: '请输入大于 0A 的电流' };

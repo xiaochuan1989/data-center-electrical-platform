@@ -3,6 +3,7 @@ import {
   CABLE_TRAY_LAYER_FACTORS,
   calculateApf,
   calculateBranch,
+  calculateBusbarAmpacity,
   calculateBusbarSelection,
   calculateCableSelection,
   calculateBusway,
@@ -259,12 +260,13 @@ function cableView() {
 }
 
 function busbarView() {
-  return viewPanel('busbar', '铜排计算', '独立校核铜排规格，并可查看完整 DIN43671-1975 载流量数据。', `
+  return viewPanel('busbar', '铜排计算', '按负载电流选择规格，或按已知铜排规格进行独立热平衡估算。', `
     <div class="engineering-tabs busbar-tabs" role="tablist" aria-label="铜排工具">
-      <button class="active" role="tab" aria-selected="true" data-busbar-tab="calculator">铜排智能计算</button>
+      <button class="active" role="tab" aria-selected="true" data-busbar-tab="selection">按电流选铜排</button>
+      <button role="tab" aria-selected="false" data-busbar-tab="ampacity">按规格算载流量</button>
       <button role="tab" aria-selected="false" data-busbar-tab="catalog">载流量数据表 <span>${busbarCatalog.length} 条</span></button>
     </div>
-    <div class="busbar-pane" data-busbar-pane="calculator">
+    <div class="busbar-pane" data-busbar-pane="selection">
       <div class="busbar-source-note"><b>计算口径</b><span>基础载流量来自 DIN43671-1975，环境温度 35°C；A03 工作簿中的温升、安装环境和表面处理规则均已保留。</span></div>
       <div class="platform-form-grid cols-4 busbar-inputs">
         <label>负载电流(A)<input id="busbar-load-current" type="number" min="1" max="20000" step="1" value="1600"></label>
@@ -280,6 +282,42 @@ function busbarView() {
       </div>
       <button id="calculate-busbar" class="platform-primary-action">计算铜排配置</button>
       <div id="busbar-result" class="busbar-result" aria-live="polite"></div>
+    </div>
+    <div class="busbar-pane" data-busbar-pane="ampacity" hidden>
+      <div class="busbar-source-note"><b>公式来源</b><span>依据《铜排载流量工程计算器-A00.xlsx》的单片铜排热平衡模型；标准提示按现行 GB/T 7251.1-2023、GB/T 24276-2025 更新。结果用于工程估算，不替代成套温升试验。</span></div>
+      <div class="busbar-ampacity-scope">
+        <b>适用范围</b>
+        <span>单片、非并联矩形铜排；自然对流稳态估算。并排铜排、相间互热、接头损耗、集肤/邻近效应及谐波须另行验证。</span>
+      </div>
+      <div class="platform-form-grid cols-4 busbar-inputs busbar-ampacity-inputs">
+        <label>铜排宽度 (mm)<input id="busbar-ampacity-width" type="number" min="1" max="500" step="1" value="120"></label>
+        <label>铜排厚度 (mm)<input id="busbar-ampacity-thickness" type="number" min="0.5" max="100" step="0.5" value="10"></label>
+        <label>房间环境温度 (℃)<input id="busbar-ampacity-room-temperature" type="number" min="-50" max="100" step="1" value="35"></label>
+        <label>内部环境温升 (K)<input id="busbar-ampacity-internal-rise" type="number" min="0" max="100" step="1" value="15"><small>Excel 默认值；应优先采用项目计算或实测值</small></label>
+        <label>铜排允许最高温度 (℃)<input id="busbar-ampacity-maximum-temperature" type="number" min="-20" max="250" step="1" value="105"><small>须同时满足端子、绝缘件和连接件限制</small></label>
+        <label>电流类型<select id="busbar-ampacity-current-type"><option value="dc">直流 / 忽略交流附加损耗</option><option value="ac">交流（使用修正系数）</option></select></label>
+        <label>设计裕量系数<select id="busbar-ampacity-design-factor"><option value="0.7">70%</option><option value="0.8" selected>80%（Excel默认）</option><option value="0.9">90%</option><option value="1">100%（无裕量）</option></select></label>
+        <label>DIN同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量</option><option value="coatedCurrentA">涂层载流量</option></select></label>
+      </div>
+      <details class="busbar-advanced">
+        <summary>高级热工参数 <span>默认值来自原 Excel，可展开查看和修改</span></summary>
+        <div class="platform-form-grid cols-3 compact">
+          <label>表面参数模式<select id="busbar-ampacity-surface-mode"><option value="excel">Excel默认：镀锡/轻微氧化</option><option value="custom">自定义发射率</option></select></label>
+          <label>表面发射率 ε<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.35" disabled></label>
+          <label>对流换热系数 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5"><small>W/(m²·K)，属于工程假设</small></label>
+          <label>20℃铜电阻率 ρ₂₀<input id="busbar-ampacity-resistivity" type="number" min="0" max="0.000001" step="0.0000000001" value="0.0000000172"><small>Ω·m</small></label>
+          <label>电阻温度系数 α<input id="busbar-ampacity-temperature-coefficient" type="number" min="0" max="0.02" step="0.00001" value="0.00393"><small>/℃</small></label>
+          <label>交流电阻修正系数<input id="busbar-ampacity-ac-factor" type="number" min="1" max="5" step="0.01" value="1" disabled><small>1.00 表示尚未计入交流附加损耗</small></label>
+        </div>
+      </details>
+      <div class="busbar-method-strip" aria-label="规格反算方法">
+        <span><b>内部环境温度</b> 房间温度 + 内部温升</span>
+        <span><b>散热能力</b> 对流散热 + 辐射散热</span>
+        <span><b>热平衡电流</b> √(总散热 ÷ 每米电阻)</span>
+        <span><b>建议电流</b> 热平衡电流 × 设计裕量</span>
+      </div>
+      <button id="calculate-busbar-ampacity" class="platform-primary-action">按规格计算载流量</button>
+      <div id="busbar-ampacity-result" class="busbar-result busbar-ampacity-result" aria-live="polite"></div>
     </div>
     <div class="busbar-pane" data-busbar-pane="catalog" hidden>
       <div class="busbar-catalog-toolbar">
@@ -659,6 +697,95 @@ function calculateBusbar() {
     </div>`;
 }
 
+function syncBusbarAmpacityControls() {
+  const surfaceMode = document.getElementById('busbar-ampacity-surface-mode');
+  const emissivity = document.getElementById('busbar-ampacity-emissivity');
+  const currentType = document.getElementById('busbar-ampacity-current-type');
+  const acFactor = document.getElementById('busbar-ampacity-ac-factor');
+  if (!surfaceMode || !emissivity || !currentType || !acFactor) return;
+  const usesExcelSurface = surfaceMode.value === 'excel';
+  if (usesExcelSurface) emissivity.value = '0.35';
+  emissivity.disabled = usesExcelSurface;
+  const usesAcFactor = currentType.value === 'ac';
+  if (!usesAcFactor) acFactor.value = '1';
+  acFactor.disabled = !usesAcFactor;
+}
+
+function calculateBusbarAmpacityResult() {
+  const result = calculateBusbarAmpacity(state.catalogs.busbars, {
+    widthMm: numberValue('busbar-ampacity-width'),
+    thicknessMm: numberValue('busbar-ampacity-thickness'),
+    roomTemperatureC: numberValue('busbar-ampacity-room-temperature'),
+    internalTemperatureRiseC: numberValue('busbar-ampacity-internal-rise'),
+    maximumTemperatureC: numberValue('busbar-ampacity-maximum-temperature'),
+    currentType: document.getElementById('busbar-ampacity-current-type').value,
+    designFactor: numberValue('busbar-ampacity-design-factor'),
+    dinReferenceField: document.getElementById('busbar-ampacity-din-reference').value,
+    convectionCoefficient: numberValue('busbar-ampacity-convection'),
+    emissivity: numberValue('busbar-ampacity-emissivity'),
+    resistivity20OhmM: numberValue('busbar-ampacity-resistivity'),
+    temperatureCoefficient: numberValue('busbar-ampacity-temperature-coefficient'),
+    acResistanceFactor: numberValue('busbar-ampacity-ac-factor', 1)
+  });
+  const target = document.getElementById('busbar-ampacity-result');
+  if (result.error) {
+    target.innerHTML = `<div class="no-result"><b>${htmlEscape(result.error)}</b><span>请检查规格、温度和高级热工参数。</span></div>`;
+    return;
+  }
+
+  state.project.busbars = { ...state.project.busbars, ampacityCalculation: result };
+  const dinLabel = result.dinReferenceField === 'coatedCurrentA' ? '涂层' : '裸排';
+  const differenceClass = result.dinDifferencePercent === null
+    ? 'neutral'
+    : Math.abs(result.dinDifferencePercent) > 0.15 ? 'warning' : 'safe';
+  const differenceText = result.dinDifferencePercent === null
+    ? 'DIN数据表中没有完全相同的单片规格'
+    : `${result.recommendedCurrentA >= result.dinCurrentA ? '高于' : '低于'}DIN ${dinLabel}数据 ${format(Math.abs(result.dinDifferencePercent) * 100, 1)}%`;
+  const dinComparison = result.dinMatch
+    ? `<div class="busbar-din-comparison ${differenceClass}">
+        <div><span>DIN同规格</span><strong>${htmlEscape(result.dinMatch.spec)} · 单片</strong></div>
+        <div><span>DIN ${dinLabel}载流量</span><strong>${format(result.dinCurrentA, 0)} A</strong></div>
+        <div><span>模型建议值差异</span><strong>${htmlEscape(differenceText)}</strong></div>
+        <p>两者温升、散热和表面条件不同，只用于交叉核对，不能互相替代。</p>
+      </div>`
+    : `<div class="busbar-din-comparison neutral"><p>${htmlEscape(differenceText)}；仍可使用热平衡结果，但无法完成DIN同规格对照。</p></div>`;
+
+  target.innerHTML = `
+    <div class="busbar-result-hero busbar-ampacity-hero">
+      <div class="busbar-best-spec"><span>建议持续工作电流</span><strong>${format(result.recommendedCurrentA, 0)} A</strong><small>热平衡值 × ${format(result.designFactor * 100, 0)}%设计裕量</small></div>
+      <div class="busbar-capacity"><span>热平衡估算载流量</span><strong>${format(result.thermalBalanceCurrentA, 0)} A</strong><small>不是经型式试验验证的额定值</small></div>
+      <div><span>设计电流下估算温度</span><strong>${format(result.estimatedOperatingTemperatureC, 1)} ℃</strong><small>内部环境 ${format(result.internalAmbientTemperatureC, 1)}℃</small></div>
+      <div><span>建议电流密度</span><strong>${format(result.currentDensityAmm2, 2)} A/mm²</strong><small>铜排截面 ${format(result.areaMm2, 0)}mm²</small></div>
+    </div>
+    <div class="result-grid busbar-result-grid busbar-ampacity-process">${resultCards([
+      ['每米散热表面积', format(result.surfaceAreaM2PerM, 4), 'm²/m'],
+      ['有效温升', format(result.effectiveTemperatureRiseK, 1), 'K'],
+      ['直流电阻', format(result.dcResistanceOhmPerM * 1000, 5), 'mΩ/m'],
+      ['计算采用电阻', format(result.usedResistanceOhmPerM * 1000, 5), 'mΩ/m'],
+      ['对流散热', format(result.convectionLossWPerM, 1), 'W/m'],
+      ['辐射散热', format(result.radiationLossWPerM, 1), 'W/m'],
+      ['总散热能力', format(result.totalDissipationWPerM, 1), 'W/m'],
+      ['建议电流下损耗', format(result.designLossWPerM, 1), 'W/m']
+    ])}</div>
+    ${dinComparison}
+    <details class="busbar-calculation-details">
+      <summary>查看完整计算方法</summary>
+      <div class="busbar-calculation-flow">
+        <p><b>截面积：</b>${format(result.widthMm, 1)} × ${format(result.thicknessMm, 1)} = ${format(result.areaMm2, 1)}mm²</p>
+        <p><b>内部环境：</b>${format(result.roomTemperatureC, 1)} + ${format(result.internalTemperatureRiseC, 1)} = ${format(result.internalAmbientTemperatureC, 1)}℃</p>
+        <p><b>对流散热：</b>h × As × ΔT = ${format(result.convectionLossWPerM, 2)}W/m</p>
+        <p><b>辐射散热：</b>ε × σ × As × (Tmax⁴ − Tamb⁴) = ${format(result.radiationLossWPerM, 2)}W/m</p>
+        <p><b>热平衡电流：</b>√[(Pconv + Prad) ÷ R] = ${format(result.thermalBalanceCurrentA, 2)}A</p>
+        <p><b>建议持续电流：</b>${format(result.thermalBalanceCurrentA, 2)} × ${format(result.designFactor, 2)} = ${format(result.recommendedCurrentA, 2)}A</p>
+      </div>
+    </details>
+    <div class="busbar-notices">
+      <p class="warning">“内部温升、换热系数、发射率和设计裕量”均会显著影响结果，请按实际结构或验证数据填写。</p>
+      <p class="${result.requiresAcVerification ? 'warning' : 'neutral'}">${result.requiresAcVerification ? '当前选择交流，但交流电阻修正系数仍为1.00，尚未计入集肤、邻近和谐波附加损耗。' : `当前采用${result.currentType === 'ac' ? `交流电阻系数 ${format(result.acResistanceFactor, 2)}` : '直流电阻'}进行计算。`}</p>
+      <p class="${result.requiresShortCircuitCheck ? 'warning' : 'neutral'}">${result.requiresShortCircuitCheck ? '建议电流达到4000A及以上，必须专项校核短路耐受能力 Icw。' : '仍须结合项目短路电流、连接件和绝缘支撑条件校核。'}</p>
+    </div>`;
+}
+
 function calculateBuswayConfig() {
   const row = index => ({ cabinets600: numberValue(`bw-r${index}-600`), cabinets800: numberValue(`bw-r${index}-800`), ac300: numberValue(`bw-r${index}-ac300`), ac600: numberValue(`bw-r${index}-ac600`) });
   const result = calculateSmartBusway({ row1: row(1), row2: row(2), installation: document.getElementById('bw-installation').value, touchscreen: document.getElementById('bw-touchscreen').checked });
@@ -760,6 +887,9 @@ function bindEvents() {
   document.getElementById('cable-catalog-search').addEventListener('input', renderCableCatalog);
   document.getElementById('awg-catalog-search').addEventListener('input', renderAwgCatalog);
   document.getElementById('calculate-busbar').addEventListener('click', calculateBusbar);
+  document.getElementById('calculate-busbar-ampacity').addEventListener('click', calculateBusbarAmpacityResult);
+  document.getElementById('busbar-ampacity-surface-mode').addEventListener('change', syncBusbarAmpacityControls);
+  document.getElementById('busbar-ampacity-current-type').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-catalog-configuration').addEventListener('change', renderBusbarCatalog);
   document.getElementById('busbar-catalog-search').addEventListener('input', renderBusbarCatalog);
   document.getElementById('calculate-smart-busway').addEventListener('click', calculateBuswayConfig);
@@ -859,6 +989,7 @@ export async function initializePlatform() {
   await Promise.all([refreshProjectSelect(), loadCatalogs()]);
   fillProjectForm();
   renderBusbarCatalog();
+  syncBusbarAmpacityControls();
   updateCableControls();
   renderAwgResult();
   renderCableCatalog();

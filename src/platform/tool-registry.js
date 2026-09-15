@@ -16,7 +16,7 @@ export const TOOL_GROUPS = [
       { id: 'load', name: '负荷与变压器校核', status: 'available', source: '数据中心负荷计算表/微模块电气负荷计算表 A00' },
       { id: 'load', name: '支路断路器与母线电流', status: 'available', source: '数据中心母线电流计算 A00' },
       { id: 'cable', name: '电缆选型', status: 'available', source: 'B-电缆选型 A00 / GB 50217-2018' },
-      { id: 'busbar', name: '铜排计算与载流量表', status: 'available', source: '铜排载流量 A03 / DIN43671-1975' },
+      { id: 'busbar', name: '铜排双向计算与载流量表', status: 'available', source: '铜排载流量 A03 / 工程计算器 A00 / DIN43671-1975' },
       { id: 'busway', name: '智能母线配置', status: 'available', source: '智能母线配置与选型' },
       { id: 'power-quality', name: 'APF / SVG 校核', status: 'available', source: 'APF容量配置 / SVG+APF 交互计算' }
     ]
@@ -34,7 +34,7 @@ export const TEMPLATE_CATALOG = [
   { category: '微模块', current: '微模块电气负荷计算表-A00.xlsx', migration: '已并入负荷模块', publish: false },
   { category: '母线电流', current: '数据中心母线电流计算-A00.xlsx', migration: '已网页化', publish: false },
   { category: '电缆选型', current: 'B-电缆选型-A00.xlsx', migration: '已按原表公式网页化', publish: false },
-  { category: '铜排', current: '铜排载流量-A03.xlsx', migration: '已独立网页化', publish: false },
+  { category: '铜排', current: '铜排载流量-A03.xlsx + 铜排载流量工程计算器-A00.xlsx', migration: '选型与规格反算均已网页化', publish: false },
   { category: '智能母线', current: '智能母线配置与选型.xlsx', migration: '已网页化', publish: false },
   { category: '电能质量', current: 'APF容量配置.xlsx', migration: '已网页化', publish: false },
   { category: '编码', current: '配电柜申请编码生成模板-持续更新.xlsx', migration: '待下一阶段网页化', publish: false },

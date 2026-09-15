@@ -216,6 +216,32 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .busbar-data-table th:nth-child(n+4):nth-child(-n+6), .busbar-data-table td:nth-child(n+4):nth-child(-n+6) { text-align: right; }
 .busbar-data-table tbody tr:hover { background: #f3f8fe; }
 .busbar-table-footnote { margin-top: 10px; color: #718397; font-size: 11px; line-height: 1.6; }
+.busbar-ampacity-scope { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0 2px; padding: 11px 14px; border: 1px solid #ead7a4; border-radius: 7px; color: #755717; background: #fff9e9; font-size: 12px; line-height: 1.6; }
+.busbar-ampacity-scope b { flex: none; color: #8a5c00; }
+.busbar-ampacity-inputs label small, .busbar-advanced label small { display: block; margin-top: 4px; color: #7a8998; font-size: 10px; line-height: 1.45; }
+.busbar-advanced { margin-top: 14px; border: 1px solid #dce6ef; border-radius: 8px; background: #fbfdff; }
+.busbar-advanced summary { padding: 12px 14px; color: #214f78; font-weight: 700; cursor: pointer; user-select: none; }
+.busbar-advanced summary span { margin-left: 8px; color: #74879a; font-size: 11px; font-weight: 400; }
+.busbar-advanced[open] summary { border-bottom: 1px solid #e5edf4; }
+.busbar-advanced .platform-form-grid { margin: 0; padding: 14px; }
+.busbar-advanced input:disabled { color: #52687d; background: #edf2f6; cursor: not-allowed; }
+.busbar-method-strip { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 10px; margin: 14px 0; }
+.busbar-method-strip span { padding: 10px 12px; border: 1px solid #dce6ef; border-radius: 7px; color: #61758a; background: #fbfdff; font-size: 12px; }
+.busbar-method-strip b { display: block; margin-bottom: 3px; color: #264e72; }
+.busbar-ampacity-hero > div:nth-child(3) { border-color: #c8d9ea; background: #f5f9fd; }
+.busbar-ampacity-process { margin-top: 12px; }
+.busbar-din-comparison { display: grid; grid-template-columns: .8fr .8fr 1.25fr; gap: 0; margin-top: 12px; overflow: hidden; border: 1px solid #d9e5ef; border-radius: 9px; background: #f8fbfe; }
+.busbar-din-comparison > div { padding: 13px 15px; border-right: 1px solid #e0e8ef; }
+.busbar-din-comparison > div:last-of-type { border-right: 0; }
+.busbar-din-comparison span { display: block; margin-bottom: 5px; color: #75879a; font-size: 11px; }
+.busbar-din-comparison strong { color: #214b70; font-size: 14px; }
+.busbar-din-comparison p { grid-column: 1 / -1; margin: 0; padding: 9px 15px; border-top: 1px solid #e0e8ef; color: #63788d; background: #f1f6fa; font-size: 11px; }
+.busbar-din-comparison.safe { border-color: #b8dfca; }
+.busbar-din-comparison.warning { border-color: #efcf8e; background: #fffaf0; }
+.busbar-calculation-details { margin-top: 12px; border: 1px solid #dce6ef; border-radius: 8px; background: #fff; }
+.busbar-calculation-details summary { padding: 11px 14px; color: #315c82; font-size: 12px; font-weight: 700; cursor: pointer; }
+.busbar-calculation-flow { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 8px 16px; padding: 0 14px 14px; }
+.busbar-calculation-flow p { margin: 0; padding: 8px 10px; border-radius: 5px; color: #536b81; background: #f5f8fb; font-size: 11px; line-height: 1.55; }
 
 .busway-row-grid, .quality-grid { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
 .busway-row-grid fieldset, .quality-grid fieldset { display: grid; grid-template-columns: repeat(2, minmax(130px, 1fr)); gap: 12px; padding: 16px; border: 1px solid #d8e4ee; border-radius: 9px; }
@@ -288,7 +314,10 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .tool-grid { grid-template-columns: repeat(2, minmax(210px, 1fr)); }
   .project-flow { grid-template-columns: repeat(6, 145px); }
   .delivery-summary dl { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
-  .busbar-result-hero, .busbar-formula-strip, .cable-result-hero { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+  .busbar-result-hero, .busbar-formula-strip, .busbar-method-strip, .cable-result-hero { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+  .busbar-din-comparison { grid-template-columns: 1fr 1fr; }
+  .busbar-din-comparison > div:nth-child(2) { border-right: 0; }
+  .busbar-din-comparison > div:nth-child(3) { grid-column: 1 / -1; border-top: 1px solid #e0e8ef; border-right: 0; }
   .cable-result-detail { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
   .correction-table-grid { grid-template-columns: 1fr; }
   .cable-catalog-toolbar { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
@@ -312,6 +341,9 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .busbar-result-hero { grid-template-columns: 1fr; }
   .cable-result-hero { grid-template-columns: 1fr; }
   .busbar-formula-strip { grid-template-columns: 1fr; }
+  .busbar-method-strip, .busbar-calculation-flow, .busbar-din-comparison { grid-template-columns: 1fr; }
+  .busbar-din-comparison > div, .busbar-din-comparison > div:nth-child(3) { grid-column: auto; border-top: 1px solid #e0e8ef; border-right: 0; }
+  .busbar-din-comparison > div:first-child { border-top: 0; }
   .busbar-catalog-toolbar { grid-template-columns: 1fr 1fr; }
   .cable-catalog-toolbar { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
   .busbar-table-summary { padding-top: 0; }

@@ -7,6 +7,7 @@ import {
   CABLE_TRAY_LAYER_FACTORS,
   calculateApf,
   calculateBranch,
+  calculateBusbarAmpacity,
   calculateBusbarSelection,
   calculateCableSelection,
   calculateBusway,
@@ -136,6 +137,41 @@ assert.equal(largeBusbar.peAreaMm2, 500);
 assert.ok(Math.abs(largeBusbar.loadRate - 0.964552) < 0.00001);
 assert.match(calculateBusbarSelection(busbarCatalog, { loadCurrentA: 0 }).error, /大于 0A/);
 
+const busbarAmpacityInput = {
+  widthMm: 120,
+  thicknessMm: 10,
+  maximumTemperatureC: 105,
+  roomTemperatureC: 35,
+  internalTemperatureRiseC: 15,
+  convectionCoefficient: 5,
+  emissivity: 0.35,
+  resistivity20OhmM: 1.72e-8,
+  temperatureCoefficient: 0.00393,
+  currentType: 'dc',
+  acResistanceFactor: 1,
+  designFactor: 0.8,
+  dinReferenceField: 'bareCurrentA'
+};
+const busbarAmpacity = calculateBusbarAmpacity(busbarCatalog, busbarAmpacityInput);
+assert.ok(Math.abs(busbarAmpacity.thermalBalanceCurrentA - 2512.8623930728604) < 1e-9);
+assert.ok(Math.abs(busbarAmpacity.recommendedCurrentA - 2010.2899144582884) < 1e-9);
+assert.equal(busbarAmpacity.areaMm2, 1200);
+assert.equal(busbarAmpacity.dinMatch.spec, '120 x 10');
+assert.equal(busbarAmpacity.dinCurrentA, 1740);
+assert.ok(Math.abs(busbarAmpacity.dinDifferencePercent - 0.1553390312978669) < 1e-12);
+assert.ok(busbarAmpacity.estimatedOperatingTemperatureC > busbarAmpacity.internalAmbientTemperatureC);
+assert.ok(busbarAmpacity.estimatedOperatingTemperatureC < busbarAmpacity.maximumTemperatureC);
+const busbarAmpacityCoated = calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, dinReferenceField: 'coatedCurrentA' });
+assert.equal(busbarAmpacityCoated.dinCurrentA, 2110);
+const busbarAmpacityAc = calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, currentType: 'ac', acResistanceFactor: 4 });
+assert.ok(Math.abs(busbarAmpacityAc.thermalBalanceCurrentA - busbarAmpacity.thermalBalanceCurrentA / 2) < 1e-9);
+assert.equal(busbarAmpacityAc.requiresAcVerification, false);
+assert.equal(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, currentType: 'ac', acResistanceFactor: 1 }).requiresAcVerification, true);
+assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, widthMm: 0 }).error, /宽度/);
+assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, widthMm: 5, thicknessMm: 10 }).error, /输入顺序/);
+assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, maximumTemperatureC: 50 }).error, /必须高于/);
+assert.match(calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, emissivity: 1.1 }).error, /发射率/);
+
 const cableCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'cable-catalog.json'), 'utf8'));
 assert.equal(cableCatalog.length, 224);
 assert.deepEqual(CABLE_AIR_SPACING_FACTORS['S=d'], { 1: 1, 2: 0.9, 3: 0.85, 4: 0.82, 5: 0.81, 6: 0.8 });
@@ -167,13 +203,17 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.5\.0"/);
+assert.match(index, /const APP_VERSION = "v2\.6\.0"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
 assert.match(index, /原表 J2 的 IFS 公式未定义 3C～4C 区间/);
 const appShell = fs.readFileSync(path.join(root, 'src', 'platform', 'app-shell.js'), 'utf8');
 assert.match(appShell, /navButton\('busbar'/);
+assert.match(appShell, /按电流选铜排/);
+assert.match(appShell, /按规格算载流量/);
+assert.match(appShell, /id="calculate-busbar-ampacity"/);
+assert.match(appShell, /GB\/T 24276-2025/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);
 assert.doesNotMatch(appShell, /conductor-catalog/);
 assert.match(appShell, /电缆修正系数数据表/);
