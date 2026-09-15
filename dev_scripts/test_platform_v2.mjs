@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  CABLE_AIR_SPACING_FACTORS,
+  CABLE_TRAY_LAYER_FACTORS,
   calculateApf,
   calculateBranch,
   calculateBusbarSelection,
@@ -108,6 +110,10 @@ assert.match(calculateBusbarSelection(busbarCatalog, { loadCurrentA: 0 }).error,
 
 const cableCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'cable-catalog.json'), 'utf8'));
 assert.equal(cableCatalog.length, 224);
+assert.deepEqual(CABLE_AIR_SPACING_FACTORS['S=d'], { 1: 1, 2: 0.9, 3: 0.85, 4: 0.82, 5: 0.81, 6: 0.8 });
+assert.deepEqual(CABLE_AIR_SPACING_FACTORS['S=2d'], { 1: 1, 2: 1, 3: 0.98, 4: 0.95, 5: 0.93, 6: 0.9 });
+assert.deepEqual(CABLE_AIR_SPACING_FACTORS['S=3d'], { 1: 1, 2: 1, 3: 1, 4: 0.98, 5: 0.97, 6: 0.96 });
+assert.deepEqual(CABLE_TRAY_LAYER_FACTORS, { 梯架: { 1: 0.8, 2: 0.65, 3: 0.55, 4: 0.5 }, 托盘: { 1: 0.7, 2: 0.55, 3: 0.5, 4: 0.45 } });
 const cableCases = [
   [{ requiredCurrentA: 400, type: 'YJV、YJLV、YJY、YJLY型(铜芯)', coreCount: '单芯', ambientC: 35, parallelCount: 3, groupCount: 6, system: '交流', arrangement: '品字形', trayType: '梯架', stackedLayers: 1 }, 0.8, 35],
   [{ requiredCurrentA: 400, type: 'YJV、YJLV、YJY、YJLY型(铜芯)', coreCount: '三芯/五芯', ambientC: 35, parallelCount: 2, groupCount: 2, system: '交流', arrangement: '不考虑', trayType: '梯架', stackedLayers: 1 }, 0.9, 70],
@@ -133,13 +139,18 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.2\.0"/);
+assert.match(index, /const APP_VERSION = "v2\.3\.0"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 const appShell = fs.readFileSync(path.join(root, 'src', 'platform', 'app-shell.js'), 'utf8');
 assert.match(appShell, /navButton\('busbar'/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);
 assert.doesNotMatch(appShell, /conductor-catalog/);
+assert.match(appShell, /电缆修正系数数据表/);
+assert.match(appShell, /电缆数据库/);
+assert.match(appShell, /中美线规对照表/);
+assert.match(appShell, /id="cable-catalog-body"/);
+assert.match(appShell, /id="awg-catalog-body"/);
 assert.match(appShell, /platform-sidebar-control-text/);
 assert.match(appShell, /data-sidebar-toggle/);
 

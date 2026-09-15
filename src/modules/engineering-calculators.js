@@ -4,7 +4,12 @@ export const BREAKER_STANDARDS = [16, 20, 32, 40, 50, 63, 80, 100, 125, 160, 200
 export const BUSWAY_STANDARDS = [160, 250, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6300];
 export const TRANSFORMER_STANDARDS = [100, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150];
 export const BUSBAR_CONFIGURATION_PRIORITY = ['单片', '双拼', '三拼', '四拼'];
-export const CABLE_AIR_GROUP_FACTORS = { 1: 1, 2: 0.9, 3: 0.85, 4: 0.82, 5: 0.81, 6: 0.8 };
+export const CABLE_AIR_SPACING_FACTORS = {
+  'S=d': { 1: 1, 2: 0.9, 3: 0.85, 4: 0.82, 5: 0.81, 6: 0.8 },
+  'S=2d': { 1: 1, 2: 1, 3: 0.98, 4: 0.95, 5: 0.93, 6: 0.9 },
+  'S=3d': { 1: 1, 2: 1, 3: 1, 4: 0.98, 5: 0.97, 6: 0.96 }
+};
+export const CABLE_AIR_GROUP_FACTORS = CABLE_AIR_SPACING_FACTORS['S=d'];
 export const CABLE_TRAY_LAYER_FACTORS = {
   梯架: { 1: 0.8, 2: 0.65, 3: 0.55, 4: 0.5 },
   托盘: { 1: 0.7, 2: 0.55, 3: 0.5, 4: 0.45 }

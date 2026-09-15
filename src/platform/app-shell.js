@@ -1,4 +1,6 @@
 import {
+  CABLE_AIR_SPACING_FACTORS,
+  CABLE_TRAY_LAYER_FACTORS,
   calculateApf,
   calculateBranch,
   calculateBusbarSelection,
@@ -174,10 +176,14 @@ function loadView() {
 
 function cableView() {
   const typeYj = 'YJV、YJLV、YJY、YJLY型(铜芯)';
+  const airColumns = [1, 2, 3, 4, 5, 6];
+  const trayColumns = [1, 2, 3, 4];
   return viewPanel('cable', '电缆选型', '按 B-电缆选型-A00 工作簿进行电缆计算；导体选型已移除，铜排请使用独立计算页。', `
     <div class="engineering-tabs cable-tabs" role="tablist" aria-label="电缆工具">
       <button class="active" role="tab" aria-selected="true" data-cable-tab="calculator">电缆智能选型</button>
-      <button role="tab" aria-selected="false" data-cable-tab="awg">中美线规查询 <span>${awgCatalog.length} 条</span></button>
+      <button role="tab" aria-selected="false" data-cable-tab="correction">电缆修正系数数据表</button>
+      <button role="tab" aria-selected="false" data-cable-tab="catalog">电缆数据库 <span>${cableCatalog.length} 条</span></button>
+      <button role="tab" aria-selected="false" data-cable-tab="awg">中美线规对照表 <span>${awgCatalog.length} 条</span></button>
     </div>
     <div class="cable-pane" data-cable-pane="calculator">
       <div class="busbar-source-note cable-source-note"><b>计算口径</b><span>基础载流量、输入条件和推荐逻辑均来自 B-电缆选型-A00；修正系数采用 GB 50217-2018 表 D.0.5、D.0.6。</span></div>
@@ -199,12 +205,56 @@ function cableView() {
       <div id="cable-result" class="cable-result" aria-live="polite"></div>
       <p class="engineering-warning">⚠ 空气中单层并列系数不适用于三相交流系统单芯电缆；超过 1600A 建议采用密集母线。最终选型仍需校核电压降、短路热稳定和实际敷设条件。</p>
     </div>
+    <div class="cable-pane" data-cable-pane="correction" hidden>
+      <div class="reference-table-intro"><b>GB 50217-2018 修正系数</b><span>完整保留工作簿中的表 D.0.5 与表 D.0.6，便于核对当前计算采用的系数。</span></div>
+      <div class="correction-table-grid">
+        <section class="reference-table-card">
+          <header><div><h2>表 D.0.5</h2><p>空气中单层并列时的载流量校正系数</p></div><span>电缆根数</span></header>
+          <div class="data-entry-table reference-data-table compact-table"><table>
+            <thead><tr><th>中心间距</th>${airColumns.map(value => `<th>${value}</th>`).join('')}</tr></thead>
+            <tbody>${Object.entries(CABLE_AIR_SPACING_FACTORS).map(([spacing, factors]) => `<tr><td><b>${spacing}</b></td>${airColumns.map(value => `<td>${format(factors[value], 2)}</td>`).join('')}</tr>`).join('')}</tbody>
+          </table></div>
+          <p class="busbar-table-footnote">S 为电缆中心间距，d 为电缆外径；不适用于三相交流系统单芯电缆。</p>
+        </section>
+        <section class="reference-table-card">
+          <header><div><h2>表 D.0.6</h2><p>梯架或托盘多层并列时的载流量校正系数</p></div><span>叠置层数</span></header>
+          <div class="data-entry-table reference-data-table compact-table"><table>
+            <thead><tr><th>桥架类型</th>${trayColumns.map(value => `<th>${value}</th>`).join('')}</tr></thead>
+            <tbody>${Object.entries(CABLE_TRAY_LAYER_FACTORS).map(([tray, factors]) => `<tr><td><b>${tray}</b></td>${trayColumns.map(value => `<td>${format(factors[value], 2)}</td>`).join('')}</tr>`).join('')}</tbody>
+          </table></div>
+          <p class="busbar-table-footnote">适用于水平状并列的电缆数量不少于 7 根。</p>
+        </section>
+      </div>
+    </div>
+    <div class="cable-pane" data-cable-pane="catalog" hidden>
+      <div class="reference-data-toolbar cable-catalog-toolbar">
+        <label>电缆类型<select id="cable-catalog-type"><option value="">全部类型</option><option>BV、BVR型(铜芯)</option><option>${typeYj}</option></select></label>
+        <label>芯数<select id="cable-catalog-core"><option value="">全部芯数</option><option>单芯</option><option>三芯/五芯</option></select></label>
+        <label>环境温度<select id="cable-catalog-ambient"><option value="">全部温度</option><option value="25">25℃</option><option value="30">30℃</option><option value="35">35℃</option><option value="40">40℃</option></select></label>
+        <label>排列方式<select id="cable-catalog-arrangement"><option value="">全部排列</option><option>不考虑</option><option>品字形</option><option>水平形</option></select></label>
+        <label class="reference-search">快速筛选<input id="cable-catalog-search" placeholder="输入线径、类型或排列方式"></label>
+        <div class="reference-table-summary" id="cable-catalog-summary"></div>
+      </div>
+      <div class="data-entry-table reference-data-table cable-database-table"><table>
+        <thead><tr><th>电缆类型</th><th>芯数</th><th>敷设方式</th><th>环境温度(℃)</th><th>允许载流量(A)</th><th>线径(mm²)</th><th>排列方式</th></tr></thead>
+        <tbody id="cable-catalog-body"></tbody>
+      </table></div>
+      <p class="busbar-table-footnote">此处展示工作簿的基础载流量数据；实际推荐结果还会叠加并联根数、并列根数或桥架叠层修正系数。</p>
+    </div>
     <div class="cable-pane" data-cable-pane="awg" hidden>
       <div class="awg-query">
         <label>美国线规线号（AWG）<select id="awg-size">${awgCatalog.map(item => `<option value="${htmlEscape(item.awg)}">${htmlEscape(item.awg)}</option>`).join('')}</select></label>
         <button id="query-awg" class="primary">查询线规</button>
       </div>
       <div id="awg-result" class="result-grid"></div>
+      <div class="reference-data-toolbar awg-catalog-toolbar">
+        <label class="reference-search">快速筛选<input id="awg-catalog-search" placeholder="输入 AWG 线号、线径或截面积"></label>
+        <div class="reference-table-summary" id="awg-catalog-summary"></div>
+      </div>
+      <div class="data-entry-table reference-data-table awg-database-table"><table>
+        <thead><tr><th>AWG线号</th><th>美国线径(mm)</th><th>中国线径(mm)</th><th>截面积(mm²)</th><th>阻值(Ω/km)</th><th>正常载流量(A)</th><th>最大载流量(A)</th></tr></thead>
+        <tbody id="awg-catalog-body"></tbody>
+      </table></div>
       <p class="busbar-table-footnote">线径、截面积、阻值及载流量来自 B-电缆选型-A00 的“中美线规对照表”。</p>
     </div>`);
 }
@@ -523,6 +573,38 @@ function renderAwgResult() {
   ]) : '<div class="no-result">没有找到对应线规数据。</div>';
 }
 
+function renderCableCatalog() {
+  const body = document.getElementById('cable-catalog-body');
+  if (!body) return;
+  const type = document.getElementById('cable-catalog-type')?.value || '';
+  const core = document.getElementById('cable-catalog-core')?.value || '';
+  const ambient = document.getElementById('cable-catalog-ambient')?.value || '';
+  const arrangement = document.getElementById('cable-catalog-arrangement')?.value || '';
+  const query = (document.getElementById('cable-catalog-search')?.value || '').trim().toLowerCase();
+  const rows = state.catalogs.cables.filter(item => {
+    if (type && item.type !== type) return false;
+    if (core && item.coreCount !== core) return false;
+    if (ambient && String(item.ambientC) !== ambient) return false;
+    if (arrangement && item.arrangement !== arrangement) return false;
+    const searchText = `${item.type} ${item.coreCount} ${item.installation} ${item.ambientC} ${item.currentA} ${item.size} ${item.arrangement}`.toLowerCase();
+    return !query || searchText.includes(query);
+  });
+  body.innerHTML = rows.map(item => `<tr><td>${htmlEscape(item.type)}</td><td>${htmlEscape(item.coreCount)}</td><td>${htmlEscape(item.installation)}</td><td>${format(item.ambientC, 0)}</td><td><b>${format(item.currentA, 0)}</b></td><td><b>${format(item.size, 1)}</b></td><td>${htmlEscape(item.arrangement)}</td></tr>`).join('');
+  document.getElementById('cable-catalog-summary').textContent = `显示 ${rows.length} / ${state.catalogs.cables.length} 条`;
+}
+
+function renderAwgCatalog() {
+  const body = document.getElementById('awg-catalog-body');
+  if (!body) return;
+  const query = (document.getElementById('awg-catalog-search')?.value || '').trim().toLowerCase();
+  const rows = state.catalogs.awg.filter(item => {
+    const searchText = `${item.awg} ${item.diameterMm} ${item.cwgDiameterMm} ${item.areaMm2} ${item.resistanceOhmKm} ${item.normalCurrentA} ${item.maximumCurrentA}`.toLowerCase();
+    return !query || searchText.includes(query);
+  });
+  body.innerHTML = rows.map(item => `<tr><td><b>${htmlEscape(item.awg)}</b></td><td>${format(item.diameterMm, 3)}</td><td>${item.cwgDiameterMm === '/' ? '—' : format(item.cwgDiameterMm, 3)}</td><td>${format(item.areaMm2, 4)}</td><td>${format(item.resistanceOhmKm, 4)}</td><td>${format(item.normalCurrentA, 3)}</td><td>${format(item.maximumCurrentA, 3)}</td></tr>`).join('');
+  document.getElementById('awg-catalog-summary').textContent = `显示 ${rows.length} / ${state.catalogs.awg.length} 条`;
+}
+
 function renderBusbarCatalog() {
   const body = document.getElementById('busbar-catalog-body');
   if (!body) return;
@@ -671,6 +753,10 @@ function bindEvents() {
     .forEach(id => document.getElementById(id).addEventListener('change', updateCableControls));
   document.getElementById('query-awg').addEventListener('click', renderAwgResult);
   document.getElementById('awg-size').addEventListener('change', renderAwgResult);
+  ['cable-catalog-type', 'cable-catalog-core', 'cable-catalog-ambient', 'cable-catalog-arrangement']
+    .forEach(id => document.getElementById(id).addEventListener('change', renderCableCatalog));
+  document.getElementById('cable-catalog-search').addEventListener('input', renderCableCatalog);
+  document.getElementById('awg-catalog-search').addEventListener('input', renderAwgCatalog);
   document.getElementById('calculate-busbar').addEventListener('click', calculateBusbar);
   document.getElementById('busbar-catalog-configuration').addEventListener('change', renderBusbarCatalog);
   document.getElementById('busbar-catalog-search').addEventListener('input', renderBusbarCatalog);
@@ -697,7 +783,8 @@ function bindEvents() {
       item.setAttribute('aria-selected', String(active));
     });
     document.querySelectorAll('[data-cable-pane]').forEach(pane => { pane.hidden = pane.dataset.cablePane !== button.dataset.cableTab; });
-    if (button.dataset.cableTab === 'awg') renderAwgResult();
+    if (button.dataset.cableTab === 'catalog') renderCableCatalog();
+    if (button.dataset.cableTab === 'awg') { renderAwgResult(); renderAwgCatalog(); }
   }));
   document.getElementById('platform-project-select').addEventListener('change', async event => {
     const projects = await listProjects();
@@ -772,6 +859,8 @@ export async function initializePlatform() {
   renderBusbarCatalog();
   updateCableControls();
   renderAwgResult();
+  renderCableCatalog();
+  renderAwgCatalog();
   const migrationElement = document.getElementById('migration-status');
   migrationElement.textContent = `旧版数据已安全复制：${migration.copiedKeys?.length || 0} 项；旧数据仍保留。`;
   bindEvents();

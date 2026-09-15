@@ -115,6 +115,8 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .catalog-answer pre { max-height: 260px; overflow: auto; margin: 0; padding: 12px; border-radius: 6px; color: #35526c; background: #edf4fa; font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; }
 
 .cable-pane[hidden] { display: none; }
+.cable-tabs { overflow-x: auto; scrollbar-width: thin; }
+.cable-tabs button { flex: none; white-space: nowrap; }
 .cable-tabs button span { margin-left: 4px; opacity: .78; font-size: 11px; }
 .cable-source-note { margin-top: 18px; }
 .cable-inputs label:has(:disabled) { opacity: .66; }
@@ -141,6 +143,31 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .awg-query label { display: flex; flex-direction: column; gap: 6px; color: #5b6f83; font-size: 12px; }
 .awg-query select { min-height: 39px; padding: 8px 10px; border: 1px solid #ccd9e5; border-radius: 7px; color: #183b5e; background: #fff; }
 .awg-query button { min-height: 39px; border: 1px solid; border-radius: 7px; cursor: pointer; font-weight: 700; }
+.reference-table-intro { display: flex; gap: 12px; align-items: flex-start; margin-top: 18px; padding: 13px 15px; border-left: 4px solid #3979bd; border-radius: 7px; color: #526b82; background: #f1f7fd; font-size: 12px; line-height: 1.6; }
+.reference-table-intro b { flex: none; color: #214f78; }
+.correction-table-grid { display: grid; grid-template-columns: minmax(520px, 1.2fr) minmax(420px, 1fr); gap: 14px; margin-top: 16px; }
+.reference-table-card { min-width: 0; padding: 15px; border: 1px solid #dbe6ef; border-radius: 9px; background: #fbfdff; }
+.reference-table-card > header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.reference-table-card h2 { margin: 0; color: #214f78; font-size: 15px; }
+.reference-table-card header p { margin: 4px 0 0; color: #6b7f93; font-size: 11px; }
+.reference-table-card header > span { flex: none; padding: 3px 8px; border-radius: 10px; color: #47647e; background: #edf3f8; font-size: 10px; }
+.reference-data-toolbar { display: grid; gap: 10px; align-items: end; margin-top: 18px; }
+.cable-catalog-toolbar { grid-template-columns: minmax(190px, 1.4fr) 130px 130px 135px minmax(210px, 1fr) auto; }
+.awg-catalog-toolbar { grid-template-columns: minmax(260px, 1fr) auto; margin-top: 14px; }
+.reference-data-toolbar label { display: flex; flex-direction: column; gap: 6px; color: #5b6f83; font-size: 12px; }
+.reference-data-toolbar select, .reference-data-toolbar input { width: 100%; min-height: 39px; padding: 8px 10px; border: 1px solid #ccd9e5; border-radius: 7px; color: #183b5e; background: #fff; box-sizing: border-box; }
+.reference-table-summary { align-self: center; padding-top: 18px; color: #63778b; font-size: 12px; white-space: nowrap; }
+.reference-data-table { max-height: 520px; overflow: auto; }
+.reference-data-table table { min-width: 900px; }
+.reference-data-table thead { position: sticky; top: 0; z-index: 2; }
+.reference-data-table tbody tr:hover { background: #f3f8fe; }
+.reference-data-table td b { color: #173f62; }
+.reference-data-table td:nth-child(n+4) { text-align: right; }
+.compact-table { max-height: none; }
+.compact-table table { min-width: 520px; }
+.compact-table th, .compact-table td { text-align: center !important; }
+.compact-table th:first-child, .compact-table td:first-child { text-align: left !important; }
+.awg-database-table td:first-child { text-align: left; }
 .no-result { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
 .no-result b { flex-basis: 100%; color: #264b6c; }
 .no-result span { color: #677d91; font-size: 12px; }
@@ -224,6 +251,8 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .delivery-summary dl { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
   .busbar-result-hero, .busbar-formula-strip, .cable-result-hero { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
   .cable-result-detail { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+  .correction-table-grid { grid-template-columns: 1fr; }
+  .cable-catalog-toolbar { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
 }
 
 @media (max-width: 900px) {
@@ -244,7 +273,9 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .cable-result-hero { grid-template-columns: 1fr; }
   .busbar-formula-strip { grid-template-columns: 1fr; }
   .busbar-catalog-toolbar { grid-template-columns: 1fr 1fr; }
+  .cable-catalog-toolbar { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
   .busbar-table-summary { padding-top: 0; }
+  .reference-table-summary { padding-top: 0; }
   .platform-v2 .appbar-sub { display: none; }
 }
 
@@ -254,5 +285,6 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
   .platform-section-head { padding: 17px 15px 14px; }
   .project-toolbar label { min-width: 100%; }
   .busbar-catalog-toolbar { grid-template-columns: 1fr; }
+  .cable-catalog-toolbar, .awg-catalog-toolbar { grid-template-columns: 1fr; }
   .cable-result-detail, .awg-query { grid-template-columns: 1fr; }
 }
