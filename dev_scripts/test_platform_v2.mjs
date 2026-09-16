@@ -47,12 +47,16 @@ const busway = calculateBusway({ activePowerKw: 500, voltage: 380, powerFactor: 
 assert.equal(busway.buswayA, 1000);
 
 const apf = calculateApf({ transformerKva: 1250, loadRate: 0.8, thdi: 0.3, voltage: 380 });
-assert.ok(Math.abs(apf.harmonicCurrentA - 436.58) < 0.1);
-assert.equal(apf.recommendedA, 450);
+assert.ok(Math.abs(apf.totalCurrentA - 1519.34) < 0.1);
+assert.ok(Math.abs(apf.harmonicCurrentA - 455.80) < 0.1);
+assert.equal(apf.recommendedA, 575);
 
 const svg = calculateSvg({ activePowerKw: 800, currentPowerFactor: 0.8, targetPowerFactor: 0.95 });
 assert.ok(Math.abs(svg.compensationKvar - 337.05) < 0.1);
 assert.equal(svg.recommendedKvar, 350);
+const leadingSvg = calculateSvg({ activePowerKw: 1000, currentPowerFactor: 0.92, targetPowerFactor: 0.99, powerFactorType: 'leading' });
+assert.ok(leadingSvg.compensationKvar > 300);
+assert.equal(leadingSvg.initialReactiveKvar < 0, true);
 
 const lithiumA00 = calculateLithiumBatteryA00({
   loadPowerKw: 500,
@@ -144,8 +148,12 @@ const busbarAmpacityInput = {
   roomTemperatureC: 35,
   permittedTemperatureRiseK: 70,
   internalTemperatureRiseC: 15,
+  convectionModel: 'custom',
+  orientation: 'edgewise-horizontal',
   convectionCoefficient: 5,
   emissivity: 0.35,
+  radiationViewFactor: 1,
+  exposedSurfaceFactor: 1,
   resistivity20OhmM: 1.72e-8,
   temperatureCoefficient: 0.00393,
   currentType: 'dc',
@@ -154,8 +162,8 @@ const busbarAmpacityInput = {
   dinReferenceField: 'bareCurrentA'
 };
 const busbarAmpacity = calculateBusbarAmpacity(busbarCatalog, busbarAmpacityInput);
-assert.ok(Math.abs(busbarAmpacity.thermalBalanceCurrentA - 2512.8623930728604) < 1e-9);
-assert.ok(Math.abs(busbarAmpacity.recommendedCurrentA - 2010.2899144582884) < 1e-9);
+assert.ok(Math.abs(busbarAmpacity.thermalBalanceCurrentA - 2512.8962295810684) < 1e-9);
+assert.ok(Math.abs(busbarAmpacity.recommendedCurrentA - 2010.316983664855) < 1e-9);
 assert.equal(busbarAmpacity.areaMm2, 1200);
 assert.equal(busbarAmpacity.maximumTemperatureC, 105);
 assert.equal(busbarAmpacity.permittedTemperatureRiseK, 70);
@@ -163,7 +171,7 @@ assert.equal(busbarAmpacity.internalAmbientTemperatureC, 50);
 assert.equal(busbarAmpacity.effectiveTemperatureRiseK, 55);
 assert.equal(busbarAmpacity.dinMatch.spec, '120 x 10');
 assert.equal(busbarAmpacity.dinCurrentA, 1740);
-assert.ok(Math.abs(busbarAmpacity.dinDifferencePercent - 0.44417378912233356) < 1e-12);
+assert.ok(Math.abs(busbarAmpacity.dinDifferencePercent - 0.08336755224606929) < 1e-12);
 assert.ok(busbarAmpacity.estimatedOperatingTemperatureC > busbarAmpacity.internalAmbientTemperatureC);
 assert.ok(busbarAmpacity.estimatedOperatingTemperatureC < busbarAmpacity.maximumTemperatureC);
 const busbarAmpacityCoated = calculateBusbarAmpacity(busbarCatalog, { ...busbarAmpacityInput, dinReferenceField: 'coatedCurrentA' });
@@ -181,14 +189,44 @@ const reviewedTinBusbar = calculateBusbarAmpacity(busbarCatalog, {
   ...busbarAmpacityInput,
   widthMm: 40,
   thicknessMm: 6,
+  convectionModel: 'din-calibrated',
   emissivity: 0.05,
+  radiationViewFactor: 0.8,
   resistivity20OhmM: 1.7241e-8,
   designFactor: 0.8
 });
-assert.ok(Math.abs(reviewedTinBusbar.thermalBalanceCurrentA - 538.4877643145713) < 1e-9);
-assert.ok(Math.abs(reviewedTinBusbar.recommendedCurrentA - 430.7902114516571) < 1e-9);
+assert.ok(Math.abs(reviewedTinBusbar.thermalBalanceCurrentA - 699.198097980867) < 1e-9);
+assert.ok(Math.abs(reviewedTinBusbar.recommendedCurrentA - 559.3584783846936) < 1e-9);
 assert.equal(reviewedTinBusbar.dinCurrentA, 528);
-assert.ok(Math.abs(reviewedTinBusbar.dinDifferencePercent - 0.019863189989718366) < 1e-12);
+assert.ok(Math.abs(reviewedTinBusbar.dinNormalizedThermalCurrentA - 508.6757450358542) < 1e-9);
+assert.ok(Math.abs(reviewedTinBusbar.dinDifferencePercent - (-0.03659896773512461)) < 1e-12);
+assert.ok(Math.abs(reviewedTinBusbar.dinReferenceConvectionCoefficient - 7.6190233112694665) < 1e-12);
+assert.ok(reviewedTinBusbar.convectionCoefficient > reviewedTinBusbar.dinReferenceConvectionCoefficient);
+
+const dinNormalizedBusbar = calculateBusbarAmpacity(busbarCatalog, {
+  ...reviewedTinBusbar,
+  widthMm: 40,
+  thicknessMm: 6,
+  roomTemperatureC: 35,
+  permittedTemperatureRiseK: 30,
+  internalTemperatureRiseC: 0,
+  convectionModel: 'din-calibrated',
+  emissivity: 0.12,
+  radiationViewFactor: 1,
+  designFactor: 1
+});
+assert.ok(Math.abs(dinNormalizedBusbar.thermalBalanceCurrentA - 528) < 1e-9);
+assert.equal(dinNormalizedBusbar.dinDifferencePercent, 0);
+
+const customBusbarFallback = calculateBusbarAmpacity(busbarCatalog, {
+  ...reviewedTinBusbar,
+  widthMm: 37,
+  thicknessMm: 6,
+  convectionModel: 'din-calibrated'
+});
+assert.equal(customBusbarFallback.convectionModel, 'natural-correlation');
+assert.equal(customBusbarFallback.convectionFallback, true);
+assert.ok(customBusbarFallback.rayleighNumber > 0);
 
 const cableCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'cable-catalog.json'), 'utf8'));
 assert.equal(cableCatalog.length, 224);
@@ -221,7 +259,7 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
 }
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.6\.4"/);
+assert.match(index, /const APP_VERSION = "v2\.6\.5"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
@@ -234,6 +272,10 @@ assert.match(appShell, /id="calculate-busbar-ampacity"/);
 assert.match(appShell, /新亮全镀锡（ε=0\.05，建议默认）/);
 assert.match(appShell, /原 Excel 历史参数（状态未注明，ε=0\.35）/);
 assert.match(appShell, /id="busbar-ampacity-rise-limit"/);
+assert.match(appShell, /DIN同规格反校（推荐）/);
+assert.match(appShell, /自然对流关联式（独立估算）/);
+assert.match(appShell, /id="busbar-ampacity-view-factor"/);
+assert.match(appShell, /id="busbar-ampacity-surface-factor"/);
 assert.match(appShell, /35 \+ 70 = 105℃/);
 assert.match(appShell, /50K 温升修正（通风 × 1\.3）/);
 assert.match(appShell, /30K 温升基准（DIN 原值）/);

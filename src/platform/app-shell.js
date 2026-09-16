@@ -284,7 +284,7 @@ function busbarView() {
       <div id="busbar-result" class="busbar-result" aria-live="polite"></div>
     </div>
     <div class="busbar-pane" data-busbar-pane="ampacity" hidden>
-      <div class="busbar-source-note"><b>公式来源</b><span>依据《铜排载流量工程计算器-A00.xlsx》的单片铜排热平衡模型；默认按外部环境 35℃、工程控制温升 70K，自动得到铜排最高温度 105℃。标准提示按现行 GB/T 7251.1-2023、GB/T 24276-2025 更新；结果用于工程估算，不替代成套温升试验。</span></div>
+      <div class="busbar-source-note"><b>计算口径</b><span>热平衡采用 I²R=Pconv+Prad。默认用同规格 DIN 30K 裸排数据反求参考等效换热系数，再按自然对流规律随温差修正；无同规格数据时自动回退到自然对流关联式。标准提示按现行 GB/T 7251.1-2023、GB/T 24276-2025 更新；结果用于工程估算，不替代成套温升试验。</span></div>
       <div class="busbar-ampacity-scope">
         <b>温升口径</b>
         <span>70K 是铜排相对外部环境的工程控制温升：35 + 70 = 105℃。若柜内空气比房间再高 15K，则柜内空气为 50℃，铜排对柜内空气的有效散热温差为 105 − 50 = 55K；它与 DIN 表的 30K 查表条件不是同一个量。</span>
@@ -302,14 +302,18 @@ function busbarView() {
         <label>柜内空气温升 (K)<input id="busbar-ampacity-internal-rise" type="number" min="0" max="100" step="1" value="15"><small>密闭柜体 Excel 默认 15K；开放空气可填 0K</small></label>
         <label>电流类型<select id="busbar-ampacity-current-type"><option value="dc">直流 / 忽略交流附加损耗</option><option value="ac">交流（使用修正系数）</option></select></label>
         <label>设计裕量系数<select id="busbar-ampacity-design-factor"><option value="0.7">70%</option><option value="0.8" selected>80%（建议默认）</option><option value="0.9">90%</option><option value="1">100%（热平衡极限，不推荐）</option></select></label>
-        <label>DIN同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量</option><option value="coatedCurrentA">涂层载流量（非热缩）</option></select></label>
+        <label>DIN同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量（35℃ / 30K）</option></select><small>对照时自动统一到DIN温升条件</small></label>
       </div>
       <details class="busbar-advanced">
-        <summary>高级热工参数 <span>建议值已复核，可展开查看和修改</span></summary>
+        <summary>高级热工参数 <span>默认采用DIN反校模型，可展开切换独立关联式</span></summary>
         <div class="platform-form-grid cols-3 compact">
+          <label>对流计算模型<select id="busbar-ampacity-convection-model"><option value="din-calibrated" selected>DIN同规格反校（推荐）</option><option value="natural-correlation">自然对流关联式（独立估算）</option><option value="custom">自定义等效换热系数</option></select><small>不再对全部规格固定使用 h=5</small></label>
+          <label>安装方向<select id="busbar-ampacity-orientation" disabled><option value="edgewise-horizontal" selected>铜排水平、宽面竖直</option><option value="vertical-run">铜排沿长度方向竖直</option><option value="flat-horizontal">铜排水平、宽面水平</option></select><small>仅自然对流关联式使用</small></label>
+          <label>自定义等效 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5" disabled><small>W/(m²·K)；仅自定义模式使用</small></label>
           <label>表面状态 / 发射率<select id="busbar-ampacity-surface-mode"><option value="bright-tin" selected>新亮全镀锡（ε=0.05，建议默认）</option><option value="conservative-tin">电镀铜保守校核（ε=0.03）</option><option value="excel">原 Excel 历史参数（状态未注明，ε=0.35）</option><option value="custom">自定义发射率</option></select><small>0.35 不代表镀锡；氧化、粗糙或特殊表面须依据实测</small></label>
           <label>计算采用的发射率 ε<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.05" disabled><small>这是辐射散热参数，不是铜排电阻发热系数</small></label>
-          <label>对流换热系数 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5"><small>W/(m²·K)；5 为自然对流初算值，并非统一常数</small></label>
+          <label>辐射视角系数 F<input id="busbar-ampacity-view-factor" type="number" min="0.05" max="1" step="0.05" value="0.8"><small>1为完全可见；柜壁、相邻铜排会降低视角系数</small></label>
+          <label>有效散热面积系数<input id="busbar-ampacity-surface-factor" type="number" min="0.1" max="1" step="0.05" value="1"><small>四面无遮挡取1；支撑、遮挡或邻近结构应降低</small></label>
           <label>20℃铜电阻率 ρ₂₀<input id="busbar-ampacity-resistivity" type="number" min="0" max="0.000001" step="0.000000000001" value="0.000000017241"><small>Ω·m；按高导电退火铜，材料不明时应保守提高</small></label>
           <label>电阻温度系数 α<input id="busbar-ampacity-temperature-coefficient" type="number" min="0" max="0.02" step="0.00001" value="0.00393"><small>/℃</small></label>
           <label>交流电阻修正系数<input id="busbar-ampacity-ac-factor" type="number" min="1" max="5" step="0.01" value="1" disabled><small>1.00 表示尚未计入交流附加损耗</small></label>
@@ -318,7 +322,8 @@ function busbarView() {
       <div class="busbar-method-strip" aria-label="规格反算方法">
         <span><b>最高温度</b> 外部环境 + 工程控制温升</span>
         <span><b>柜内空气温度</b> 外部环境 + 柜内空气温升</span>
-        <span><b>散热能力</b> 对流散热 + 辐射散热</span>
+        <span><b>对流散热</b> DIN反校 h 或自然对流 Nu/Ra 关联式</span>
+        <span><b>辐射散热</b> ε × F × σ × As × (T⁴ − Tamb⁴)</span>
         <span><b>热平衡电流</b> √(总散热 ÷ 每米电阻)</span>
         <span><b>建议电流</b> 热平衡电流 × 设计裕量</span>
       </div>
@@ -351,13 +356,22 @@ function buswayView() {
 }
 
 function powerQualityView() {
-  return viewPanel('power-quality', '电能质量', 'APF 谐波电流和 SVG 无功补偿容量独立校核。', `
-    <div class="quality-grid"><fieldset><legend>APF 容量</legend>
-      <label>变压器容量(kVA)<input id="apf-transformer" type="number" value="1250"></label><label>负载率<input id="apf-load-rate" type="number" step="0.05" value="0.8"></label><label>THDi（小数）<input id="apf-thdi" type="number" step="0.01" value="0.3"></label>
-    </fieldset><fieldset><legend>SVG 容量</legend>
-      <label>有功功率(kW)<input id="svg-power" type="number" value="800"></label><label>当前功率因数<input id="svg-pf-before" type="number" step="0.01" value="0.8"></label><label>目标功率因数<input id="svg-pf-target" type="number" step="0.01" value="0.95"></label>
-    </fieldset></div><button id="calculate-power-quality" class="platform-primary-action">计算 APF / SVG</button><div id="power-quality-result" class="result-grid"></div>
-    <p class="engineering-warning">⚠ 谐波源类型、频谱、变压器短路阻抗和系统谐振风险需由电能质量检测或仿真复核。</p>`);
+  return viewPanel('power-quality', '数据中心电能质量治理', '用 APF 治理谐波电流，用 SVG 动态补偿无功；结果可回写当前项目。', `
+    <div class="quality-intro"><div><b>治理对象</b><span>UPS、服务器电源、变频空调等非线性负荷</span></div><div><b>设计路径</b><span>总负荷 → 谐波/无功分量 → APF/SVG 初选容量</span></div><div><b>参考来源</b><span>数据中心电能质量治理：交互式容量计算 SVG+APF</span></div></div>
+    <div class="quality-flow" aria-label="电能质量治理流程">
+      <div class="quality-flow-node source"><span>负荷侧</span><strong>UPS / IT / VFD</strong><small>非线性负荷</small></div><div class="quality-flow-arrow">→</div>
+      <div class="quality-flow-node"><span>检测</span><strong>THDi + PF</strong><small>识别污染类型</small></div><div class="quality-flow-arrow">→</div>
+      <div class="quality-flow-node apf"><span>APF</span><strong>谐波电流</strong><small>注入反向补偿</small></div><div class="quality-flow-arrow">+</div>
+      <div class="quality-flow-node svg"><span>SVG</span><strong>无功容量</strong><small>动态调节 PF</small></div>
+    </div>
+    <div class="quality-grid"><fieldset class="quality-panel apf-panel"><legend>APF · 谐波治理</legend>
+      <p class="quality-panel-note">按参考页公式：<code>Ih = S × K × THDi ÷ (√3 × U)</code>，再乘 1.25 安全裕量。</p>
+      <label>变压器容量 S (kVA)<input id="apf-transformer" type="number" min="1" value="2000"></label><label>负载率 K<input id="apf-load-rate" type="number" min="0" max="1" step="0.01" value="0.7"></label><label>估算 THDi (%)<input id="apf-thdi" type="number" min="0" step="1" value="20"></label><label>二次侧线电压 U (V)<input id="apf-voltage" type="number" min="1" value="400"></label><label>安全裕量<input id="apf-safety" type="number" min="1" step="0.05" value="1.25"></label>
+    </fieldset><fieldset class="quality-panel svg-panel"><legend>SVG · 无功治理</legend>
+      <p class="quality-panel-note">感性滞后按差额补偿；容性超前按初始与目标无功相加抵消。</p>
+      <label>有功功率 P (kW)<input id="svg-power" type="number" min="0" value="1000"></label><label>当前功率因数 PF₁<input id="svg-pf-before" type="number" min="0.01" max="1" step="0.01" value="0.92"></label><label>功率因数类型<select id="svg-pf-type"><option value="leading" selected>超前（容性）</option><option value="lagging">滞后（感性）</option></select></label><label>目标功率因数 PF₂<input id="svg-pf-target" type="number" min="0.01" max="1" step="0.01" value="0.99"></label>
+    </fieldset></div><button id="calculate-power-quality" class="platform-primary-action">计算 APF / SVG</button><div id="power-quality-result" class="quality-result"></div>
+    <p class="engineering-warning">⚠ 初步容量校核不替代现场电能质量测试。谐波频谱、补偿点、短路阻抗、谐振风险、三相不平衡和设备滤波率仍需由厂家及专业工程师复核。</p>`);
 }
 
 function deliveryView() {
@@ -706,6 +720,9 @@ function calculateBusbar() {
 function syncBusbarAmpacityControls() {
   const surfaceMode = document.getElementById('busbar-ampacity-surface-mode');
   const emissivity = document.getElementById('busbar-ampacity-emissivity');
+  const convectionModel = document.getElementById('busbar-ampacity-convection-model');
+  const convectionCoefficient = document.getElementById('busbar-ampacity-convection');
+  const orientation = document.getElementById('busbar-ampacity-orientation');
   const currentType = document.getElementById('busbar-ampacity-current-type');
   const acFactor = document.getElementById('busbar-ampacity-ac-factor');
   const roomTemperature = document.getElementById('busbar-ampacity-room-temperature');
@@ -716,6 +733,8 @@ function syncBusbarAmpacityControls() {
   const usesSurfacePreset = Object.hasOwn(surfacePresets, surfaceMode.value);
   if (usesSurfacePreset) emissivity.value = surfacePresets[surfaceMode.value];
   emissivity.disabled = usesSurfacePreset;
+  if (convectionModel && convectionCoefficient) convectionCoefficient.disabled = convectionModel.value !== 'custom';
+  if (convectionModel && orientation) orientation.disabled = convectionModel.value !== 'natural-correlation';
   const usesAcFactor = currentType.value === 'ac';
   if (!usesAcFactor) acFactor.value = '1';
   acFactor.disabled = !usesAcFactor;
@@ -735,8 +754,12 @@ function calculateBusbarAmpacityResult() {
     currentType: document.getElementById('busbar-ampacity-current-type').value,
     designFactor: numberValue('busbar-ampacity-design-factor'),
     dinReferenceField: document.getElementById('busbar-ampacity-din-reference').value,
+    convectionModel: document.getElementById('busbar-ampacity-convection-model').value,
+    orientation: document.getElementById('busbar-ampacity-orientation').value,
     convectionCoefficient: numberValue('busbar-ampacity-convection'),
     emissivity: numberValue('busbar-ampacity-emissivity'),
+    radiationViewFactor: numberValue('busbar-ampacity-view-factor'),
+    exposedSurfaceFactor: numberValue('busbar-ampacity-surface-factor'),
     resistivity20OhmM: numberValue('busbar-ampacity-resistivity'),
     temperatureCoefficient: numberValue('busbar-ampacity-temperature-coefficient'),
     acResistanceFactor: numberValue('busbar-ampacity-ac-factor', 1)
@@ -748,6 +771,17 @@ function calculateBusbarAmpacityResult() {
   }
 
   const surfaceLabel = surfaceModeElement.selectedOptions[0]?.textContent || '自定义发射率';
+  const convectionModelLabels = {
+    'din-calibrated': 'DIN同规格30K反校',
+    'natural-correlation': '自然对流Nu/Ra关联式',
+    custom: '自定义等效换热系数'
+  };
+  const orientationLabels = {
+    'edgewise-horizontal': '铜排水平、宽面竖直',
+    'vertical-run': '铜排沿长度方向竖直',
+    'flat-horizontal': '铜排水平、宽面水平'
+  };
+  const convectionModelLabel = convectionModelLabels[result.convectionModel] || result.convectionModel;
   const isThermalLimit = result.designFactor >= 0.999;
   state.project.busbars = {
     ...state.project.busbars,
@@ -759,54 +793,61 @@ function calculateBusbarAmpacityResult() {
     : Math.abs(result.dinDifferencePercent) > 0.15 ? 'warning' : 'safe';
   const differenceText = result.dinDifferencePercent === null
     ? 'DIN数据表中没有完全相同的单片规格'
-    : `${result.thermalBalanceCurrentA >= result.dinCurrentA ? '高于' : '低于'}DIN ${dinLabel}数据 ${format(Math.abs(result.dinDifferencePercent) * 100, 1)}%`;
+    : `${result.dinNormalizedThermalCurrentA >= result.dinCurrentA ? '高于' : '低于'}DIN ${dinLabel}数据 ${format(Math.abs(result.dinDifferencePercent) * 100, 1)}%`;
   const dinComparison = result.dinMatch
     ? `<div class="busbar-din-comparison ${differenceClass}">
         <div><span>DIN同规格</span><strong>${htmlEscape(result.dinMatch.spec)} · 单片</strong></div>
         <div><span>DIN ${dinLabel}载流量</span><strong>${format(result.dinCurrentA, 0)} A</strong></div>
-        <div><span>热平衡值差异</span><strong>${htmlEscape(differenceText)}</strong></div>
-        <p>两者温升、散热和表面条件不同，只用于交叉核对，不能互相替代。</p>
+        <div><span>模型归一到35℃ / 30K</span><strong>${format(result.dinNormalizedThermalCurrentA, 0)} A</strong></div>
+        <div><span>同条件差异</span><strong>${htmlEscape(differenceText)}</strong></div>
+        <p>已统一到DIN的35℃环境和30K温升后比较；项目条件下的热平衡值不再直接与30K表值对比。</p>
       </div>`
     : `<div class="busbar-din-comparison neutral"><p>${htmlEscape(differenceText)}；仍可使用热平衡结果，但无法完成DIN同规格对照。</p></div>`;
 
   target.innerHTML = `
     <div class="busbar-result-hero busbar-ampacity-hero">
       <div class="busbar-best-spec"><span>${isThermalLimit ? '热平衡极限电流' : '建议持续工作电流'}</span><strong>${format(result.recommendedCurrentA, 0)} A</strong><small>${isThermalLimit ? '100%无设计裕量，不建议直接作为额定值' : `热平衡值 × ${format(result.designFactor * 100, 0)}%设计裕量`}</small></div>
-      <div class="busbar-capacity"><span>热平衡估算载流量</span><strong>${format(result.thermalBalanceCurrentA, 0)} A</strong><small>不是经型式试验验证的额定值</small></div>
+      <div class="busbar-capacity"><span>项目条件热平衡载流量</span><strong>${format(result.thermalBalanceCurrentA, 0)} A</strong><small>${htmlEscape(convectionModelLabel)} · h=${format(result.convectionCoefficient, 2)}</small></div>
       <div><span>设计电流下估算温度</span><strong>${format(result.estimatedOperatingTemperatureC, 1)} ℃</strong><small>内部环境 ${format(result.internalAmbientTemperatureC, 1)}℃</small></div>
       <div><span>建议电流密度</span><strong>${format(result.currentDensityAmm2, 2)} A/mm²</strong><small>铜排截面 ${format(result.areaMm2, 0)}mm²</small></div>
     </div>
     <div class="result-grid busbar-result-grid busbar-ampacity-process">${resultCards([
       ['允许总温升', format(result.permittedTemperatureRiseK, 1), 'K'],
       ['对柜内空气散热温差', format(result.effectiveTemperatureRiseK, 1), 'K'],
+      ['项目条件等效 h', format(result.convectionCoefficient, 2), 'W/(m²·K)'],
       ['每米散热表面积', format(result.surfaceAreaM2PerM, 4), 'm²/m'],
       ['直流电阻', format(result.dcResistanceOhmPerM * 1000, 5), 'mΩ/m'],
       ['计算采用电阻', format(result.usedResistanceOhmPerM * 1000, 5), 'mΩ/m'],
       ['对流散热', format(result.convectionLossWPerM, 1), 'W/m'],
       ['辐射散热', format(result.radiationLossWPerM, 1), 'W/m'],
       ['总散热能力', format(result.totalDissipationWPerM, 1), 'W/m'],
-      ['建议电流下损耗', format(result.designLossWPerM, 1), 'W/m']
+      ['建议电流下损耗', format(result.designLossWPerM, 1), 'W/m'],
+      ['DIN 30K归一化值', format(result.dinNormalizedThermalCurrentA, 0), 'A']
     ])}</div>
     ${dinComparison}
     <details class="busbar-calculation-details">
       <summary>查看完整计算方法</summary>
       <div class="busbar-calculation-flow">
+        <p><b>对流模型：</b>${htmlEscape(convectionModelLabel)}${result.convectionModel === 'natural-correlation' ? `；安装方向：${htmlEscape(orientationLabels[result.orientation] || result.orientation)}` : ''}</p>
+        ${result.dinReferenceConvectionCoefficient !== null ? `<p><b>DIN反校：</b>同规格裸排在35℃ / 30K条件下反求参考 h=${format(result.dinReferenceConvectionCoefficient, 3)}W/(m²·K)，项目温差按 h∝ΔT<sup>0.25</sup>修正。</p>` : ''}
         <p><b>表面参数：</b>${htmlEscape(surfaceLabel)}；计算采用 ε=${format(result.emissivity, 2)}</p>
         <p><b>截面积：</b>${format(result.widthMm, 1)} × ${format(result.thicknessMm, 1)} = ${format(result.areaMm2, 1)}mm²</p>
         <p><b>铜排最高温度：</b>外部环境 ${format(result.roomTemperatureC, 1)}℃ + 工程控制温升 ${format(result.permittedTemperatureRiseK, 1)}K = ${format(result.maximumTemperatureC, 1)}℃</p>
         <p><b>柜内空气温度：</b>外部环境 ${format(result.roomTemperatureC, 1)}℃ + 柜内空气温升 ${format(result.internalTemperatureRiseC, 1)}K = ${format(result.internalAmbientTemperatureC, 1)}℃</p>
         <p><b>有效散热温差：</b>${format(result.maximumTemperatureC, 1)} − ${format(result.internalAmbientTemperatureC, 1)} = ${format(result.effectiveTemperatureRiseK, 1)}K</p>
-        <p><b>对流散热：</b>h × As × ΔT = ${format(result.convectionLossWPerM, 2)}W/m</p>
-        <p><b>辐射散热：</b>ε × σ × As × (Tmax⁴ − Tamb⁴) = ${format(result.radiationLossWPerM, 2)}W/m</p>
+        <p><b>有效散热面积：</b>四面总面积 ${format(result.grossSurfaceAreaM2PerM, 4)} × ${format(result.exposedSurfaceFactor, 2)} = ${format(result.surfaceAreaM2PerM, 4)}m²/m</p>
+        <p><b>对流散热：</b>h(规格、温差、方向) × As × ΔT = ${format(result.convectionLossWPerM, 2)}W/m</p>
+        <p><b>辐射散热：</b>ε × F(${format(result.radiationViewFactor, 2)}) × σ × As × (Tmax⁴ − Tamb⁴) = ${format(result.radiationLossWPerM, 2)}W/m</p>
         <p><b>热平衡电流：</b>√[(Pconv + Prad) ÷ R] = ${format(result.thermalBalanceCurrentA, 2)}A</p>
         <p><b>建议持续电流：</b>${format(result.thermalBalanceCurrentA, 2)} × ${format(result.designFactor, 2)} = ${format(result.recommendedCurrentA, 2)}A</p>
       </div>
     </details>
     <div class="busbar-notices">
+      <p class="${result.convectionFallback ? 'warning' : 'safe'}">${result.convectionFallback ? '当前规格在DIN表中没有完全匹配项，已自动回退到自然对流关联式；请重点复核安装方向和结构条件。' : `当前采用${htmlEscape(convectionModelLabel)}，不再对所有规格固定使用 h=5。`}</p>
       <p class="neutral">70K 为本项目采用的工程控制口径，并非所有母线场景的统一限值；实际最高温度还应受端子、绝缘、连接件、相邻元件和验证条件中的最低限值约束。</p>
       <p class="${surfaceModeElement.value === 'excel' ? 'warning' : 'neutral'}">${surfaceModeElement.value === 'excel' ? '当前使用原 Excel 的 ε=0.35 历史参数，其表面状态和依据未注明；它不代表新亮镀锡铜排，可能使载流量估算偏高。' : '新亮镀锡默认采用 ε=0.05；需要更保守时可选择 ε=0.03，其他表面状态应采用实测或验证值。'}</p>
       <p class="${isThermalLimit ? 'warning' : 'neutral'}">${isThermalLimit ? '当前选择100%：结果是达到最高温度时的理论热平衡极限，没有连续运行设计裕量。' : `当前已采用 ${format(result.designFactor * 100, 0)}% 设计系数；该系数是工程裕量，不是标准统一规定。`}</p>
-      <p class="warning">“内部温升、换热系数、发射率和设计裕量”均会显著影响结果，请按实际结构或验证数据填写。</p>
+      <p class="warning">柜内空气温升、安装方向、有效散热面积、辐射视角系数和设计裕量都会影响结果；并排互热及接头损耗仍需专项校核。</p>
       <p class="${result.requiresAcVerification ? 'warning' : 'neutral'}">${result.requiresAcVerification ? '当前选择交流，但交流电阻修正系数仍为1.00，尚未计入集肤、邻近和谐波附加损耗。' : `当前采用${result.currentType === 'ac' ? `交流电阻系数 ${format(result.acResistanceFactor, 2)}` : '直流电阻'}进行计算。`}</p>
       <p class="${result.requiresShortCircuitCheck ? 'warning' : 'neutral'}">${result.requiresShortCircuitCheck ? '建议电流达到4000A及以上，必须专项校核短路耐受能力 Icw。' : '仍须结合项目短路电流、连接件和绝缘支撑条件校核。'}</p>
     </div>`;
@@ -825,13 +866,10 @@ function calculateBuswayConfig() {
 }
 
 function calculatePowerQuality() {
-  const apf = calculateApf({ transformerKva: numberValue('apf-transformer'), loadRate: numberValue('apf-load-rate'), thdi: numberValue('apf-thdi'), voltage: state.project.topology?.voltage || 380 });
-  const svg = calculateSvg({ activePowerKw: numberValue('svg-power'), currentPowerFactor: numberValue('svg-pf-before'), targetPowerFactor: numberValue('svg-pf-target') });
+  const apf = calculateApf({ transformerKva: numberValue('apf-transformer'), loadRate: numberValue('apf-load-rate'), thdi: numberValue('apf-thdi') / 100, voltage: numberValue('apf-voltage', state.project.topology?.voltage || 380), safetyFactor: numberValue('apf-safety', 1.25) });
+  const svg = calculateSvg({ activePowerKw: numberValue('svg-power'), currentPowerFactor: numberValue('svg-pf-before'), targetPowerFactor: numberValue('svg-pf-target'), powerFactorType: document.getElementById('svg-pf-type').value });
   state.project.powerQuality = { apf, svg };
-  document.getElementById('power-quality-result').innerHTML = resultCards([
-    ['谐波电流', format(apf.harmonicCurrentA), 'A'], ['APF建议容量', apf.recommendedA, 'A'],
-    ['所需补偿容量', format(svg.compensationKvar), 'kvar'], ['SVG建议容量', svg.recommendedKvar, 'kvar']
-  ]);
+  document.getElementById('power-quality-result').innerHTML = `<div class="quality-result-hero"><div class="quality-result-card apf-result"><span>APF 建议容量</span><strong>${format(apf.recommendedA, 0)} A</strong><small>谐波电流 ${format(apf.harmonicCurrentA, 1)}A × ${format(apf.safetyFactor, 2)}</small></div><div class="quality-result-card svg-result"><span>SVG 建议容量</span><strong>${format(svg.recommendedKvar, 0)} kvar</strong><small>${svg.powerFactorType === 'leading' ? '超前无功抵消' : '滞后无功补偿'} · 计算值 ${format(svg.compensationKvar, 1)} kvar</small></div></div>${resultCards([['总负荷电流', format(apf.totalCurrentA), 'A'], ['设计谐波电流', format(apf.designCurrentA), 'A'], ['初始无功', format(svg.initialReactiveKvar), 'kvar'], ['目标无功', format(svg.targetReactiveKvar), 'kvar']])}<div class="quality-method"><b>容量建议</b><span>APF 采用 25A 标准档向上取整，SVG 采用 25kvar 标准档向上取整；实际设备并联台数、模块容量和安装位置需结合厂家样本确认。</span></div>`;
 }
 
 function exportExcel() {
@@ -915,6 +953,7 @@ function bindEvents() {
   document.getElementById('calculate-busbar').addEventListener('click', calculateBusbar);
   document.getElementById('calculate-busbar-ampacity').addEventListener('click', calculateBusbarAmpacityResult);
   document.getElementById('busbar-ampacity-surface-mode').addEventListener('change', syncBusbarAmpacityControls);
+  document.getElementById('busbar-ampacity-convection-model').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-current-type').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-room-temperature').addEventListener('input', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-rise-limit').addEventListener('input', syncBusbarAmpacityControls);
