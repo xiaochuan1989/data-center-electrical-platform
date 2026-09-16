@@ -14,6 +14,9 @@ import {
   calculateLoadSummary,
   calculateLithiumBatteryA00,
   calculateSmartBusway,
+  calculateSmartBuswayBranch,
+  calculateSmartBuswayDesign,
+  createSmartBuswayDesign,
   calculateSvg,
   nextStandard
 } from '../src/modules/engineering-calculators.js';
@@ -22,9 +25,13 @@ import { createProject, normalizeProject } from '../src/platform/project-schema.
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const blankProject = createProject('验收项目');
-assert.equal(blankProject.schemaVersion, 1);
+assert.equal(blankProject.schemaVersion, 2);
 assert.equal(blankProject.name, '验收项目');
 assert.deepEqual(normalizeProject({ name: '旧项目', legacy: null }).legacy, {});
+const migratedProject = normalizeProject({ schemaVersion: 1, name: '旧母线项目', busbars: { smartBusway: { plugBoxes: 12 } } });
+assert.equal(migratedProject.schemaVersion, 2);
+assert.equal(migratedProject.busbars.smartBuswayDesign, null);
+assert.equal(migratedProject.legacy.smartBuswayV1.plugBoxes, 12);
 
 assert.equal(nextStandard(63, [16, 32, 63, 100]), 63);
 assert.equal(nextStandard(64, [16, 32, 63, 100]), 100);
@@ -94,6 +101,77 @@ assert.equal(smartBusway.row1LengthM, 8);
 assert.equal(smartBusway.buswayLengthM, 32);
 assert.equal(smartBusway.startBoxes, 4);
 assert.equal(smartBusway.touchscreen, 1);
+
+const smartDesign = createSmartBuswayDesign({
+  row1: { cabinets600: 2, cabinets800: 1, ac300: 1, ac600: 0 },
+  row2: { cabinets600: 1, cabinets800: 0, ac300: 0, ac600: 1 },
+  defaultPowerKw: 10,
+  touchscreen: false
+});
+assert.equal(smartDesign.rows[0].items.filter(item => item.kind === 'rack').length, 3);
+assert.equal(smartDesign.rows[0].items[2].kind, 'ac');
+assert.equal(calculateSmartBuswayBranch({ powerKw: 0, phase: 'single' }).breakerA, 16);
+assert.equal(calculateSmartBuswayBranch({ powerKw: '', phase: 'three' }).baseCurrentA, 0);
+assert.equal(calculateSmartBuswayBranch({ powerKw: 10, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25 }).breakerA, 20);
+assert.equal(calculateSmartBuswayBranch({ powerKw: 8, phase: 'single', powerFactor: 0.95, safetyFactor: 1.25 }).warning.includes('建议采用三相'), true);
+assert.equal(calculateSmartBuswayBranch({ powerKw: 25, phase: 'single', powerFactor: 0.95, safetyFactor: 1.25 }).breakerA, null);
+
+const smartResult = calculateSmartBuswayDesign(smartDesign);
+assert.equal(smartResult.paths.length, 2);
+assert.equal(smartResult.paths[0].normalPowerKw, 20);
+assert.equal(smartResult.paths[0].failurePowerKw, 40);
+assert.equal(smartResult.paths[0].ratedCurrentA, 160);
+assert.equal(smartResult.design.rows[0].exactLengthM, 2.3);
+assert.equal(smartResult.design.rows[0].orderLengthM, 3);
+assert.equal(smartResult.accessories.startBoxes, 4);
+assert.equal(smartResult.neutralRecommendation, '100% N');
+assert.ok(smartResult.bom.some(item => item.code === 'IPL-160-T2-1'));
+assert.equal(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').length, 2);
+assert.deepEqual(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').map(item => item.path).sort(), ['A', 'B']);
+assert.ok(smartResult.bom.every(item => !('price' in item)));
+
+const boundaryDesign = createSmartBuswayDesign({ row1: {}, row2: {}, defaultPowerKw: 1 });
+boundaryDesign.rows[0].items = [{ id: 'edge', kind: 'rack', name: '边界机柜', widthMm: 600, powerKw: 600, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'AB' }];
+const overLimit = calculateSmartBuswayDesign({ ...boundaryDesign, demandFactor: 1, safetyFactor: 1, harmonicFactor: 1 });
+assert.equal(overLimit.paths[0].configurable, false);
+assert.equal(overLimit.bomBlocked, true);
+assert.deepEqual(overLimit.bom, []);
+assert.match(overLimit.warnings.join('\n'), /超过 800A/);
+
+const asymmetric = createSmartBuswayDesign({ row1: { cabinets600: 1 }, row2: { cabinets800: 2 }, defaultPowerKw: 5, harmonicFactor: 0.85 });
+const asymmetricResult = calculateSmartBuswayDesign(asymmetric);
+assert.equal(asymmetricResult.design.rows[0].exactLengthM, 0.6);
+assert.equal(asymmetricResult.design.rows[1].exactLengthM, 1.6);
+assert.equal(asymmetricResult.accessories.buswayLengthM, 6);
+assert.equal(asymmetricResult.neutralRecommendation, '200% N');
+assert.equal(calculateSmartBuswayDesign(createSmartBuswayDesign({ topology: 'single', row1: { cabinets600: 1 }, row2: {} })).paths.length, 1);
+
+function smartBuswayAtCurrent(currentA) {
+  const design = createSmartBuswayDesign({ row1: {}, row2: {}, defaultPowerKw: 1, powerFactor: 0.95 });
+  design.rows[0].items = [{ id: `edge-${currentA}`, kind: 'rack', name: '边界柜', widthMm: 600, powerKw: currentA * Math.sqrt(3) * 380 * 0.95 / 1000, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'AB' }];
+  design.demandFactor = 1; design.safetyFactor = 1; design.harmonicFactor = 1;
+  return calculateSmartBuswayDesign(design).paths[0];
+}
+assert.equal(smartBuswayAtCurrent(159).ratedCurrentA, 160);
+assert.equal(smartBuswayAtCurrent(160).ratedCurrentA, 160);
+assert.equal(smartBuswayAtCurrent(161).ratedCurrentA, 250);
+assert.equal(smartBuswayAtCurrent(630).ratedCurrentA, 630);
+assert.equal(smartBuswayAtCurrent(631).ratedCurrentA, 800);
+assert.equal(smartBuswayAtCurrent(799).ratedCurrentA, 800);
+assert.equal(smartBuswayAtCurrent(800).ratedCurrentA, 800);
+assert.equal(smartBuswayAtCurrent(801).ratedCurrentA, null);
+
+const feedDesign = createSmartBuswayDesign({ row1: {}, row2: {}, defaultPowerKw: 1 });
+feedDesign.rows[0].items = [
+  { id: 'a-only', kind: 'rack', name: 'A柜', widthMm: 600, powerKw: 10, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'A' },
+  { id: 'b-only', kind: 'rack', name: 'B柜', widthMm: 600, powerKw: 20, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'B' },
+  { id: 'ab', kind: 'rack', name: '双路柜', widthMm: 600, powerKw: 30, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'AB' }
+];
+const feedResult = calculateSmartBuswayDesign(feedDesign);
+assert.equal(feedResult.paths[0].normalPowerKw, 25);
+assert.equal(feedResult.paths[1].normalPowerKw, 35);
+assert.equal(feedResult.paths[0].failurePowerKw, 40);
+assert.equal(feedResult.paths[1].failurePowerKw, 50);
 
 const busbarCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'busbar-catalog.json'), 'utf8'));
 assert.equal(busbarCatalog.length, 97);
@@ -257,6 +335,11 @@ for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalo
   assert.ok(!serialized.includes('供应商价'));
   assert.ok(!serialized.includes('目录价'));
 }
+const smartCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'smart-busway-catalog.json'), 'utf8'));
+assert.deepEqual(smartCatalog.busways.map(item => item.ratedCurrentA), [160, 250, 400, 630, 800]);
+assert.equal(smartCatalog.terminalBoxes.at(-1).code, 'IPL-TB800');
+assert.ok(smartCatalog.plugBoxes.some(item => item.code === 'IPL-DB-63T-2'));
+assert.doesNotMatch(JSON.stringify(smartCatalog), /价格|price/i);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 assert.match(index, /const APP_VERSION = "v2\.6\.5"/);
@@ -286,6 +369,8 @@ assert.match(appShell, /100%（热平衡极限，不推荐）/);
 assert.doesNotMatch(appShell, /value="heat-shrink"/);
 assert.match(appShell, /GB\/T 24276-2025/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);
+assert.match(appShell, /navButton\('busway', '智能母线'/);
+assert.match(appShell, /智能母线设计/);
 assert.doesNotMatch(appShell, /conductor-catalog/);
 assert.match(appShell, /电缆修正系数数据表/);
 assert.match(appShell, /电缆数据库/);

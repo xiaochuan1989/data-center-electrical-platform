@@ -1,0 +1,27 @@
+{
+  "source": "XGM-智能母线-商务成本-A11.xlsm（仅型号）",
+  "busways": [
+    { "ratedCurrentA": 160, "code": "IPL-160-T2-1", "description": "160A 智能母线槽" },
+    { "ratedCurrentA": 250, "code": "IPL-250-T2-1", "description": "250A 智能母线槽" },
+    { "ratedCurrentA": 400, "code": "IPL-400-T2-1", "description": "400A 智能母线槽" },
+    { "ratedCurrentA": 630, "code": "IPL-630-T2-1", "description": "630A 智能母线槽" },
+    { "ratedCurrentA": 800, "code": "IPL-800-T2-1", "description": "800A 智能母线槽" }
+  ],
+  "terminalBoxes": [
+    { "ratedCurrentA": 160, "code": "IPL-TB160", "switchCode": "IPL-TB160-QF" },
+    { "ratedCurrentA": 250, "code": "IPL-TB250", "switchCode": "IPL-TB250-QF" },
+    { "ratedCurrentA": 400, "code": "IPL-TB400", "switchCode": "IPL-TB400-QF" },
+    { "ratedCurrentA": 630, "code": "IPL-TB630", "switchCode": "IPL-TB630-QF" },
+    { "ratedCurrentA": 800, "code": "IPL-TB800", "switchCode": "IPL-TB800-QF" }
+  ],
+  "plugBoxes": [
+    { "code": "IPL-DB-32S-1", "ratedCurrentA": 32, "phase": "single", "outputs": 1 },
+    { "code": "IPL-DB-32S-3", "ratedCurrentA": 32, "phase": "single", "outputs": 3 },
+    { "code": "IPL-DB-32T-1", "ratedCurrentA": 32, "phase": "three", "outputs": 1 },
+    { "code": "IPL-DB-32T-3", "ratedCurrentA": 32, "phase": "three", "outputs": 3 },
+    { "code": "IPL-DB-63S-3", "ratedCurrentA": 63, "phase": "single", "outputs": 3 },
+    { "code": "IPL-DB-63T-2", "ratedCurrentA": 63, "phase": "three", "outputs": 2 },
+    { "code": "IPL-DB-40T-2", "ratedCurrentA": 40, "phase": "three", "outputs": 2 },
+    { "code": "IPL-DB-50T-2", "ratedCurrentA": 50, "phase": "three", "outputs": 2 }
+  ]
+}

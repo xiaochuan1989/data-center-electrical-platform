@@ -2,6 +2,8 @@ const SQRT3 = Math.sqrt(3);
 
 export const BREAKER_STANDARDS = [16, 20, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 320, 400, 500, 630, 800, 1000, 1250, 1600];
 export const BUSWAY_STANDARDS = [160, 250, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6300];
+export const SMART_BUSWAY_STANDARDS = [160, 250, 400, 630, 800];
+export const SMART_BUSWAY_BREAKERS = [16, 20, 32, 40, 50, 63, 80, 100, 125];
 export const TRANSFORMER_STANDARDS = [100, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150];
 export const BUSBAR_CONFIGURATION_PRIORITY = ['单片', '双拼', '三拼', '四拼'];
 export const CABLE_AIR_SPACING_FACTORS = {
@@ -209,28 +211,275 @@ export function calculateLithiumBatteryA00(input = {}) {
   };
 }
 
-export function calculateSmartBusway(input) {
-  const rowLength = row => Math.ceil((600 * number(row?.cabinets600) + 800 * number(row?.cabinets800) + 300 * number(row?.ac300) + 600 * number(row?.ac600)) / 1000);
-  const row1LengthM = rowLength(input.row1);
-  const row2LengthM = rowLength(input.row2);
-  const row1Cabinets = number(input.row1?.cabinets600) + number(input.row1?.cabinets800);
-  const row2Cabinets = number(input.row2?.cabinets600) + number(input.row2?.cabinets800);
-  const startBoxes = 4;
-  const buswayLengthM = (row1LengthM + row2LengthM) * 2;
-  const plugBoxes = (Math.ceil(row1Cabinets / 3) + Math.ceil(row2Cabinets / 3)) * 2;
-  const fixingPieces = Math.ceil(row1Cabinets * 1.2) + Math.ceil(row2Cabinets * 1.2);
+const PLUG_BOX_CODES = {
+  'single-32-1': 'IPL-DB-32S-1',
+  'single-32-3': 'IPL-DB-32S-3',
+  'single-63-3': 'IPL-DB-63S-3',
+  'three-32-1': 'IPL-DB-32T-1',
+  'three-40-1': 'IPL-DB-40T-2',
+  'three-50-1': 'IPL-DB-50T-2',
+  'three-63-1': 'IPL-DB-63T-2'
+};
+
+function smartBuswayId(prefix = 'item') {
+  return globalThis.crypto?.randomUUID?.() || `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function distributeCooling(racks, cooling) {
+  if (!cooling.length) return racks;
+  const slots = cooling.length + 1;
+  const base = Math.floor(racks.length / slots);
+  const extra = racks.length % slots;
+  const result = [];
+  let cursor = 0;
+  for (let slot = 0; slot < slots; slot += 1) {
+    const count = base + (slot < extra ? 1 : 0);
+    result.push(...racks.slice(cursor, cursor + count));
+    cursor += count;
+    if (slot < cooling.length) result.push(cooling[slot]);
+  }
+  return result;
+}
+
+function makeLayoutRow(row, rowIndex, defaults) {
+  const racks = [];
+  const cooling = [];
+  const counts = {
+    cabinets600: Math.max(0, Math.floor(number(row?.cabinets600))),
+    cabinets800: Math.max(0, Math.floor(number(row?.cabinets800))),
+    ac300: Math.max(0, Math.floor(number(row?.ac300))),
+    ac600: Math.max(0, Math.floor(number(row?.ac600)))
+  };
+  [600, 800].forEach(widthMm => {
+    for (let index = 0; index < counts[`cabinets${widthMm}`]; index += 1) {
+      const sequence = racks.length + 1;
+      racks.push({
+        id: smartBuswayId('rack'), kind: 'rack', name: `机柜${sequence}`, widthMm,
+        powerKw: defaults.powerKw, phase: defaults.phase, powerFactor: defaults.powerFactor,
+        safetyFactor: defaults.branchSafetyFactor, feed: defaults.feed, manualSplit: false
+      });
+    }
+  });
+  [300, 600].forEach(widthMm => {
+    for (let index = 0; index < counts[`ac${widthMm}`]; index += 1) {
+      cooling.push({ id: smartBuswayId('ac'), kind: 'ac', name: `列间空调${cooling.length + 1}`, widthMm });
+    }
+  });
+  return { id: `row-${rowIndex + 1}`, name: `第${rowIndex + 1}排`, items: distributeCooling(racks, cooling) };
+}
+
+/** @returns {SmartBuswayDesign} */
+export function createSmartBuswayDesign(input = {}) {
+  const powerKw = Math.max(0, number(input.defaultPowerKw, 10));
+  const defaults = {
+    powerKw,
+    phase: input.defaultPhase || (powerKw >= 8 ? 'three' : 'single'),
+    powerFactor: clamp(input.powerFactor ?? 0.95, 0.01, 1),
+    branchSafetyFactor: Math.max(1, number(input.branchSafetyFactor, 1.25)),
+    feed: input.defaultFeed === 'A' || input.defaultFeed === 'B' ? input.defaultFeed : 'AB'
+  };
   return {
-    row1LengthM,
-    row2LengthM,
-    startBoxes,
-    buswayLengthM,
-    plugBoxes,
-    endCovers: startBoxes,
-    dustCovers: Math.ceil(buswayLengthM * 0.7),
-    fixingPieces,
-    serialServer: input.touchscreen ? 0 : 1,
-    touchscreen: input.touchscreen ? 1 : 0,
-    supports: input.installation === 'cabinet-top' ? Math.ceil(fixingPieces / 2) + startBoxes : 0
+    version: 1,
+    topology: input.topology === 'single' ? 'single' : 'dual',
+    installation: input.installation === 'ceiling' ? 'ceiling' : 'cabinet-top',
+    aisleWidthMm: Math.max(600, number(input.aisleWidthMm, 1200)),
+    voltage: Math.max(1, number(input.voltage, 380)),
+    demandFactor: clamp(input.demandFactor ?? 1, 0, 1),
+    powerFactor: defaults.powerFactor,
+    safetyFactor: Math.max(1, number(input.safetyFactor, 1.15)),
+    harmonicFactor: Math.max(0.01, number(input.harmonicFactor, 1)),
+    neutralMode: input.neutralMode === '100' || input.neutralMode === '200' ? input.neutralMode : 'auto',
+    touchscreen: Boolean(input.touchscreen),
+    rows: [makeLayoutRow(input.row1 || {}, 0, defaults), makeLayoutRow(input.row2 || {}, 1, defaults)],
+    selectedItemId: null,
+    result: null
+  };
+}
+
+/** @returns {SmartBuswayDesign} */
+export function generateSmartBuswayLayout(input = {}) {
+  return createSmartBuswayDesign(input);
+}
+
+/** @returns {{baseCurrentA:number,designCurrentA:number,breakerA:number|null,voltage:number,phase:string,warning:string|null}} */
+export function calculateSmartBuswayBranch(item = {}) {
+  const phase = item.phase === 'single' ? 'single' : 'three';
+  const voltage = phase === 'single' ? 220 : 380;
+  const powerKw = Math.max(0, number(item.powerKw));
+  const powerFactor = clamp(item.powerFactor ?? 0.95, 0.01, 1);
+  const safety = Math.max(1, number(item.safetyFactor, 1.25));
+  const baseCurrentA = phase === 'single'
+    ? powerKw * 1000 / (voltage * powerFactor)
+    : powerKw * 1000 / (SQRT3 * voltage * powerFactor);
+  const designCurrentA = baseCurrentA * safety;
+  const breakerA = nextStandard(designCurrentA, SMART_BUSWAY_BREAKERS);
+  let warning = null;
+  if (!breakerA && designCurrentA > 0) warning = '支路选型电流超过 125A，现有插接箱型号无法覆盖';
+  else if (phase === 'single' && powerKw >= 8) warning = '8kW 及以上机柜建议采用三相供电';
+  return { baseCurrentA, designCurrentA, breakerA, voltage, phase, warning };
+}
+
+function plugBoxProduct(phase, breakerA, count) {
+  if (!breakerA) return null;
+  if (phase === 'single') {
+    if (breakerA <= 32) return PLUG_BOX_CODES[`single-32-${count === 1 ? 1 : 3}`];
+    if (breakerA <= 63) return PLUG_BOX_CODES['single-63-3'];
+    return null;
+  }
+  const rating = breakerA <= 32 ? 32 : breakerA <= 40 ? 40 : breakerA <= 50 ? 50 : breakerA <= 63 ? 63 : null;
+  return rating ? PLUG_BOX_CODES[`three-${rating}-1`] : null;
+}
+
+function groupPlugBoxes(rows, paths) {
+  const groups = [];
+  const phaseNames = ['L1', 'L2', 'L3'];
+  let phaseCursor = 0;
+  rows.forEach((row, rowIndex) => {
+    paths.forEach(path => {
+      const racks = row.items.filter(item => item.kind === 'rack' && (item.feed === 'AB' || item.feed === path));
+      let singles = [];
+      const flushSingles = () => {
+        while (singles.length) {
+          const first = singles[0];
+          const bucket = first.branch.breakerA <= 32 ? 32 : first.branch.breakerA <= 63 ? 63 : first.branch.breakerA;
+          const take = first.manualSplit ? 1 : Math.min(3, singles.findIndex(item => item.manualSplit || (item.branch.breakerA <= 32 ? 32 : item.branch.breakerA <= 63 ? 63 : item.branch.breakerA) !== bucket) < 0 ? singles.length : singles.findIndex(item => item.manualSplit || (item.branch.breakerA <= 32 ? 32 : item.branch.breakerA <= 63 ? 63 : item.branch.breakerA) !== bucket));
+          const members = singles.splice(0, Math.max(1, take));
+          const code = plugBoxProduct('single', first.branch.breakerA, members.length);
+          groups.push({
+            id: smartBuswayId('plug'), rowId: row.id, rowIndex, path, phase: members.map(() => phaseNames[phaseCursor++ % 3]).join('/'),
+            circuitPhase: 'single', breakerA: first.branch.breakerA, memberIds: members.map(item => item.id), memberNames: members.map(item => item.name),
+            currentA: Math.max(...members.map(item => item.branch.designCurrentA)), productCode: code, modelStatus: code ? 'confirmed' : 'pending'
+          });
+        }
+      };
+      racks.forEach(item => {
+        if (item.phase === 'single') singles.push(item);
+        else {
+          flushSingles();
+          const code = plugBoxProduct('three', item.branch.breakerA, 1);
+          groups.push({
+            id: smartBuswayId('plug'), rowId: row.id, rowIndex, path, phase: 'L1/L2/L3', circuitPhase: 'three', breakerA: item.branch.breakerA,
+            memberIds: [item.id], memberNames: [item.name], currentA: item.branch.designCurrentA, productCode: code, modelStatus: code ? 'confirmed' : 'pending'
+          });
+        }
+      });
+      flushSingles();
+    });
+  });
+  return groups;
+}
+
+function addBom(map, key, item) {
+  const current = map.get(key);
+  if (current) current.quantity += item.quantity;
+  else map.set(key, { ...item });
+}
+
+/** @returns {{design:SmartBuswayDesign,paths:SmartBuswayPathResult[],plugBoxGroups:PlugBoxGroup[],bom:SmartBuswayBomItem[],warnings:string[]}} */
+export function calculateSmartBuswayDesign(rawDesign = {}) {
+  const design = structuredClone(rawDesign?.rows ? rawDesign : createSmartBuswayDesign(rawDesign));
+  design.topology = design.topology === 'single' ? 'single' : 'dual';
+  design.rows = Array.isArray(design.rows) ? design.rows.slice(0, 2) : [];
+  while (design.rows.length < 2) design.rows.push({ id: `row-${design.rows.length + 1}`, name: `第${design.rows.length + 1}排`, items: [] });
+  const warnings = [];
+  let rackCount = 0;
+  design.rows.forEach((row, rowIndex) => {
+    row.id ||= `row-${rowIndex + 1}`;
+    row.name ||= `第${rowIndex + 1}排`;
+    row.items = Array.isArray(row.items) ? row.items : [];
+    row.items.forEach((item, itemIndex) => {
+      item.id ||= smartBuswayId(item.kind || 'item');
+      item.widthMm = item.kind === 'ac' ? ([300, 600].includes(number(item.widthMm)) ? number(item.widthMm) : 600) : ([600, 800].includes(number(item.widthMm)) ? number(item.widthMm) : 600);
+      if (item.kind === 'rack') {
+        rackCount += 1;
+        item.name ||= `机柜${itemIndex + 1}`;
+        item.feed = design.topology === 'single' ? 'A' : ['A', 'B'].includes(item.feed) ? item.feed : 'AB';
+        item.phase = item.phase === 'single' ? 'single' : 'three';
+        item.branch = calculateSmartBuswayBranch(item);
+        if (item.branch.warning) warnings.push(`${row.name} ${item.name}：${item.branch.warning}`);
+      }
+    });
+    row.exactLengthM = row.items.reduce((sum, item) => sum + number(item.widthMm), 0) / 1000;
+    row.orderLengthM = Math.ceil(row.exactLengthM);
+    row.rackCount = row.items.filter(item => item.kind === 'rack').length;
+  });
+  if (!rackCount) warnings.push('当前布局中没有 IT 机柜');
+
+  const pathNames = design.topology === 'single' ? ['A'] : ['A', 'B'];
+  const paths = pathNames.map(path => {
+    const racks = design.rows.flatMap(row => row.items).filter(item => item.kind === 'rack');
+    const normalPowerKw = racks.reduce((sum, item) => sum + (item.feed === path ? number(item.powerKw) : item.feed === 'AB' ? number(item.powerKw) / 2 : 0), 0);
+    const failurePowerKw = racks.reduce((sum, item) => sum + (item.feed === path || item.feed === 'AB' ? number(item.powerKw) : 0), 0);
+    const bus = calculateBusway({
+      activePowerKw: failurePowerKw,
+      voltage: design.voltage || 380,
+      powerFactor: design.powerFactor ?? 0.95,
+      demandFactor: design.demandFactor ?? 1,
+      safety: design.safetyFactor ?? 1.15,
+      harmonicFactor: design.harmonicFactor ?? 1
+    });
+    const normalizedDesignCurrentA = Number(bus.designCurrentA.toFixed(9));
+    const ratedCurrentA = nextStandard(normalizedDesignCurrentA, SMART_BUSWAY_STANDARDS);
+    const engineeringRatedCurrentA = nextStandard(normalizedDesignCurrentA, BUSWAY_STANDARDS);
+    const configurable = ratedCurrentA !== null;
+    if (!configurable) warnings.push(`${path} 路选型电流 ${bus.designCurrentA.toFixed(1)}A 超过 800A：停止生成智能母线 BOM，请分段或改用固定式母线`);
+    return {
+      path, normalPowerKw, failurePowerKw, currentA: bus.currentA, designCurrentA: bus.designCurrentA,
+      ratedCurrentA, engineeringRatedCurrentA, loadRate: ratedCurrentA ? bus.currentA / ratedCurrentA : null, configurable
+    };
+  });
+
+  const plugBoxGroups = groupPlugBoxes(design.rows, pathNames);
+  plugBoxGroups.filter(group => !group.productCode).forEach(group => warnings.push(`${group.path}路 ${group.memberNames.join('、')}：插接箱型号待确认`));
+  const buswayLengthM = design.rows.reduce((sum, row) => sum + row.orderLengthM, 0) * pathNames.length;
+  const startBoxes = design.rows.filter(row => row.items.length).length * pathNames.length;
+  const connectors = design.rows.reduce((sum, row) => sum + Math.floor(row.orderLengthM / 3) + Math.floor((row.orderLengthM % 3) / 2), 0) * pathNames.length;
+  const fixingPieces = design.rows.reduce((sum, row) => sum + Math.ceil(row.rackCount * 1.2), 0);
+  const accessories = {
+    startBoxes, endCovers: startBoxes, buswayLengthM, connectors, dustCovers: Math.ceil(buswayLengthM * 0.7), fixingPieces,
+    supports: design.installation === 'cabinet-top' ? Math.ceil(fixingPieces / 2) + startBoxes : 0,
+    touchscreen: design.touchscreen ? 1 : 0, serialServer: design.touchscreen ? 0 : 1
+  };
+  const neutralRecommendation = number(design.harmonicFactor, 1) < 1 ? '200% N' : '100% N';
+  const selectedNeutral = design.neutralMode === '100' ? '100% N' : design.neutralMode === '200' ? '200% N' : neutralRecommendation;
+  if (selectedNeutral !== neutralRecommendation) warnings.push(`N 线人工选择 ${selectedNeutral}，与 Kh=${number(design.harmonicFactor, 1)} 的自动建议 ${neutralRecommendation} 不一致`);
+
+  const bomBlocked = paths.some(path => !path.configurable);
+  const bomMap = new Map();
+  if (!bomBlocked) {
+    paths.forEach(path => {
+      design.rows.filter(row => row.items.length).forEach(row => {
+        addBom(bomMap, `bus-${path.path}-${path.ratedCurrentA}`, { category: '母线槽', code: `IPL-${path.ratedCurrentA}-T2-1`, description: `${path.ratedCurrentA}A 智能母线槽`, quantity: row.orderLengthM, unit: 'm', path: path.path });
+        addBom(bomMap, `terminal-${path.path}-${path.ratedCurrentA}`, { category: '端口箱', code: `IPL-TB${path.ratedCurrentA}`, description: `${path.ratedCurrentA}A 端口箱`, quantity: 1, unit: '个', path: path.path });
+      });
+    });
+    plugBoxGroups.forEach(group => addBom(bomMap, `plug-${group.path}-${group.productCode || 'pending'}-${group.breakerA}-${group.circuitPhase}`, {
+      category: '插接箱', code: group.productCode || '', description: group.productCode ? `${group.breakerA}A ${group.circuitPhase === 'single' ? '单相' : '三相'}插接箱` : '型号待确认', quantity: 1, unit: '个', path: group.path, status: group.modelStatus
+    }));
+    [
+      ['连接件', '', '母线连接件', accessories.connectors, '个'], ['附件', '', '末端盖', accessories.endCovers, '个'],
+      ['附件', '', '插接口防尘盖', accessories.dustCovers, '个'], ['附件', '', '固定件', accessories.fixingPieces, '个'],
+      ['安装', '', design.installation === 'cabinet-top' ? '柜顶安装支架' : '吊装支架（工程配置）', accessories.supports, '个'],
+      ['监控', '', design.touchscreen ? '触摸屏' : '串口服务器', design.touchscreen ? accessories.touchscreen : accessories.serialServer, '台']
+    ].forEach(([category, code, description, quantity, unit]) => { if (quantity) addBom(bomMap, `${category}-${description}`, { category, code, description, quantity, unit, path: '共用' }); });
+  }
+  const result = { paths, plugBoxGroups, accessories, neutralRecommendation, selectedNeutral, warnings, bomBlocked, bom: [...bomMap.values()] };
+  design.result = result;
+  return { design, ...result };
+}
+
+// v1 compatibility wrapper: old count-only callers keep their original return shape.
+export function calculateSmartBusway(input) {
+  if (input?.rows || input?.topology) return calculateSmartBuswayDesign(input);
+  const calculated = calculateSmartBuswayDesign(createSmartBuswayDesign(input));
+  return {
+    row1LengthM: calculated.design.rows[0].orderLengthM,
+    row2LengthM: calculated.design.rows[1].orderLengthM,
+    ...calculated.accessories,
+    plugBoxes: calculated.plugBoxGroups.length,
+    serialServer: calculated.accessories.serialServer,
+    touchscreen: calculated.accessories.touchscreen,
+    supports: calculated.accessories.supports
   };
 }
 
