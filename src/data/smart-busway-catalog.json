@@ -22,6 +22,7 @@
     { "code": "IPL-DB-63S-3", "ratedCurrentA": 63, "phase": "single", "outputs": 3 },
     { "code": "IPL-DB-63T-2", "ratedCurrentA": 63, "phase": "three", "outputs": 2 },
     { "code": "IPL-DB-40T-2", "ratedCurrentA": 40, "phase": "three", "outputs": 2 },
+    { "code": "", "ratedCurrentA": 40, "phase": "three", "outputs": 3, "modelStatus": "pending", "description": "40A 三相3路（型号待确认）" },
     { "code": "IPL-DB-50T-2", "ratedCurrentA": 50, "phase": "three", "outputs": 2 }
   ]
 }

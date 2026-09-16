@@ -118,22 +118,25 @@ assert.equal(calculateSmartBuswayBranch({ powerKw: 25, phase: 'single', powerFac
 
 const smartResult = calculateSmartBuswayDesign(smartDesign);
 assert.equal(smartResult.paths.length, 2);
+assert.equal(smartResult.runs.length, 4);
 assert.equal(smartResult.paths[0].normalPowerKw, 20);
 assert.equal(smartResult.paths[0].failurePowerKw, 40);
 assert.equal(smartResult.paths[0].ratedCurrentA, 160);
+assert.equal(smartResult.runs.find(run => run.rowId === 'row-1' && run.path === 'A').normalPowerKw, 15);
+assert.equal(smartResult.runs.find(run => run.rowId === 'row-2' && run.path === 'A').failurePowerKw, 10);
 assert.equal(smartResult.design.rows[0].exactLengthM, 2.3);
 assert.equal(smartResult.design.rows[0].orderLengthM, 3);
 assert.equal(smartResult.accessories.startBoxes, 4);
 assert.equal(smartResult.neutralRecommendation, '100% N');
 assert.ok(smartResult.bom.some(item => item.code === 'IPL-160-T2-1'));
-assert.equal(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').length, 2);
-assert.deepEqual(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').map(item => item.path).sort(), ['A', 'B']);
+assert.equal(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').length, 4);
+assert.deepEqual(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').map(item => item.path).sort(), ['第1排A路', '第1排B路', '第2排A路', '第2排B路']);
 assert.ok(smartResult.bom.every(item => !('price' in item)));
 
 const boundaryDesign = createSmartBuswayDesign({ row1: {}, row2: {}, defaultPowerKw: 1 });
 boundaryDesign.rows[0].items = [{ id: 'edge', kind: 'rack', name: '边界机柜', widthMm: 600, powerKw: 600, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'AB' }];
 const overLimit = calculateSmartBuswayDesign({ ...boundaryDesign, demandFactor: 1, safetyFactor: 1, harmonicFactor: 1 });
-assert.equal(overLimit.paths[0].configurable, false);
+assert.equal(overLimit.runs[0].configurable, false);
 assert.equal(overLimit.bomBlocked, true);
 assert.deepEqual(overLimit.bom, []);
 assert.match(overLimit.warnings.join('\n'), /超过 800A/);
@@ -145,6 +148,106 @@ assert.equal(asymmetricResult.design.rows[1].exactLengthM, 1.6);
 assert.equal(asymmetricResult.accessories.buswayLengthM, 6);
 assert.equal(asymmetricResult.neutralRecommendation, '200% N');
 assert.equal(calculateSmartBuswayDesign(createSmartBuswayDesign({ topology: 'single', row1: { cabinets600: 1 }, row2: {} })).paths.length, 1);
+
+const mixedProfiles = createSmartBuswayDesign({
+  row1: { profiles: [
+    { quantity: 2, widthMm: 600, powerKw: 5, phase: 'three', feed: 'AB' },
+    { quantity: 1, widthMm: 800, powerKw: 10, phase: 'three', feed: 'A' },
+    { quantity: 1, widthMm: 600, powerKw: 20, phase: 'three', feed: 'B' }
+  ] },
+  row2: {}
+});
+assert.equal(mixedProfiles.version, 2);
+assert.deepEqual(mixedProfiles.rows[0].items.filter(item => item.kind === 'rack').map(item => item.powerKw), [5, 5, 10, 20]);
+assert.equal(mixedProfiles.rows[0].items.filter(item => item.kind === 'rack')[2].widthMm, 800);
+const mixedResult = calculateSmartBuswayDesign(mixedProfiles);
+assert.equal(mixedResult.runs.length, 2);
+assert.equal(mixedResult.runs.find(run => run.path === 'A').failurePowerKw, 20);
+assert.equal(mixedResult.runs.find(run => run.path === 'B').failurePowerKw, 30);
+
+const groupingDesign = createSmartBuswayDesign({ row1: {}, row2: {} });
+groupingDesign.rows[0].items = [1, 2, 3].map(index => ({ id: `g32-${index}`, kind: 'rack', name: `32A柜${index}`, widthMm: 600, powerKw: 10, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'A' }));
+let groupingResult = calculateSmartBuswayDesign(groupingDesign);
+assert.equal(groupingResult.plugBoxGroups.length, 1);
+assert.equal(groupingResult.plugBoxGroups[0].selectedOutputs, 3);
+assert.equal(groupingResult.plugBoxGroups[0].productCode, 'IPL-DB-32T-3');
+
+const partialManualDesign = structuredClone(groupingResult.design);
+partialManualDesign.plugBoxGroups[0].selectionMode = 'manual';
+partialManualDesign.plugBoxGroups[0].memberIds = [groupingDesign.rows[0].items[0].id];
+const partialManualResult = calculateSmartBuswayDesign(partialManualDesign);
+assert.equal(partialManualResult.plugBoxGroups.length, 2);
+assert.deepEqual(partialManualResult.plugBoxGroups.flatMap(group => group.memberIds).sort(), groupingDesign.rows[0].items.map(item => item.id).sort());
+assert.equal(partialManualResult.plugBoxGroups.find(group => group.selectionMode === 'manual').memberIds.length, 1);
+
+groupingDesign.rows[0].items = [1, 2, 3].map(index => ({ id: `g40-${index}`, kind: 'rack', name: `40A柜${index}`, widthMm: 600, powerKw: 20, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'A' }));
+groupingDesign.plugBoxGroups = [];
+groupingResult = calculateSmartBuswayDesign(groupingDesign);
+assert.equal(groupingResult.plugBoxGroups[0].selectedRatedCurrentA, 40);
+assert.equal(groupingResult.plugBoxGroups[0].selectedOutputs, 3);
+assert.equal(groupingResult.plugBoxGroups[0].productCode, '');
+assert.equal(groupingResult.plugBoxGroups[0].modelStatus, 'pending');
+
+const grouping50 = createSmartBuswayDesign({ row1: {}, row2: {} });
+grouping50.rows[0].items = [1, 2, 3].map(index => ({ id: `g50-${index}`, kind: 'rack', name: `50A柜${index}`, widthMm: 600, powerKw: 25, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'A' }));
+const grouping50Result = calculateSmartBuswayDesign(grouping50);
+assert.deepEqual(grouping50Result.plugBoxGroups.map(group => group.memberIds.length), [2, 1]);
+assert.ok(grouping50Result.plugBoxGroups.every(group => group.selectedOutputs === 2));
+
+const invalid50Design = structuredClone(grouping50Result.design);
+invalid50Design.plugBoxGroups = [{
+  ...grouping50Result.plugBoxGroups[0],
+  id: 'manual-50a-three-output',
+  selectionMode: 'manual',
+  memberIds: grouping50.rows[0].items.map(item => item.id),
+  selectedRatedCurrentA: 50,
+  selectedOutputs: 3
+}];
+const invalid50Result = calculateSmartBuswayDesign(invalid50Design);
+assert.equal(invalid50Result.plugBoxGroups[0].validationStatus, 'error');
+assert.equal(invalid50Result.plugBoxBomBlocked, true);
+assert.match(invalid50Result.plugBoxGroups[0].issues.map(issue => issue.message).join('\n'), /最多支持 2 路/);
+assert.ok(!invalid50Result.bom.some(item => item.category === '插接箱'));
+
+const duplicateGroupDesign = structuredClone(grouping50Result.design);
+duplicateGroupDesign.plugBoxGroups = grouping50Result.plugBoxGroups.slice(0, 2).map((group, index) => ({
+  ...group,
+  id: `duplicate-${index}`,
+  selectionMode: 'manual',
+  memberIds: [grouping50.rows[0].items[0].id]
+}));
+const duplicateGroupResult = calculateSmartBuswayDesign(duplicateGroupDesign);
+assert.equal(duplicateGroupResult.plugBoxBomBlocked, true);
+assert.match(duplicateGroupResult.issues.map(issue => issue.message).join('\n'), /重复归组/);
+
+const manualDesign = groupingResult.design;
+manualDesign.plugBoxGroups[0].selectionMode = 'manual';
+manualDesign.plugBoxGroups[0].selectedRatedCurrentA = 32;
+manualDesign.plugBoxGroups[0].selectedOutputs = 3;
+manualDesign.selectedPlugBoxId = manualDesign.plugBoxGroups[0].id;
+const manualResult = calculateSmartBuswayDesign(manualDesign);
+assert.equal(manualResult.plugBoxGroups[0].selectionMode, 'manual');
+assert.equal(manualResult.plugBoxGroups[0].selectedRatedCurrentA, 32);
+assert.equal(manualResult.plugBoxGroups[0].validationStatus, 'danger');
+assert.ok(manualResult.bom.some(item => item.category === '插接箱' && item.status === 'manual-risk'));
+
+const runOverrideDesign = createSmartBuswayDesign({ row1: { cabinets600: 1 }, row2: {}, defaultPowerKw: 150 });
+let runOverrideResult = calculateSmartBuswayDesign(runOverrideDesign);
+const runKey = runOverrideResult.runs[0].key;
+runOverrideResult.design.runSelections[runKey] = { mode: 'manual', buswayRatedCurrentA: 160, terminalLinked: false, terminalRatedCurrentA: 250, terminalWithSwitch: true };
+runOverrideResult = calculateSmartBuswayDesign(runOverrideResult.design);
+assert.equal(runOverrideResult.runs[0].selectionMode, 'manual');
+assert.equal(runOverrideResult.runs[0].terminalCode, 'IPL-TB250-QF');
+assert.equal(runOverrideResult.runs[0].validationStatus, 'danger');
+assert.ok(runOverrideResult.bom.some(item => item.category === '母线槽' && item.status === 'manual-risk'));
+
+const runUpsizeDesign = createSmartBuswayDesign({ row1: { cabinets600: 1 }, row2: {}, defaultPowerKw: 10 });
+let runUpsizeResult = calculateSmartBuswayDesign(runUpsizeDesign);
+runUpsizeResult.design.runSelections[runUpsizeResult.runs[0].key] = { mode: 'manual', buswayRatedCurrentA: 250, terminalLinked: true, terminalRatedCurrentA: 250, terminalWithSwitch: false };
+runUpsizeResult = calculateSmartBuswayDesign(runUpsizeResult.design);
+const upsizeBom = runUpsizeResult.bom.find(item => item.category === '母线槽' && item.path === '第1排A路');
+assert.equal(upsizeBom.status, 'manual');
+assert.equal(upsizeBom.selectionMode, 'manual');
 
 function smartBuswayAtCurrent(currentA) {
   const design = createSmartBuswayDesign({ row1: {}, row2: {}, defaultPowerKw: 1, powerFactor: 0.95 });
@@ -339,10 +442,11 @@ const smartCatalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', '
 assert.deepEqual(smartCatalog.busways.map(item => item.ratedCurrentA), [160, 250, 400, 630, 800]);
 assert.equal(smartCatalog.terminalBoxes.at(-1).code, 'IPL-TB800');
 assert.ok(smartCatalog.plugBoxes.some(item => item.code === 'IPL-DB-63T-2'));
+assert.ok(smartCatalog.plugBoxes.some(item => item.ratedCurrentA === 40 && item.phase === 'three' && item.outputs === 3 && item.modelStatus === 'pending' && !item.code));
 assert.doesNotMatch(JSON.stringify(smartCatalog), /价格|price/i);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.6\.5"/);
+assert.match(index, /const APP_VERSION = "v2\.7\.0"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算方法说明与 Excel 单元格对应关系/);

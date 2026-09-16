@@ -351,6 +351,22 @@ function busbarView() {
     <p class="engineering-warning">⚠ 铜排间距、相间距、柜内温升、短路耐受能力和实际散热条件仍需结合成套结构复核；大于等于 4000A 时必须专项校核 Icw。</p>`);
 }
 
+function quickProfileMarkup(profile = {}) {
+  const quantity = profile.quantity ?? 10;
+  const widthMm = Number(profile.widthMm) === 800 ? 800 : 600;
+  const powerKw = profile.powerKw ?? 10;
+  const phase = profile.phase || 'auto';
+  const feed = profile.feed || 'AB';
+  return `<div class="busway-profile-row" data-bw-profile>
+    <label>数量<input data-profile-field="quantity" type="number" min="0" step="1" value="${quantity}"></label>
+    <label>宽度<select data-profile-field="widthMm"><option value="600"${widthMm === 600 ? ' selected' : ''}>600mm</option><option value="800"${widthMm === 800 ? ' selected' : ''}>800mm</option></select></label>
+    <label>单柜功率<input data-profile-field="powerKw" type="number" min="0" step="0.1" value="${powerKw}"></label>
+    <label>相制<select data-profile-field="phase"><option value="auto"${phase === 'auto' ? ' selected' : ''}>自动</option><option value="three"${phase === 'three' ? ' selected' : ''}>三相</option><option value="single"${phase === 'single' ? ' selected' : ''}>单相</option></select></label>
+    <label>供电<select data-profile-field="feed"><option value="AB"${feed === 'AB' ? ' selected' : ''}>A+B</option><option value="A"${feed === 'A' ? ' selected' : ''}>仅A</option><option value="B"${feed === 'B' ? ' selected' : ''}>仅B</option></select></label>
+    <div class="busway-profile-actions"><button type="button" data-bw-profile-copy title="复制类型">复制</button><button type="button" data-bw-profile-delete class="danger" title="删除类型">删除</button></div>
+  </div>`;
+}
+
 function buswayView() {
   return viewPanel('busway', '智能母线', '从机柜级负荷生成 A/B 母线方案、插接箱组合、微模块布局图与配置清单。', `
     <div class="smart-busway-steps" role="tablist" aria-label="智能母线设计流程">
@@ -360,12 +376,15 @@ function buswayView() {
     </div>
     <section class="smart-busway-pane" data-bw-pane="1">
       <div class="smart-busway-intro"><b>快速建立微模块</b><span>空调会在整排中均匀分布；生成后仍可逐柜调整功率、相制与 A/B 供电。</span></div>
-      <div class="busway-row-grid">
-        ${[1, 2].map(row => `<fieldset><legend>第 ${row} 排</legend><label>600mm IT机柜<input id="bw-r${row}-600" type="number" min="0" value="10"></label><label>800mm IT机柜<input id="bw-r${row}-800" type="number" min="0" value="0"></label><label>300mm列间空调<input id="bw-r${row}-ac300" type="number" min="0" value="0"></label><label>600mm列间空调<input id="bw-r${row}-ac600" type="number" min="0" value="2"></label></fieldset>`).join('')}
+      <div class="busway-row-grid flexible">
+        ${[1, 2].map(row => `<fieldset data-bw-quick-row="${row}"><legend>第 ${row} 排</legend>
+          <div class="busway-profile-head"><b>机柜类型</b><div><button type="button" data-bw-profile-add="${row}">＋ 类型</button><button type="button" data-bw-copy-row="${row}">复制另一排</button></div></div>
+          <div class="busway-profile-list" id="bw-r${row}-profiles">${quickProfileMarkup()}</div>
+          <div class="busway-cooling-fields"><label>300mm列间空调<input id="bw-r${row}-ac300" type="number" min="0" value="0"></label><label>600mm列间空调<input id="bw-r${row}-ac600" type="number" min="0" value="2"></label></div>
+          <output id="bw-r${row}-profile-summary" class="busway-profile-summary"></output>
+        </fieldset>`).join('')}
       </div>
       <div class="platform-form-grid cols-4 compact smart-busway-basics">
-        <label>默认单柜功率 (kW)<input id="bw-default-power" type="number" min="0" step="0.1" value="10"></label>
-        <label>默认相制<select id="bw-default-phase"><option value="auto">自动（≥8kW 三相）</option><option value="three">三相</option><option value="single">单相</option></select></label>
         <label>供电拓扑<select id="bw-topology"><option value="dual">A/B 双路</option><option value="single">A 单路</option></select></label>
         <label>默认冷通道 (mm)<input id="bw-aisle-width" type="number" min="600" step="100" value="1200"></label>
         <label>安装方式<select id="bw-installation"><option value="cabinet-top">柜顶安装</option><option value="ceiling">吊装</option></select></label>
@@ -387,6 +406,7 @@ function buswayView() {
         <div class="smart-busway-canvas"><div id="smart-busway-svg-wrap"></div><div id="smart-busway-side-view"></div></div>
         <aside id="smart-busway-inspector" class="smart-busway-inspector"></aside>
       </div>
+      <div id="smart-busway-group-editor" class="smart-busway-group-editor"></div>
       <div class="smart-busway-actions"><button data-bw-step="1">返回快速配置</button><button id="recalculate-smart-busway" class="platform-primary-action">重新计算并查看清单</button></div>
     </section>
     <section class="smart-busway-pane" data-bw-pane="3" hidden>
@@ -484,8 +504,10 @@ function fillProjectForm() {
     { name: '精密空调', quantity: 4, unitPowerKw: 20, demandFactor: 0.8, powerFactor: 0.85 }
   ];
   rows.forEach(addLoadRow);
+  renderBuswayQuickConfig(project.busbars?.smartBuswayDesign);
   updateDashboard();
   renderDeliverySummary();
+  if (state.activeView === 'busway') renderSmartBusway();
 }
 
 function collectProjectForm() {
@@ -900,12 +922,15 @@ function calculateBusbarAmpacityResult() {
 }
 
 function quickBuswayInput() {
-  const row = index => ({ cabinets600: numberValue(`bw-r${index}-600`), cabinets800: numberValue(`bw-r${index}-800`), ac300: numberValue(`bw-r${index}-ac300`), ac600: numberValue(`bw-r${index}-ac600`) });
-  const powerKw = numberValue('bw-default-power', 10);
-  const phaseSetting = document.getElementById('bw-default-phase').value;
+  const row = index => ({
+    profiles: [...document.querySelectorAll(`#bw-r${index}-profiles [data-bw-profile]`)].map(element => Object.fromEntries(
+      [...element.querySelectorAll('[data-profile-field]')].map(input => [input.dataset.profileField, input.type === 'number' ? Number(input.value) : input.value])
+    )),
+    ac300: numberValue(`bw-r${index}-ac300`),
+    ac600: numberValue(`bw-r${index}-ac600`)
+  });
   return {
-    row1: row(1), row2: row(2), defaultPowerKw: powerKw,
-    defaultPhase: phaseSetting === 'auto' ? (powerKw >= 8 ? 'three' : 'single') : phaseSetting,
+    row1: row(1), row2: row(2),
     topology: document.getElementById('bw-topology').value,
     aisleWidthMm: numberValue('bw-aisle-width', 1200),
     installation: document.getElementById('bw-installation').value,
@@ -915,6 +940,55 @@ function quickBuswayInput() {
     voltage: state.project?.topology?.voltage || 380,
     powerFactor: 0.95
   };
+}
+
+function updateQuickProfileSummary() {
+  [1, 2].forEach(index => {
+    const profiles = [...document.querySelectorAll(`#bw-r${index}-profiles [data-bw-profile]`)].map(element => ({
+      quantity: Number(element.querySelector('[data-profile-field="quantity"]')?.value || 0),
+      widthMm: Number(element.querySelector('[data-profile-field="widthMm"]')?.value || 600)
+    }));
+    const ac300 = numberValue(`bw-r${index}-ac300`);
+    const ac600 = numberValue(`bw-r${index}-ac600`);
+    const cabinets = profiles.reduce((sum, item) => sum + Math.max(0, item.quantity), 0);
+    const lengthM = (profiles.reduce((sum, item) => sum + Math.max(0, item.quantity) * item.widthMm, 0) + ac300 * 300 + ac600 * 600) / 1000;
+    const output = document.getElementById(`bw-r${index}-profile-summary`);
+    if (output) output.textContent = `预计 ${cabinets} 个机柜 · 实长 ${format(lengthM, 2)}m · 订货长度 ${Math.ceil(lengthM)}m`;
+  });
+}
+
+function deriveQuickProfiles(row = {}) {
+  const profiles = [];
+  (row.items || []).filter(item => item.kind === 'rack').forEach(item => {
+    const phase = item.phase || 'auto';
+    const prior = profiles.at(-1);
+    if (prior && prior.widthMm === item.widthMm && prior.powerKw === item.powerKw && prior.phase === phase && prior.feed === item.feed) prior.quantity += 1;
+    else profiles.push({ quantity: 1, widthMm: item.widthMm, powerKw: item.powerKw, phase, feed: item.feed });
+  });
+  return profiles;
+}
+
+function renderBuswayQuickConfig(design = state.project?.busbars?.smartBuswayDesign) {
+  if (!document.getElementById('bw-r1-profiles')) return;
+  if (design) {
+    [1, 2].forEach(index => {
+      const quickRow = design.quickConfig?.rows?.[index - 1];
+      const profiles = quickRow?.profiles?.length ? quickRow.profiles : deriveQuickProfiles(design.rows?.[index - 1]);
+      const host = document.getElementById(`bw-r${index}-profiles`);
+      host.innerHTML = (profiles.length ? profiles : [{ quantity: 0, widthMm: 600, powerKw: 10, phase: 'auto', feed: 'AB' }]).map(quickProfileMarkup).join('');
+      document.getElementById(`bw-r${index}-ac300`).value = quickRow?.ac300 ?? (design.rows?.[index - 1]?.items || []).filter(item => item.kind === 'ac' && item.widthMm === 300).length;
+      document.getElementById(`bw-r${index}-ac600`).value = quickRow?.ac600 ?? (design.rows?.[index - 1]?.items || []).filter(item => item.kind === 'ac' && item.widthMm === 600).length;
+    });
+    document.getElementById('bw-topology').value = design.topology || 'dual';
+    document.getElementById('bw-aisle-width').value = design.aisleWidthMm ?? 1200;
+    document.getElementById('bw-installation').value = design.installation || 'cabinet-top';
+    document.getElementById('bw-demand').value = design.demandFactor ?? 1;
+    document.getElementById('bw-safety').value = design.safetyFactor ?? 1.15;
+    document.getElementById('bw-harmonic').value = design.harmonicFactor ?? 1;
+    document.getElementById('bw-neutral').value = design.neutralMode || 'auto';
+    document.getElementById('bw-touchscreen').checked = Boolean(design.touchscreen);
+  }
+  updateQuickProfileSummary();
 }
 
 function currentBuswayDesign() {
@@ -990,7 +1064,11 @@ function smartBuswaySvg(design, result) {
     }).join('');
     const lengthWidth = row.exactLengthM * 1000 * scale;
     const topBusY = rowIndex === 0 ? rowY[0] - 58 : rowY[1] + rowHeight + 38;
-    const busLines = paths.map((path, pathIndex) => `<g class="bw-svg-path path-${path.toLowerCase()}"><line x1="${margin - 20}" y1="${topBusY + pathIndex * 25}" x2="${margin + lengthWidth + 20}" y2="${topBusY + pathIndex * 25}"/><rect x="${margin - 37}" y="${topBusY - 10 + pathIndex * 25}" width="18" height="20" rx="3"/><text x="${margin - 49}" y="${topBusY + 4 + pathIndex * 25}" text-anchor="end">${path}路始端</text><rect x="${margin + lengthWidth + 21}" y="${topBusY - 8 + pathIndex * 25}" width="8" height="16" rx="2"/><text x="${margin + lengthWidth + 38}" y="${topBusY + 4 + pathIndex * 25}">末端</text></g>`).join('');
+    const busLines = paths.map((path, pathIndex) => {
+      const run = result.runs.find(item => item.rowId === row.id && item.path === path);
+      const rating = run ? `推${run.recommendedBuswayCurrentA || '>'}/采${run.selectedBuswayCurrentA || '>'}A${run.selectionMode === 'manual' ? ' · 人工' : ''}` : '';
+      return `<g class="bw-svg-path path-${path.toLowerCase()}"><line x1="${margin - 20}" y1="${topBusY + pathIndex * 25}" x2="${margin + lengthWidth + 20}" y2="${topBusY + pathIndex * 25}"/><rect x="${margin - 37}" y="${topBusY - 10 + pathIndex * 25}" width="18" height="20" rx="3"/><text x="${margin - 49}" y="${topBusY + 4 + pathIndex * 25}" text-anchor="end">${path}路始端</text><text x="${margin + 6}" y="${topBusY - 7 + pathIndex * 25}">${rating}</text><rect x="${margin + lengthWidth + 21}" y="${topBusY - 8 + pathIndex * 25}" width="8" height="16" rx="2"/><text x="${margin + lengthWidth + 38}" y="${topBusY + 4 + pathIndex * 25}">末端</text></g>`;
+    }).join('');
     return `${busLines}${items}<text x="${margin}" y="${rowY[rowIndex] - 20}" class="bw-svg-row-name">${htmlEscape(row.name)} · 实长 ${format(row.exactLengthM, 2)}m / 订货 ${row.orderLengthM}m</text>`;
   }).join('');
   const plugMarkup = result.plugBoxGroups.map((group, index) => {
@@ -998,8 +1076,12 @@ function smartBuswaySvg(design, result) {
     const x = positions.reduce((sum, position) => sum + position.center, 0) / Math.max(1, positions.length);
     const y = group.rowIndex === 0 ? 118 - (group.path === 'B' ? 2 : 25) : 575 + (group.path === 'B' ? 25 : 0);
     const cabinetY = group.rowIndex === 0 ? rowY[0] : rowY[1] + rowHeight;
-    const label = `${group.breakerA || '—'}A ${group.phase}`;
-    return `<g class="bw-svg-plug path-${group.path.toLowerCase()}"><line x1="${x}" y1="${y}" x2="${x}" y2="${cabinetY}"/><rect x="${x - 25}" y="${y - 10}" width="50" height="20" rx="4"/><text x="${x}" y="${y + 4}" text-anchor="middle">${label}</text></g>`;
+    const currentLabel = group.selectionMode === 'manual' || group.recommendedRatedCurrentA !== group.selectedRatedCurrentA
+      ? `推${group.recommendedRatedCurrentA || '—'}/采${group.selectedRatedCurrentA || '—'}A`
+      : `${group.selectedRatedCurrentA || '—'}A · 推荐`;
+    const circuitLabel = `已用${group.memberIds.length}/${group.selectedOutputs}路${group.modelStatus === 'pending' ? ' · 待确认' : ''}`;
+    const selected = group.id === design.selectedPlugBoxId;
+    return `<g class="bw-svg-plug path-${group.path.toLowerCase()}${selected ? ' selected' : ''} ${group.validationStatus}" data-bw-group="${htmlEscape(group.id)}" tabindex="0" role="button"><line x1="${x}" y1="${y}" x2="${x}" y2="${cabinetY}"/><rect x="${x - 39}" y="${y - 13}" width="78" height="26" rx="4"/><text x="${x}" y="${y - 2}" text-anchor="middle">${currentLabel}</text><text x="${x}" y="${y + 8}" text-anchor="middle">${circuitLabel}</text><title>${htmlEscape(group.memberNames.join('、'))} · ${group.productCode || '型号待确认'}</title></g>`;
   }).join('');
   return `<svg id="smart-busway-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewWidth} 720" role="img" aria-label="两排微模块智能母线俯视布局图">
     ${definitions}<rect width="${viewWidth}" height="720" fill="#f8fbfe"/><rect x="40" y="32" width="${viewWidth - 80}" height="650" rx="16" fill="url(#bw-grid)" stroke="#d8e5ef"/>
@@ -1043,7 +1125,7 @@ function smartBuswaySideSvg(design, result) {
     const x = positions.reduce((sum, position) => sum + position.center, 0) / positions.length;
     const y = group.path === 'A' ? busAY : busBY;
     const cabinetTopY = elevationFloorY - cabinetHeight;
-    return `<g class="side-plug path-${group.path.toLowerCase()}"><rect x="${x - 12}" y="${y - 6}" width="24" height="12" rx="2"/><path d="M${x} ${y + 6}V${cabinetTopY}"/><title>${group.path}路 · ${group.breakerA || '—'}A · ${group.phase}</title></g>`;
+    return `<g class="side-plug path-${group.path.toLowerCase()}"><rect x="${x - 12}" y="${y - 6}" width="24" height="12" rx="2"/><path d="M${x} ${y + 6}V${cabinetTopY}"/><title>${group.path}路 · ${group.selectedRatedCurrentA || '—'}A · ${group.memberIds.length}/${group.selectedOutputs}路</title></g>`;
   }).join('');
   const sectionScale = 0.064;
   const sectionRackW = 800 * sectionScale;
@@ -1096,13 +1178,52 @@ function smartBuswayInspector(design) {
     ${rackFields}<div class="smart-busway-order-actions"><button data-bw-move="back">← 前移</button><button data-bw-move="forward">后移 →</button></div><button data-bw-delete class="danger">删除该设备</button>`;
 }
 
+function smartBuswayGroupEditor(design, result) {
+  const groups = result.plugBoxGroups || [];
+  if (!groups.length) return `<div class="smart-busway-group-empty"><b>插接箱分组</b><p>当前没有可分组的机柜。</p></div>`;
+  let selected = groups.find(group => group.id === design.selectedPlugBoxId);
+  if (!selected) selected = groups[0];
+  design.selectedPlugBoxId = selected.id;
+  const row = design.rows[selected.rowIndex];
+  const eligible = (row?.items || []).filter(item => item.kind === 'rack' && item.phase === selected.circuitPhase && (item.feed === 'AB' || item.feed === selected.path));
+  const ratings = selected.circuitPhase === 'single' ? [32, 63] : [32, 40, 50, 63];
+  const outputOptions = [...new Set((smartBuswayCatalog.plugBoxes || [])
+    .filter(item => item.phase === selected.circuitPhase && Number(item.ratedCurrentA) === Number(selected.selectedRatedCurrentA))
+    .map(item => Number(item.outputs)))].sort((a, b) => a - b);
+  if (!outputOptions.length) outputOptions.push(selected.selectedOutputs || Math.max(1, selected.memberIds.length));
+  const groupLabel = group => `${design.rows[group.rowIndex]?.name || ''}${group.path} · ${group.selectedRatedCurrentA || '—'}A · ${group.memberIds.length}/${group.selectedOutputs}路`;
+  return `<div class="smart-busway-group-head"><div><h2>插接箱分组</h2><p>自动推荐后可调整。人工分组会在重新计算时保留。</p></div><button type="button" data-bw-group-action="reset-all">全部恢复推荐</button></div>
+    <div class="smart-busway-group-layout">
+      <div class="smart-busway-group-list">${groups.map(group => `<button type="button" data-bw-group-id="${htmlEscape(group.id)}" class="${group.id === selected.id ? 'active ' : ''}${group.validationStatus}"><b>${htmlEscape(groupLabel(group))}</b><span>${htmlEscape(group.memberNames.join('、') || '未分配机柜')}</span><small>${group.productCode || '型号待确认'}${group.selectionMode === 'manual' ? ' · 人工' : ' · 推荐'}</small></button>`).join('')}</div>
+      <div class="smart-busway-group-detail">
+        <div class="smart-busway-group-meta"><span>${row?.name || ''}${selected.path}路</span><b>${selected.circuitPhase === 'single' ? '单相' : '三相'}插接箱</b><em class="${selected.validationStatus}">${selected.validationStatus === 'ok' ? '校核正常' : '需要复核'}</em></div>
+        <div class="platform-form-grid cols-3 compact">
+          <label>推荐电流<input value="${selected.recommendedRatedCurrentA || '超表列'}A" readonly></label>
+          <label>采用电流<select data-bw-group-field="selectedRatedCurrentA">${ratings.map(value => `<option value="${value}"${Number(selected.selectedRatedCurrentA) === value ? ' selected' : ''}>${value}A</option>`).join('')}</select></label>
+          <label>输出回路<select data-bw-group-field="selectedOutputs">${outputOptions.map(value => `<option value="${value}"${Number(selected.selectedOutputs) === value ? ' selected' : ''}>${value}路</option>`).join('')}</select></label>
+        </div>
+        <fieldset class="smart-busway-group-members"><legend>所带机柜</legend>${eligible.map(item => `<label><input type="checkbox" data-bw-group-member="${item.id}"${selected.memberIds.includes(item.id) ? ' checked' : ''}> <span>${htmlEscape(item.name)}</span><small>${format(item.powerKw)}kW · 推荐 ${item.branch?.breakerA || '超表列'}A</small></label>`).join('')}</fieldset>
+        <div class="smart-busway-group-issues">${selected.issues?.length ? selected.issues.map(issue => `<p class="${issue.severity}">${htmlEscape(issue.message)}</p>`).join('') : '<p class="ok">当前分组满足已确认规则。</p>'}</div>
+        <div class="smart-busway-group-actions"><button type="button" data-bw-group-action="split">拆分为单柜</button><button type="button" data-bw-group-action="merge-next">与下一组合并</button><button type="button" data-bw-group-action="reset">恢复本组推荐</button></div>
+      </div>
+    </div>`;
+}
+
+function smartBuswayRatingOptions(selected) {
+  return [160, 250, 400, 630, 800].map(value => `<option value="${value}"${Number(selected) === value ? ' selected' : ''}>${value}A</option>`).join('');
+}
+
 function renderSmartBuswayResults(result) {
   const pathHost = document.getElementById('smart-busway-path-result');
   if (!pathHost) return;
-  pathHost.innerHTML = `<div class="smart-busway-path-grid">${result.paths.map(path => `<article class="${path.configurable ? '' : 'danger'}"><header><b>${path.path} 路母线</b><span>${path.configurable ? `${path.ratedCurrentA}A` : '超 800A'}</span></header><dl><div><dt>正常工况</dt><dd>${format(path.normalPowerKw)} kW</dd></div><div><dt>另一路失电</dt><dd>${format(path.failurePowerKw)} kW</dd></div><div><dt>计算电流</dt><dd>${format(path.currentA)} A</dd></div><div><dt>选型电流</dt><dd>${format(path.designCurrentA)} A</dd></div><div><dt>额定档位</dt><dd>${path.ratedCurrentA ? `${path.ratedCurrentA} A` : `工程参考 ${path.engineeringRatedCurrentA || '超表列'} A`}</dd></div><div><dt>负载率</dt><dd>${path.loadRate === null ? '—' : `${format(path.loadRate * 100)}%`}</dd></div></dl></article>`).join('')}</div>
+  pathHost.innerHTML = `<div class="smart-busway-path-actions"><button type="button" data-bw-run-action="reset-all">全部恢复推荐</button></div><div class="smart-busway-path-grid">${result.runs.map(run => `<article class="${run.validationStatus}"><header><b>${htmlEscape(run.rowName)} ${run.path}路</b><span>${run.configurable ? `采用 ${run.selectedBuswayCurrentA}A${run.selectionMode === 'manual' ? ' · 人工' : ''}` : '超 800A'}</span></header><dl><div><dt>正常工况</dt><dd>${format(run.normalPowerKw)} kW</dd></div><div><dt>另一路失电</dt><dd>${format(run.failurePowerKw)} kW</dd></div><div><dt>计算电流</dt><dd>${format(run.currentA)} A</dd></div><div><dt>选型电流</dt><dd>${format(run.designCurrentA)} A</dd></div><div><dt>推荐档位</dt><dd>${run.recommendedBuswayCurrentA ? `${run.recommendedBuswayCurrentA} A` : `超800A`}</dd></div><div><dt>采用负载率</dt><dd>${run.selectedLoadRate === null ? '—' : `${format(run.selectedLoadRate * 100)}%`}</dd></div></dl>
+      <div class="smart-busway-run-selectors"><label>母线槽<select data-bw-run-key="${run.key}" data-bw-run-field="buswayRatedCurrentA"${!run.configurable ? ' disabled' : ''}>${smartBuswayRatingOptions(run.selectedBuswayCurrentA)}</select></label><label class="checkbox-field"><input type="checkbox" data-bw-run-key="${run.key}" data-bw-run-field="terminalLinked"${run.terminalLinked ? ' checked' : ''}> 始端箱同档联动</label><label>始端箱<select data-bw-run-key="${run.key}" data-bw-run-field="terminalRatedCurrentA"${run.terminalLinked || !run.configurable ? ' disabled' : ''}>${smartBuswayRatingOptions(run.selectedTerminalCurrentA)}</select></label><label class="checkbox-field"><input type="checkbox" data-bw-run-key="${run.key}" data-bw-run-field="terminalWithSwitch"${run.terminalWithSwitch ? ' checked' : ''}> 始端箱带开关</label></div>
+      ${run.issues.length ? `<div class="smart-busway-run-issues">${run.issues.map(issue => `<p class="${issue.severity}">${htmlEscape(issue.message)}</p>`).join('')}</div>` : ''}
+      <div class="smart-busway-run-actions"><button type="button" data-bw-run-action="apply-row" data-bw-run-key="${run.key}">应用到本排</button><button type="button" data-bw-run-action="apply-all" data-bw-run-key="${run.key}">应用到全部运行</button><button type="button" data-bw-run-action="reset" data-bw-run-key="${run.key}">恢复推荐</button></div>
+    </article>`).join('')}</div>
     <div class="smart-busway-summary-strip"><span><b>${result.neutralRecommendation}</b> N线自动建议</span><span><b>${result.selectedNeutral}</b> 当前采用</span><span><b>${result.plugBoxGroups.length}</b> 插接箱</span><span><b>${format(result.accessories.buswayLengthM, 1)}m</b> 订货母线总长</span></div>`;
   const bomHost = document.getElementById('smart-busway-bom');
-  bomHost.innerHTML = result.bomBlocked ? `<div class="smart-busway-blocked"><b>BOM 已停止生成</b><p>智能母线选型超过 800A。计算结果保留，请分段设计或改用固定式母线。</p></div>` : `<div class="smart-busway-table-head"><div><h2>配置清单</h2><p>仅含确认型号与工程数量，不含价格。</p></div><b>${result.bom.length} 项</b></div><div class="data-entry-table smart-busway-bom-table"><table><thead><tr><th>分类</th><th>产品型号</th><th>说明</th><th>路径</th><th>数量</th><th>单位</th></tr></thead><tbody>${result.bom.map(item => `<tr class="${item.status === 'pending' ? 'pending' : ''}"><td>${htmlEscape(item.category)}</td><td><code>${htmlEscape(item.status === 'pending' ? '型号待确认' : item.code || '—')}</code></td><td>${htmlEscape(item.description)}</td><td>${htmlEscape(item.path || '—')}</td><td>${format(item.quantity, 2)}</td><td>${htmlEscape(item.unit)}</td></tr>`).join('')}</tbody></table></div>`;
+  bomHost.innerHTML = result.bomBlocked ? `<div class="smart-busway-blocked"><b>BOM 已停止生成</b><p>至少一个独立运行的选型电流超过800A。计算结果保留，请分段设计或改用固定式母线。</p></div>` : `<div class="smart-busway-table-head"><div><h2>配置清单</h2><p>清单按人工采用值生成，不含价格。推荐值与采用值不一致时保留风险标记。</p></div><b>${result.bom.length} 项</b></div>${result.plugBoxBomBlocked ? '<div class="smart-busway-blocked"><b>插接箱清单暂未生成</b><p>存在重复、缺失或超出回路数的分组，请返回布局微调修正。</p></div>' : ''}<div class="data-entry-table smart-busway-bom-table"><table><thead><tr><th>分类</th><th>产品型号</th><th>说明</th><th>路径</th><th>推荐/采用</th><th>数量</th><th>单位</th></tr></thead><tbody>${result.bom.map(item => `<tr class="${item.status || ''}"><td>${htmlEscape(item.category)}</td><td><code>${htmlEscape(item.status === 'pending' ? '型号待确认' : item.code || '—')}</code></td><td>${htmlEscape(item.description)}</td><td>${htmlEscape(item.path || '—')}</td><td>${item.recommendedCurrentA ? `${item.recommendedCurrentA}A / ${item.selectedCurrentA}A` : '—'}${item.status === 'manual-risk' ? '<small>人工降档</small>' : item.selectionMode === 'manual' ? '<small>人工采用</small>' : ''}</td><td>${format(item.quantity, 2)}</td><td>${htmlEscape(item.unit)}</td></tr>`).join('')}</tbody></table></div>`;
   document.getElementById('smart-busway-warnings').innerHTML = result.warnings.length ? `<div class="smart-busway-warning-list"><h2>需要关注 <span>${result.warnings.length}</span></h2>${result.warnings.map(warning => `<p>⚠ ${htmlEscape(warning)}</p>`).join('')}</div>` : '<div class="smart-busway-ok">当前计算未发现越界或型号缺口。</div>';
 }
 
@@ -1119,6 +1240,8 @@ function renderSmartBusway() {
   if (side) side.innerHTML = smartBuswaySideSvg(result.design, result);
   const inspector = document.getElementById('smart-busway-inspector');
   if (inspector) inspector.innerHTML = smartBuswayInspector(result.design);
+  const groupEditor = document.getElementById('smart-busway-group-editor');
+  if (groupEditor) groupEditor.innerHTML = smartBuswayGroupEditor(result.design, result);
   const output = document.getElementById('bw-zoom-value');
   const range = document.getElementById('bw-zoom');
   if (output) output.value = `${Math.round(state.buswayZoom * 100)}%`;
@@ -1165,6 +1288,95 @@ function deleteSelectedBuswayItem() {
   if (!selected) return;
   design.rows[selected.rowIndex].items.splice(selected.itemIndex, 1);
   design.selectedItemId = null;
+  renderSmartBusway();
+}
+
+function selectedPlugBoxGroup(design) {
+  return (design.plugBoxGroups || []).find(group => group.id === design.selectedPlugBoxId) || null;
+}
+
+function updatePlugBoxGroupField(target) {
+  const design = currentBuswayDesign();
+  const group = selectedPlugBoxGroup(design);
+  if (!group) return;
+  group.selectionMode = 'manual';
+  group[target.dataset.bwGroupField] = Number(target.value);
+  renderSmartBusway();
+}
+
+function updatePlugBoxMember(target) {
+  const design = currentBuswayDesign();
+  const group = selectedPlugBoxGroup(design);
+  if (!group) return;
+  group.selectionMode = 'manual';
+  const id = target.dataset.bwGroupMember;
+  group.memberIds = [...new Set(target.checked ? [...group.memberIds, id] : group.memberIds.filter(value => value !== id))];
+  renderSmartBusway();
+}
+
+function handlePlugBoxGroupAction(action) {
+  const design = currentBuswayDesign();
+  const group = selectedPlugBoxGroup(design);
+  if (action === 'reset-all') {
+    design.plugBoxGroups = [];
+    design.selectedPlugBoxId = null;
+    renderSmartBusway();
+    return;
+  }
+  if (!group) return;
+  if (action === 'reset') {
+    design.plugBoxGroups = design.plugBoxGroups.filter(item => item.id !== group.id);
+    design.selectedPlugBoxId = null;
+  }
+  if (action === 'split') {
+    const replacements = group.memberIds.map((memberId, index) => ({
+      ...structuredClone(group), id: `${group.id}-split-${index + 1}`, memberIds: [memberId],
+      selectionMode: 'manual', selectedOutputs: group.circuitPhase === 'three' && group.selectedRatedCurrentA <= 32 ? 1 : group.selectedOutputs
+    }));
+    design.plugBoxGroups = design.plugBoxGroups.flatMap(item => item.id === group.id ? replacements : [item]);
+    design.selectedPlugBoxId = replacements[0]?.id || null;
+  }
+  if (action === 'merge-next') {
+    const candidates = design.plugBoxGroups.filter(item => item.rowId === group.rowId && item.path === group.path && item.circuitPhase === group.circuitPhase);
+    const index = candidates.findIndex(item => item.id === group.id);
+    const next = candidates[index + 1];
+    if (next) {
+      group.selectionMode = 'manual';
+      group.memberIds = [...new Set([...group.memberIds, ...next.memberIds])];
+      group.selectedRatedCurrentA = Math.max(group.selectedRatedCurrentA || 0, next.selectedRatedCurrentA || 0);
+      group.selectedOutputs = Math.max(group.selectedOutputs || 1, next.selectedOutputs || 1, group.memberIds.length);
+      design.plugBoxGroups = design.plugBoxGroups.filter(item => item.id !== next.id);
+    }
+  }
+  renderSmartBusway();
+}
+
+function updateSmartBuswayRunSelection(target) {
+  const design = currentBuswayDesign();
+  const key = target.dataset.bwRunKey;
+  const field = target.dataset.bwRunField;
+  if (!key || !field) return;
+  const current = design.runSelections[key] || {};
+  current.mode = 'manual';
+  current[field] = target.type === 'checkbox' ? target.checked : Number(target.value);
+  if (field === 'buswayRatedCurrentA' && current.terminalLinked !== false) current.terminalRatedCurrentA = current.buswayRatedCurrentA;
+  if (field === 'terminalLinked' && current.terminalLinked) current.terminalRatedCurrentA = current.buswayRatedCurrentA;
+  design.runSelections[key] = current;
+  renderSmartBusway();
+}
+
+function handleSmartBuswayRunAction(action, key) {
+  const design = currentBuswayDesign();
+  if (action === 'reset-all') design.runSelections = {};
+  else if (action === 'reset') delete design.runSelections[key];
+  else {
+    const source = design.runSelections[key];
+    if (!source) return;
+    const [rowId] = key.split(':');
+    Object.keys(design.runSelections).forEach(targetKey => {
+      if (action === 'apply-all' || targetKey.startsWith(`${rowId}:`)) design.runSelections[targetKey] = { ...source, mode: 'manual' };
+    });
+  }
   renderSmartBusway();
 }
 
@@ -1219,16 +1431,21 @@ function exportExcel() {
     ['智能母线设计', state.project.name], ['拓扑', smartResult.design.topology === 'dual' ? 'A/B双路' : 'A单路'], ['安装方式', smartResult.design.installation === 'cabinet-top' ? '柜顶安装' : '吊装'],
     ['冷通道(mm)', smartResult.design.aisleWidthMm], ['需要系数 Kd', smartResult.design.demandFactor], ['安全系数 Ks', smartResult.design.safetyFactor], ['谐波系数 Kh', smartResult.design.harmonicFactor],
     ['N线自动建议', smartResult.neutralRecommendation], ['当前N线', smartResult.selectedNeutral], [],
-    ['路径', '正常功率(kW)', '单路故障功率(kW)', '计算电流(A)', '选型电流(A)', '额定档位(A)', '负载率'],
-    ...smartResult.paths.map(path => [path.path, path.normalPowerKw, path.failurePowerKw, path.currentA, path.designCurrentA, path.ratedCurrentA || `超800（工程参考${path.engineeringRatedCurrentA || '超表列'}）`, path.loadRate ?? ''])
+    ['独立运行', '正常功率(kW)', '单路故障功率(kW)', '计算电流(A)', '选型电流(A)', '推荐母线(A)', '采用母线(A)', '推荐始端箱(A)', '采用始端箱(A)', '带开关', '采用负载率', '选择方式', '校核状态'],
+    ...smartResult.runs.map(run => [`${run.rowName}${run.path}路`, run.normalPowerKw, run.failurePowerKw, run.currentA, run.designCurrentA, run.recommendedBuswayCurrentA || '超800', run.selectedBuswayCurrentA || '', run.recommendedTerminalCurrentA || '超800', run.selectedTerminalCurrentA || '', run.terminalWithSwitch ? '是' : '否', run.selectedLoadRate ?? '', run.selectionMode === 'manual' ? '人工采用' : '自动推荐', run.validationStatus === 'ok' ? '正常' : run.issues.map(item => item.message).join('；')])
   ] : [['智能母线设计', '尚未生成']];
-  const cabinetRows = [['排', '顺序', '设备名称', '类型', '宽度(mm)', '功率(kW)', '相制', '功率因数', '供电方式', '支路电流(A)', '断路器(A)', '插接箱覆盖']];
+  const cabinetRows = [['排', '顺序', '设备名称', '类型', '宽度(mm)', '功率(kW)', '相制', '功率因数', '供电方式', '支路选型电流(A)', '推荐断路器(A)', '路径', '插接箱组号', '回路号', '相别', '推荐插接箱(A)', '采用插接箱(A)', '产品型号', '校核状态']];
   if (smartResult) smartResult.design.rows.forEach((row, rowIndex) => row.items.forEach((item, itemIndex) => {
-    const groups = smartResult.plugBoxGroups.filter(group => group.memberIds.includes(item.id)).map(group => `${group.path}:${group.productCode || '型号待确认'}`).join('；');
-    cabinetRows.push([row.name, itemIndex + 1, item.name, item.kind === 'rack' ? 'IT机柜' : '列间空调', item.widthMm, item.kind === 'rack' ? item.powerKw : '', item.kind === 'rack' ? (item.phase === 'single' ? '单相' : '三相') : '', item.kind === 'rack' ? item.powerFactor : '', item.kind === 'rack' ? item.feed : '', item.branch?.designCurrentA ?? '', item.branch?.breakerA ?? '', groups]);
+    const groups = smartResult.plugBoxGroups.filter(group => group.memberIds.includes(item.id));
+    if (item.kind !== 'rack' || !groups.length) cabinetRows.push([row.name, itemIndex + 1, item.name, item.kind === 'rack' ? 'IT机柜' : '列间空调', item.widthMm, item.kind === 'rack' ? item.powerKw : '', item.kind === 'rack' ? (item.phase === 'single' ? '单相' : '三相') : '', item.kind === 'rack' ? item.powerFactor : '', item.kind === 'rack' ? item.feed : '', item.branch?.designCurrentA ?? '', item.branch?.breakerA ?? '', '', '', '', '', '', '', '', '']);
+    else groups.forEach(group => {
+      const circuitIndex = group.memberIds.indexOf(item.id);
+      cabinetRows.push([row.name, itemIndex + 1, item.name, 'IT机柜', item.widthMm, item.powerKw, item.phase === 'single' ? '单相' : '三相', item.powerFactor, item.feed, item.branch?.designCurrentA ?? '', item.branch?.breakerA ?? '', group.path, group.id, circuitIndex + 1, group.circuitPhases?.[circuitIndex] || '', group.recommendedRatedCurrentA || '', group.selectedRatedCurrentA || '', group.productCode || '型号待确认', group.validationStatus === 'ok' ? '正常' : group.issues.map(issue => issue.message).join('；')]);
+    });
   }));
-  const buswayBomRows = [['分类', '产品型号', '说明', '路径', '数量', '单位', '状态'], ...(smartResult?.bom || []).map(item => [item.category, item.status === 'pending' ? '型号待确认' : item.code || '—', item.description, item.path, item.quantity, item.unit, item.status === 'pending' ? '待确认' : item.code ? '已确认' : '工程附件'])];
-  if (smartResult?.bomBlocked) buswayBomRows.push(['提示', '', '选型电流超过800A，未生成智能母线BOM', '', '', '', '停止生成']);
+  const buswayBomRows = [['分类', '产品型号', '说明', '路径', '推荐电流(A)', '采用电流(A)', '数量', '单位', '状态'], ...(smartResult?.bom || []).map(item => [item.category, item.status === 'pending' ? '型号待确认' : item.code || '—', item.description, item.path, item.recommendedCurrentA ?? '', item.selectedCurrentA ?? '', item.quantity, item.unit, item.status === 'manual-risk' ? '人工降档，需工程复核' : item.status === 'pending' ? `型号待确认${item.selectionMode === 'manual' ? '；人工采用' : ''}` : item.selectionMode === 'manual' ? '人工采用' : item.code ? '已确认' : '工程附件'])];
+  if (smartResult?.bomBlocked) buswayBomRows.push(['提示', '', '选型电流超过800A，未生成智能母线BOM', '', '', '', '', '', '停止生成']);
+  else if (smartResult?.plugBoxBomBlocked) buswayBomRows.push(['提示', '', '插接箱分组存在结构错误，插接箱条目未生成', '', '', '', '', '', '需修正分组']);
   const workbook = window.XLSX.utils.book_new();
   const overviewSheet = window.XLSX.utils.aoa_to_sheet(overview);
   const loadSheet = window.XLSX.utils.aoa_to_sheet(loadRows);
@@ -1239,9 +1456,9 @@ function exportExcel() {
   overviewSheet['!cols'] = [{ wch: 22 }, { wch: 56 }];
   loadSheet['!cols'] = [22, 10, 16, 14, 12, 18, 18].map(wch => ({ wch }));
   costSheet['!cols'] = [8, 20, 36, 10, 10, 18, 18, 24].map(wch => ({ wch }));
-  buswaySheet['!cols'] = [22, 22, 22, 18, 18, 18, 16].map(wch => ({ wch }));
-  cabinetSheet['!cols'] = [10, 8, 18, 12, 12, 12, 10, 12, 12, 16, 14, 40].map(wch => ({ wch }));
-  buswayBomSheet['!cols'] = [12, 24, 32, 10, 12, 10, 12].map(wch => ({ wch }));
+  buswaySheet['!cols'] = [22, 18, 20, 16, 16, 16, 16, 18, 18, 12, 16, 14, 42].map(wch => ({ wch }));
+  cabinetSheet['!cols'] = [10, 8, 18, 12, 12, 12, 10, 12, 12, 18, 16, 10, 34, 10, 12, 18, 18, 24, 42].map(wch => ({ wch }));
+  buswayBomSheet['!cols'] = [12, 24, 34, 16, 16, 16, 12, 10, 24].map(wch => ({ wch }));
   window.XLSX.utils.book_append_sheet(workbook, overviewSheet, '项目汇总');
   window.XLSX.utils.book_append_sheet(workbook, loadSheet, '负荷计算');
   window.XLSX.utils.book_append_sheet(workbook, costSheet, '商务成本空白表');
@@ -1320,8 +1537,46 @@ function bindEvents() {
   document.getElementById('bw-export-excel').addEventListener('click', exportExcel);
   const buswayPanel = document.getElementById('platform-view-busway');
   buswayPanel.addEventListener('click', event => {
+    const profileAdd = event.target.closest('[data-bw-profile-add]');
+    if (profileAdd) {
+      document.getElementById(`bw-r${profileAdd.dataset.bwProfileAdd}-profiles`).insertAdjacentHTML('beforeend', quickProfileMarkup({ quantity: 1, widthMm: 600, powerKw: 10, phase: 'auto', feed: 'AB' }));
+      updateQuickProfileSummary();
+    }
+    const profileCopy = event.target.closest('[data-bw-profile-copy]');
+    if (profileCopy) {
+      const profile = profileCopy.closest('[data-bw-profile]');
+      const values = Object.fromEntries([...profile.querySelectorAll('[data-profile-field]')].map(input => [input.dataset.profileField, input.type === 'number' ? Number(input.value) : input.value]));
+      profile.insertAdjacentHTML('afterend', quickProfileMarkup(values));
+      updateQuickProfileSummary();
+    }
+    const profileDelete = event.target.closest('[data-bw-profile-delete]');
+    if (profileDelete) {
+      const list = profileDelete.closest('.busway-profile-list');
+      profileDelete.closest('[data-bw-profile]').remove();
+      if (!list.children.length) list.insertAdjacentHTML('beforeend', quickProfileMarkup({ quantity: 0, widthMm: 600, powerKw: 10, phase: 'auto', feed: 'AB' }));
+      updateQuickProfileSummary();
+    }
+    const copyRow = event.target.closest('[data-bw-copy-row]');
+    if (copyRow) {
+      const source = Number(copyRow.dataset.bwCopyRow);
+      const target = source === 1 ? 2 : 1;
+      const profiles = [...document.querySelectorAll(`#bw-r${source}-profiles [data-bw-profile]`)].map(profile => Object.fromEntries([...profile.querySelectorAll('[data-profile-field]')].map(input => [input.dataset.profileField, input.type === 'number' ? Number(input.value) : input.value])));
+      document.getElementById(`bw-r${target}-profiles`).innerHTML = profiles.map(quickProfileMarkup).join('');
+      document.getElementById(`bw-r${target}-ac300`).value = document.getElementById(`bw-r${source}-ac300`).value;
+      document.getElementById(`bw-r${target}-ac600`).value = document.getElementById(`bw-r${source}-ac600`).value;
+      updateQuickProfileSummary();
+    }
     const stepButton = event.target.closest('[data-bw-step]');
     if (stepButton) setBuswayStep(stepButton.dataset.bwStep);
+    const groupButton = event.target.closest('[data-bw-group-id], [data-bw-group]');
+    if (groupButton) {
+      currentBuswayDesign().selectedPlugBoxId = groupButton.dataset.bwGroupId || groupButton.dataset.bwGroup;
+      renderSmartBusway();
+    }
+    const groupAction = event.target.closest('[data-bw-group-action]');
+    if (groupAction) handlePlugBoxGroupAction(groupAction.dataset.bwGroupAction);
+    const runAction = event.target.closest('[data-bw-run-action]');
+    if (runAction) handleSmartBuswayRunAction(runAction.dataset.bwRunAction, runAction.dataset.bwRunKey);
     const itemTarget = event.target.closest('[data-bw-item]');
     if (itemTarget) {
       const design = currentBuswayDesign();
@@ -1382,10 +1637,17 @@ function bindEvents() {
   });
   buswayPanel.addEventListener('change', event => {
     if (event.target.matches('[data-bw-field]')) updateSelectedBuswayField(event.target);
+    if (event.target.matches('[data-bw-group-field]')) updatePlugBoxGroupField(event.target);
+    if (event.target.matches('[data-bw-group-member]')) updatePlugBoxMember(event.target);
+    if (event.target.matches('[data-bw-run-field]')) updateSmartBuswayRunSelection(event.target);
+    if (event.target.matches('[data-profile-field], #bw-r1-ac300, #bw-r1-ac600, #bw-r2-ac300, #bw-r2-ac600')) updateQuickProfileSummary();
     if (event.target.id === 'bw-zoom') {
       state.buswayZoom = Number(event.target.value);
       renderSmartBusway();
     }
+  });
+  buswayPanel.addEventListener('input', event => {
+    if (event.target.matches('[data-profile-field], #bw-r1-ac300, #bw-r1-ac600, #bw-r2-ac300, #bw-r2-ac600')) updateQuickProfileSummary();
   });
   document.getElementById('bw-zoom-in').addEventListener('click', () => { state.buswayZoom = Math.min(1.8, state.buswayZoom + 0.1); renderSmartBusway(); });
   document.getElementById('bw-zoom-out').addEventListener('click', () => { state.buswayZoom = Math.max(0.7, state.buswayZoom - 0.1); renderSmartBusway(); });

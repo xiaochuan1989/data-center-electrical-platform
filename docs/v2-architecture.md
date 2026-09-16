@@ -1,6 +1,6 @@
 # v2 平台架构与数据边界
 
-> 当前版本：v2.6.5 · 更新：2026-09-16
+> 当前版本：v2.7.0 · 更新：2026-09-16
 
 ## 架构策略
 
@@ -38,7 +38,7 @@ flowchart LR
 | `src/data/busbar-catalog.json` | 97 条铜排载流量数据 |
 | `src/data/cable-catalog.json` | 224 条电缆基础数据 |
 | `src/data/awg-catalog.json` | 50 条中美线规对照数据 |
-| `src/data/smart-busway-catalog.json` | 160～800A 智能母线槽、端口箱及已确认插接箱的无价格目录 |
+| `src/data/smart-busway-catalog.json` | 160～800A 智能母线槽、端口箱、已确认插接箱及无编码工程能力项的无价格目录 |
 | `src/css/platform-v2.css` | 平台、侧栏、工程模块和数据库视口布局 |
 
 ## 产品数据库布局
@@ -70,8 +70,9 @@ viewport
 ### schema v2 与智能母线
 
 - 当前项目 `schemaVersion=2`；智能母线设计保存在 `project.busbars.smartBuswayDesign`。
-- `SmartBuswayDesign` 管理拓扑、安装方式、通道宽度、Kd/Ks/Kh、N 线选择、两排布局和选中设备；`LayoutItem` 保存逐柜负荷与供电属性。
-- 计算输出由 `SmartBuswayPathResult`、`PlugBoxGroup` 和 `SmartBuswayBomItem` 组成，但逐柜布局仍是再次计算时的权威来源。
+- `SmartBuswayDesign.version=2` 管理拓扑、安装方式、通道宽度、Kd/Ks/Kh、N 线选择、`quickConfig.rows[].profiles`、两排布局、`runSelections` 和持久化 `plugBoxGroups`；`LayoutItem` 保存逐柜负荷与供电属性。
+- 计算输出以“排 × 路”的 `runs` 为当前接口，旧 `paths` 汇总继续作为兼容字段；`SmartBuswayPathResult` 同时保留推荐/采用母线档位、推荐/采用始端箱和风险状态。
+- `PlugBoxGroup` 保存成员、回路数、推荐/采用电流、推荐/采用型号和确认状态。重新计算只更新自动建议，不覆盖人工分组；结构错误只阻断插接箱条目，任一运行超过 800A 则阻断整份智能母线 BOM。
 - 旧版智能母线结果只迁入 `project.legacy.smartBuswayV1`，不从汇总结果猜测机柜顺序、插接箱覆盖或相序。
 - 项目负荷只用于首次预填，用户编辑布局后不会被负荷模块反向覆盖。
 
@@ -89,4 +90,4 @@ Vite 只从 `index.html` 和 `src/` 生成 `dist/`。`工具模板/`、原始 Ex
 6. 文档版本、应用版本和包版本一致。
 7. 锂电池 Excel 示例（500kW、600kVA、512V、2组、PF0.8、0.25h、输出效率0.95）应得到 C2=160、F2=0.95、I2=4C、J2=3.05V、K2=141.909995Ah，页面整数显示 142Ah。
 8. 铜排工程计算器继续保留原 Excel 示例（120×10mm、ε=0.35）的公式等价回归，同时以新亮镀锡复核示例（40×6mm、外部环境35℃、工程控制温升70K、柜内空气温升15K、h=5、ε=0.05、ρ₂₀=1.7241×10⁻⁸Ω·m）验证：热平衡电流 538.487764A、80%建议值 430.790211A、与 DIN 裸排 528A 的差异约 1.99%。A03 按电流选型只保留裸排/涂层数据列选择，不再把热缩套管等同于涂层列。
-9. 智能母线覆盖 159/160/161A、630/631A、799/800/801A、空值/零值、单/双路、A-only/B-only、不对称两排、保存迁移和 BOM 阻断；浏览器同时检查 SVG 桌面/窄屏、整排立面、冷通道剖面及 PNG/PDF/Excel 输出。
+9. 智能母线覆盖 159/160/161A、630/631A、799/800/801A、空值/零值、单/双路、A-only/B-only、不对称两排、多容量类型、按排×路径选型、推荐/人工采用值、32A三相3路、40A三相2路/3路待确认、50A/63A三相2路、重复/缺失分组、保存迁移和 BOM 阻断；浏览器同时检查 SVG 桌面/窄屏、分组编辑器、运行选型卡、整排立面、冷通道剖面及 PNG/PDF/Excel 输出。
