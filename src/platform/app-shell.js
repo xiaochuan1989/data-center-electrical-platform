@@ -39,7 +39,8 @@ const state = {
   activeView: 'project',
   buswayStep: 1,
   buswayZoom: 1,
-  buswayDrag: null
+  buswayDrag: null,
+  buswayDraft: null
 };
 
 function htmlEscape(value) {
@@ -352,12 +353,13 @@ function busbarView() {
 }
 
 function quickProfileMarkup(profile = {}) {
+  const profileId = profile.id || `profile-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const quantity = profile.quantity ?? 10;
   const widthMm = Number(profile.widthMm) === 800 ? 800 : 600;
   const powerKw = profile.powerKw ?? 10;
   const phase = profile.phase || 'auto';
   const feed = profile.feed || 'AB';
-  return `<div class="busway-profile-row" data-bw-profile>
+  return `<div class="busway-profile-row" data-bw-profile data-profile-id="${htmlEscape(profileId)}">
     <label>数量<input data-profile-field="quantity" type="number" min="0" step="1" value="${quantity}"></label>
     <label>宽度<select data-profile-field="widthMm"><option value="600"${widthMm === 600 ? ' selected' : ''}>600mm</option><option value="800"${widthMm === 800 ? ' selected' : ''}>800mm</option></select></label>
     <label>单柜功率<input data-profile-field="powerKw" type="number" min="0" step="0.1" value="${powerKw}"></label>
@@ -370,12 +372,12 @@ function quickProfileMarkup(profile = {}) {
 function buswayView() {
   return viewPanel('busway', '智能母线', '从机柜级负荷生成 A/B 母线方案、插接箱组合、微模块布局图与配置清单。', `
     <div class="smart-busway-steps" role="tablist" aria-label="智能母线设计流程">
-      <button class="active" data-bw-step="1"><b>1</b><span>快速配置<small>建立两排布局</small></span></button>
-      <button data-bw-step="2"><b>2</b><span>布局微调<small>逐柜编辑与图纸</small></span></button>
-      <button data-bw-step="3"><b>3</b><span>计算与清单<small>选型、附件与导出</small></span></button>
+      <button class="active" data-bw-step="1"><b>1</b><span>方案配置<small>设备选型与策略</small></span></button>
+      <button data-bw-step="2"><b>2</b><span>布局与回路分配<small>逐柜落位与微调</small></span></button>
+      <button data-bw-step="3"><b>3</b><span>校核与清单<small>风险、附件与导出</small></span></button>
     </div>
     <section class="smart-busway-pane" data-bw-pane="1">
-      <div class="smart-busway-intro"><b>快速建立微模块</b><span>空调会在整排中均匀分布；生成后仍可逐柜调整功率、相制与 A/B 供电。</span></div>
+      <div class="smart-busway-intro"><b>先配置方案，再生成布局</b><span>先确定机柜类型、母线槽、始端箱和插接箱策略；生成后再按实际位置调整机柜与回路。</span></div>
       <div class="busway-row-grid flexible">
         ${[1, 2].map(row => `<fieldset data-bw-quick-row="${row}"><legend>第 ${row} 排</legend>
           <div class="busway-profile-head"><b>机柜类型</b><div><button type="button" data-bw-profile-add="${row}">＋ 类型</button><button type="button" data-bw-copy-row="${row}">复制另一排</button></div></div>
@@ -392,9 +394,13 @@ function buswayView() {
         <label>安全系数 Ks<input id="bw-safety" type="number" min="1" step="0.05" value="1.15"></label>
         <label>谐波系数 Kh<input id="bw-harmonic" type="number" min="0.01" max="1" step="0.05" value="1"></label>
         <label>N 线配置<select id="bw-neutral"><option value="auto">自动建议</option><option value="100">人工 100% N</option><option value="200">人工 200% N</option></select></label>
-        <label class="checkbox-field"><input id="bw-touchscreen" type="checkbox"> 配置触摸屏</label>
+        <label class="checkbox-field"><input id="bw-terminal-small-screen" type="checkbox"> 始端箱带小屏（选配）</label>
+        <label class="checkbox-field"><input id="bw-monitor-screen-10" type="checkbox"> 每套母线配置10寸监控屏（选配）</label>
       </div>
-      <div class="smart-busway-actions"><button id="generate-smart-busway" class="platform-primary-action">生成布局并计算</button><span>项目负荷仅用于首次预填；生成后以逐柜明细为准。</span></div>
+      <div class="smart-busway-monitor-note"><b>监控功能已内置</b><span>始端箱默认带防凝露功能，并通过始端箱上传动环；无需配置显示屏或串口服务器与动环通信。</span></div>
+      <div id="smart-busway-config-runs" class="smart-busway-config-section"></div>
+      <div id="smart-busway-config-plugs" class="smart-busway-config-section"></div>
+      <div class="smart-busway-actions"><button id="generate-smart-busway" class="platform-primary-action">生成布局并分配回路</button><span>配置值将带入布局；生成后以逐柜明细和实际分组为准。</span></div>
     </section>
     <section class="smart-busway-pane" data-bw-pane="2" hidden>
       <div class="smart-busway-layout-toolbar">
@@ -407,14 +413,14 @@ function buswayView() {
         <aside id="smart-busway-inspector" class="smart-busway-inspector"></aside>
       </div>
       <div id="smart-busway-group-editor" class="smart-busway-group-editor"></div>
-      <div class="smart-busway-actions"><button data-bw-step="1">返回快速配置</button><button id="recalculate-smart-busway" class="platform-primary-action">重新计算并查看清单</button></div>
+      <div class="smart-busway-actions"><button data-bw-step="1">返回方案配置</button><button id="recalculate-smart-busway" class="platform-primary-action">校核并查看清单</button></div>
     </section>
     <section class="smart-busway-pane" data-bw-pane="3" hidden>
       <div id="smart-busway-path-result"></div>
       <div class="smart-busway-output-bar"><div><button id="bw-export-png">导出 PNG</button><button id="bw-print-pdf">打印 / 保存 PDF</button><button id="bw-export-excel" class="primary">导出项目 Excel</button></div><span>Excel 将新增“智能母线设计、机柜明细、配置清单”工作表。</span></div>
       <div id="smart-busway-bom"></div>
       <div id="smart-busway-warnings"></div>
-      <div class="smart-busway-actions"><button data-bw-step="2">返回布局微调</button></div>
+      <div class="smart-busway-actions"><button data-bw-step="2">返回布局与回路分配</button></div>
     </section>
     <p class="engineering-warning">⚠ ${ENGINEERING_WARNING}</p>`);
 }
@@ -923,9 +929,10 @@ function calculateBusbarAmpacityResult() {
 
 function quickBuswayInput() {
   const row = index => ({
-    profiles: [...document.querySelectorAll(`#bw-r${index}-profiles [data-bw-profile]`)].map(element => Object.fromEntries(
-      [...element.querySelectorAll('[data-profile-field]')].map(input => [input.dataset.profileField, input.type === 'number' ? Number(input.value) : input.value])
-    )),
+    profiles: [...document.querySelectorAll(`#bw-r${index}-profiles [data-bw-profile]`)].map(element => ({
+      id: element.dataset.profileId,
+      ...Object.fromEntries([...element.querySelectorAll('[data-profile-field]')].map(input => [input.dataset.profileField, input.type === 'number' ? Number(input.value) : input.value]))
+    })),
     ac300: numberValue(`bw-r${index}-ac300`),
     ac600: numberValue(`bw-r${index}-ac600`)
   });
@@ -936,7 +943,8 @@ function quickBuswayInput() {
     installation: document.getElementById('bw-installation').value,
     demandFactor: numberValue('bw-demand', 1), safetyFactor: numberValue('bw-safety', 1.15), harmonicFactor: numberValue('bw-harmonic', 1),
     neutralMode: document.getElementById('bw-neutral').value,
-    touchscreen: document.getElementById('bw-touchscreen').checked,
+    terminalSmallScreen: document.getElementById('bw-terminal-small-screen').checked,
+    monitorScreen10Inch: document.getElementById('bw-monitor-screen-10').checked,
     voltage: state.project?.topology?.voltage || 380,
     powerFactor: 0.95
   };
@@ -986,9 +994,52 @@ function renderBuswayQuickConfig(design = state.project?.busbars?.smartBuswayDes
     document.getElementById('bw-safety').value = design.safetyFactor ?? 1.15;
     document.getElementById('bw-harmonic').value = design.harmonicFactor ?? 1;
     document.getElementById('bw-neutral').value = design.neutralMode || 'auto';
-    document.getElementById('bw-touchscreen').checked = Boolean(design.touchscreen);
+    document.getElementById('bw-terminal-small-screen').checked = Boolean(design.terminalSmallScreen);
+    document.getElementById('bw-monitor-screen-10').checked = Boolean(design.monitorScreen10Inch ?? design.touchscreen);
   }
   updateQuickProfileSummary();
+  state.buswayDraft = design ? structuredClone(design) : null;
+  refreshBuswayConfigurationPlan();
+}
+
+function smartBuswayRunCards(result, editable = false) {
+  return `<div class="smart-busway-path-grid">${result.runs.map(run => `<article class="${run.validationStatus}"><header><b>${htmlEscape(run.rowName)} ${run.path}路</b><span>${run.configurable ? `采用 ${run.selectedBuswayCurrentA}A${run.selectionMode === 'manual' ? ' · 人工' : ''}` : '超 800A'}</span></header><dl><div><dt>正常工况</dt><dd>${format(run.normalPowerKw)} kW</dd></div><div><dt>另一路失电</dt><dd>${format(run.failurePowerKw)} kW</dd></div><div><dt>计算电流</dt><dd>${format(run.currentA)} A</dd></div><div><dt>选型电流</dt><dd>${format(run.designCurrentA)} A</dd></div><div><dt>推荐档位</dt><dd>${run.recommendedBuswayCurrentA ? `${run.recommendedBuswayCurrentA} A` : '超800A'}</dd></div><div><dt>采用负载率</dt><dd>${run.selectedLoadRate === null ? '—' : `${format(run.selectedLoadRate * 100)}%`}</dd></div></dl>
+    ${editable ? `<div class="smart-busway-run-selectors"><label>母线槽<select data-bw-config-run-key="${run.key}" data-bw-config-run-field="buswayRatedCurrentA"${!run.configurable ? ' disabled' : ''}>${smartBuswayRatingOptions(run.selectedBuswayCurrentA)}</select></label><label class="checkbox-field"><input type="checkbox" data-bw-config-run-key="${run.key}" data-bw-config-run-field="terminalLinked"${run.terminalLinked ? ' checked' : ''}> 与母线槽同档联动</label><label>始端箱 <small>直接修改会自动取消联动</small><select data-bw-config-run-key="${run.key}" data-bw-config-run-field="terminalRatedCurrentA"${!run.configurable ? ' disabled' : ''}>${smartBuswayRatingOptions(run.selectedTerminalCurrentA)}</select></label><label class="checkbox-field"><input type="checkbox" data-bw-config-run-key="${run.key}" data-bw-config-run-field="terminalWithSwitch"${run.terminalWithSwitch ? ' checked' : ''}> 始端箱带开关</label></div>
+      <div class="smart-busway-run-actions"><button type="button" data-bw-config-run-action="apply-row" data-bw-config-run-key="${run.key}">应用到本排</button><button type="button" data-bw-config-run-action="apply-all" data-bw-config-run-key="${run.key}">应用到全部运行</button><button type="button" data-bw-config-run-action="reset" data-bw-config-run-key="${run.key}">恢复推荐</button></div>` : `<div class="smart-busway-run-adopted"><span>母线槽 <b>${run.selectedBuswayCurrentA || '—'}A</b></span><span>始端箱 <b>${run.selectedTerminalCurrentA || '—'}A · ${run.terminalWithSwitch ? '带开关' : '不带开关'}</b></span><span>${run.terminalLinked ? '同档联动' : '独立选型'}</span></div>`}
+    ${run.issues.length ? `<div class="smart-busway-run-issues">${run.issues.map(issue => `<p class="${issue.severity}">${htmlEscape(issue.message)}</p>`).join('')}</div>` : ''}</article>`).join('')}</div>`;
+}
+
+function strategyOutputOptions(strategy) {
+  const options = [...new Set((smartBuswayCatalog.plugBoxes || [])
+    .filter(item => item.phase === strategy.circuitPhase && Number(item.ratedCurrentA) === Number(strategy.selectedRatedCurrentA))
+    .map(item => Number(item.outputs)))];
+  if (!options.includes(Number(strategy.selectedOutputs))) options.push(Number(strategy.selectedOutputs));
+  return options.filter(Boolean).sort((a, b) => a - b);
+}
+
+function renderBuswayConfigurationPlan(result) {
+  const runHost = document.getElementById('smart-busway-config-runs');
+  const plugHost = document.getElementById('smart-busway-config-plugs');
+  if (runHost) runHost.innerHTML = `<div class="smart-busway-table-head"><div><h2>母线槽与始端箱</h2><p>按每排、每路独立推荐；采用值可在生成布局前调整。</p></div><button type="button" data-bw-config-run-action="reset-all">全部恢复推荐</button></div>${smartBuswayRunCards(result, true)}`;
+  if (plugHost) plugHost.innerHTML = `<div class="smart-busway-table-head"><div><h2>插接箱配置策略</h2><p>按机柜类型预定规格和组合路数；实际机柜归属将在布局中自动分配，并可继续微调。</p></div><b>${result.plugBoxStrategies.length} 项策略</b></div>
+    <div class="data-entry-table smart-busway-strategy-table"><table><thead><tr><th>范围</th><th>机柜类型</th><th>支路推荐</th><th>采用电流</th><th>输出路数</th><th>预计数量</th><th>备用</th><th>型号状态</th></tr></thead><tbody>${result.plugBoxStrategies.map(strategy => {
+      const ratings = strategy.circuitPhase === 'single' ? [32, 63] : [32, 40, 50, 63];
+      const profile = result.design.quickConfig?.rows?.[strategy.rowIndex]?.profiles?.[strategy.profileIndex] || {};
+      return `<tr class="${strategy.validationStatus}"><td><b>${htmlEscape(result.design.rows[strategy.rowIndex]?.name || '')}${strategy.path}路</b></td><td>${strategy.cabinetCount}柜 × ${format(strategy.powerKw)}kW<br><small>${profile.widthMm || 600}mm · ${strategy.circuitPhase === 'single' ? '单相' : '三相'}</small></td><td>${strategy.recommendedBreakerA || '超表列'}A<br><small>支路 ${format(strategy.branchCurrentA)}A</small></td><td><select data-bw-strategy-id="${strategy.id}" data-bw-strategy-field="selectedRatedCurrentA">${ratings.map(value => `<option value="${value}"${Number(strategy.selectedRatedCurrentA) === value ? ' selected' : ''}>${value}A</option>`).join('')}</select></td><td><select data-bw-strategy-id="${strategy.id}" data-bw-strategy-field="selectedOutputs">${strategyOutputOptions(strategy).map(value => `<option value="${value}"${Number(strategy.selectedOutputs) === value ? ' selected' : ''}>${value}路</option>`).join('')}</select></td><td><b>${strategy.plannedQuantity}</b> 个<br><small>按 ${strategy.selectedOutputs} 路组合</small></td><td><input data-bw-strategy-id="${strategy.id}" data-bw-strategy-field="spareQuantity" type="number" min="0" step="1" value="${strategy.spareQuantity || 0}" aria-label="备用插接箱数量"></td><td><code>${strategy.productCode || '型号待确认'}</code><br><small>${strategy.selectionMode === 'manual' ? '人工采用' : '自动推荐'}</small></td></tr>`;
+    }).join('')}</tbody></table></div>
+    <p class="smart-busway-config-note">不同功率机柜可在第二步重新合并；40A 三相 3 路等无正式编码组合会保留为“型号待确认”，不会虚构产品编码。</p>`;
+}
+
+function refreshBuswayConfigurationPlan() {
+  if (!document.getElementById('smart-busway-config-runs')) return null;
+  const prior = state.buswayDraft || state.project?.busbars?.smartBuswayDesign || {};
+  const input = quickBuswayInput();
+  input.runSelections = prior.runSelections || {};
+  input.plugBoxStrategies = prior.plugBoxStrategies || [];
+  const result = calculateSmartBuswayDesign(createSmartBuswayDesign(input));
+  state.buswayDraft = result.design;
+  renderBuswayConfigurationPlan(result);
+  return result;
 }
 
 function currentBuswayDesign() {
@@ -1013,7 +1064,8 @@ function calculateBuswayConfig({ goToResults = true } = {}) {
 }
 
 function generateBuswayConfig() {
-  state.project.busbars.smartBuswayDesign = createSmartBuswayDesign(quickBuswayInput());
+  const result = refreshBuswayConfigurationPlan();
+  state.project.busbars.smartBuswayDesign = result?.design || createSmartBuswayDesign(quickBuswayInput());
   calculateBuswayConfig({ goToResults: false });
   setBuswayStep(2);
 }
@@ -1192,9 +1244,9 @@ function smartBuswayGroupEditor(design, result) {
     .map(item => Number(item.outputs)))].sort((a, b) => a - b);
   if (!outputOptions.length) outputOptions.push(selected.selectedOutputs || Math.max(1, selected.memberIds.length));
   const groupLabel = group => `${design.rows[group.rowIndex]?.name || ''}${group.path} · ${group.selectedRatedCurrentA || '—'}A · ${group.memberIds.length}/${group.selectedOutputs}路`;
-  return `<div class="smart-busway-group-head"><div><h2>插接箱分组</h2><p>自动推荐后可调整。人工分组会在重新计算时保留。</p></div><button type="button" data-bw-group-action="reset-all">全部恢复推荐</button></div>
+  return `<div class="smart-busway-group-head"><div><h2>实际回路分配</h2><p>已按第一步的插接箱策略分配到具体机柜；这里可按现场位置继续拆分、合并或换柜。</p></div><button type="button" data-bw-group-action="reset-all">恢复方案分组</button></div>
     <div class="smart-busway-group-layout">
-      <div class="smart-busway-group-list">${groups.map(group => `<button type="button" data-bw-group-id="${htmlEscape(group.id)}" class="${group.id === selected.id ? 'active ' : ''}${group.validationStatus}"><b>${htmlEscape(groupLabel(group))}</b><span>${htmlEscape(group.memberNames.join('、') || '未分配机柜')}</span><small>${group.productCode || '型号待确认'}${group.selectionMode === 'manual' ? ' · 人工' : ' · 推荐'}</small></button>`).join('')}</div>
+      <div class="smart-busway-group-list">${groups.map(group => `<button type="button" data-bw-group-id="${htmlEscape(group.id)}" class="${group.id === selected.id ? 'active ' : ''}${group.validationStatus}"><b>${htmlEscape(groupLabel(group))}</b><span>${htmlEscape(group.memberNames.join('、') || '未分配机柜')}</span><small>${group.productCode || '型号待确认'}${group.selectionMode === 'manual' ? ' · 布局人工调整' : group.selectionMode === 'planned' ? ' · 方案配置' : ' · 自动补充'}</small></button>`).join('')}</div>
       <div class="smart-busway-group-detail">
         <div class="smart-busway-group-meta"><span>${row?.name || ''}${selected.path}路</span><b>${selected.circuitPhase === 'single' ? '单相' : '三相'}插接箱</b><em class="${selected.validationStatus}">${selected.validationStatus === 'ok' ? '校核正常' : '需要复核'}</em></div>
         <div class="platform-form-grid cols-3 compact">
@@ -1216,14 +1268,10 @@ function smartBuswayRatingOptions(selected) {
 function renderSmartBuswayResults(result) {
   const pathHost = document.getElementById('smart-busway-path-result');
   if (!pathHost) return;
-  pathHost.innerHTML = `<div class="smart-busway-path-actions"><button type="button" data-bw-run-action="reset-all">全部恢复推荐</button></div><div class="smart-busway-path-grid">${result.runs.map(run => `<article class="${run.validationStatus}"><header><b>${htmlEscape(run.rowName)} ${run.path}路</b><span>${run.configurable ? `采用 ${run.selectedBuswayCurrentA}A${run.selectionMode === 'manual' ? ' · 人工' : ''}` : '超 800A'}</span></header><dl><div><dt>正常工况</dt><dd>${format(run.normalPowerKw)} kW</dd></div><div><dt>另一路失电</dt><dd>${format(run.failurePowerKw)} kW</dd></div><div><dt>计算电流</dt><dd>${format(run.currentA)} A</dd></div><div><dt>选型电流</dt><dd>${format(run.designCurrentA)} A</dd></div><div><dt>推荐档位</dt><dd>${run.recommendedBuswayCurrentA ? `${run.recommendedBuswayCurrentA} A` : `超800A`}</dd></div><div><dt>采用负载率</dt><dd>${run.selectedLoadRate === null ? '—' : `${format(run.selectedLoadRate * 100)}%`}</dd></div></dl>
-      <div class="smart-busway-run-selectors"><label>母线槽<select data-bw-run-key="${run.key}" data-bw-run-field="buswayRatedCurrentA"${!run.configurable ? ' disabled' : ''}>${smartBuswayRatingOptions(run.selectedBuswayCurrentA)}</select></label><label class="checkbox-field"><input type="checkbox" data-bw-run-key="${run.key}" data-bw-run-field="terminalLinked"${run.terminalLinked ? ' checked' : ''}> 始端箱同档联动</label><label>始端箱<select data-bw-run-key="${run.key}" data-bw-run-field="terminalRatedCurrentA"${run.terminalLinked || !run.configurable ? ' disabled' : ''}>${smartBuswayRatingOptions(run.selectedTerminalCurrentA)}</select></label><label class="checkbox-field"><input type="checkbox" data-bw-run-key="${run.key}" data-bw-run-field="terminalWithSwitch"${run.terminalWithSwitch ? ' checked' : ''}> 始端箱带开关</label></div>
-      ${run.issues.length ? `<div class="smart-busway-run-issues">${run.issues.map(issue => `<p class="${issue.severity}">${htmlEscape(issue.message)}</p>`).join('')}</div>` : ''}
-      <div class="smart-busway-run-actions"><button type="button" data-bw-run-action="apply-row" data-bw-run-key="${run.key}">应用到本排</button><button type="button" data-bw-run-action="apply-all" data-bw-run-key="${run.key}">应用到全部运行</button><button type="button" data-bw-run-action="reset" data-bw-run-key="${run.key}">恢复推荐</button></div>
-    </article>`).join('')}</div>
+  pathHost.innerHTML = `<div class="smart-busway-table-head"><div><h2>运行校核</h2><p>此处只复核计算结果和已采用设备；选型修改请返回第一步“方案配置”。</p></div></div>${smartBuswayRunCards(result, false)}
     <div class="smart-busway-summary-strip"><span><b>${result.neutralRecommendation}</b> N线自动建议</span><span><b>${result.selectedNeutral}</b> 当前采用</span><span><b>${result.plugBoxGroups.length}</b> 插接箱</span><span><b>${format(result.accessories.buswayLengthM, 1)}m</b> 订货母线总长</span></div>`;
   const bomHost = document.getElementById('smart-busway-bom');
-  bomHost.innerHTML = result.bomBlocked ? `<div class="smart-busway-blocked"><b>BOM 已停止生成</b><p>至少一个独立运行的选型电流超过800A。计算结果保留，请分段设计或改用固定式母线。</p></div>` : `<div class="smart-busway-table-head"><div><h2>配置清单</h2><p>清单按人工采用值生成，不含价格。推荐值与采用值不一致时保留风险标记。</p></div><b>${result.bom.length} 项</b></div>${result.plugBoxBomBlocked ? '<div class="smart-busway-blocked"><b>插接箱清单暂未生成</b><p>存在重复、缺失或超出回路数的分组，请返回布局微调修正。</p></div>' : ''}<div class="data-entry-table smart-busway-bom-table"><table><thead><tr><th>分类</th><th>产品型号</th><th>说明</th><th>路径</th><th>推荐/采用</th><th>数量</th><th>单位</th></tr></thead><tbody>${result.bom.map(item => `<tr class="${item.status || ''}"><td>${htmlEscape(item.category)}</td><td><code>${htmlEscape(item.status === 'pending' ? '型号待确认' : item.code || '—')}</code></td><td>${htmlEscape(item.description)}</td><td>${htmlEscape(item.path || '—')}</td><td>${item.recommendedCurrentA ? `${item.recommendedCurrentA}A / ${item.selectedCurrentA}A` : '—'}${item.status === 'manual-risk' ? '<small>人工降档</small>' : item.selectionMode === 'manual' ? '<small>人工采用</small>' : ''}</td><td>${format(item.quantity, 2)}</td><td>${htmlEscape(item.unit)}</td></tr>`).join('')}</tbody></table></div>`;
+  bomHost.innerHTML = result.bomBlocked ? `<div class="smart-busway-blocked"><b>BOM 已停止生成</b><p>至少一个独立运行的选型电流超过800A。计算结果保留，请分段设计或改用固定式母线。</p></div>` : `<div class="smart-busway-table-head"><div><h2>配置清单</h2><p>清单按方案采用值和布局人工调整生成，不含价格；推荐值与采用值不一致时保留风险标记。</p></div><b>${result.bom.length} 项</b></div>${result.plugBoxBomBlocked ? '<div class="smart-busway-blocked"><b>插接箱清单暂未生成</b><p>存在重复、缺失或超出回路数的分组，请返回“布局与回路分配”修正。</p></div>' : ''}<div class="data-entry-table smart-busway-bom-table"><table><thead><tr><th>分类</th><th>产品型号</th><th>说明</th><th>路径</th><th>推荐/采用</th><th>数量</th><th>单位</th></tr></thead><tbody>${result.bom.map(item => `<tr class="${item.status || ''}"><td>${htmlEscape(item.category)}</td><td><code>${htmlEscape(item.status === 'pending' ? '型号待确认' : item.code || '—')}</code></td><td>${htmlEscape(item.description)}</td><td>${htmlEscape(item.path || '—')}</td><td>${item.recommendedCurrentA ? `${item.recommendedCurrentA}A / ${item.selectedCurrentA}A` : '—'}${item.status === 'manual-risk' ? '<small>人工降档</small>' : item.selectionMode === 'manual' ? '<small>人工采用</small>' : ''}</td><td>${format(item.quantity, 2)}</td><td>${htmlEscape(item.unit)}</td></tr>`).join('')}</tbody></table></div>`;
   document.getElementById('smart-busway-warnings').innerHTML = result.warnings.length ? `<div class="smart-busway-warning-list"><h2>需要关注 <span>${result.warnings.length}</span></h2>${result.warnings.map(warning => `<p>⚠ ${htmlEscape(warning)}</p>`).join('')}</div>` : '<div class="smart-busway-ok">当前计算未发现越界或型号缺口。</div>';
 }
 
@@ -1359,6 +1407,7 @@ function updateSmartBuswayRunSelection(target) {
   const current = design.runSelections[key] || {};
   current.mode = 'manual';
   current[field] = target.type === 'checkbox' ? target.checked : Number(target.value);
+  if (field === 'terminalRatedCurrentA') current.terminalLinked = false;
   if (field === 'buswayRatedCurrentA' && current.terminalLinked !== false) current.terminalRatedCurrentA = current.buswayRatedCurrentA;
   if (field === 'terminalLinked' && current.terminalLinked) current.terminalRatedCurrentA = current.buswayRatedCurrentA;
   design.runSelections[key] = current;
@@ -1378,6 +1427,46 @@ function handleSmartBuswayRunAction(action, key) {
     });
   }
   renderSmartBusway();
+}
+
+function updateBuswayConfigRunSelection(target) {
+  const key = target.dataset.bwConfigRunKey;
+  const field = target.dataset.bwConfigRunField;
+  if (!key || !field || !state.buswayDraft) return;
+  const current = state.buswayDraft.runSelections?.[key] || {};
+  current.mode = 'manual';
+  current[field] = target.type === 'checkbox' ? target.checked : Number(target.value);
+  if (field === 'terminalRatedCurrentA') current.terminalLinked = false;
+  if (field === 'buswayRatedCurrentA' && current.terminalLinked !== false) current.terminalRatedCurrentA = current.buswayRatedCurrentA;
+  if (field === 'terminalLinked' && current.terminalLinked) current.terminalRatedCurrentA = current.buswayRatedCurrentA;
+  state.buswayDraft.runSelections ||= {};
+  state.buswayDraft.runSelections[key] = current;
+  refreshBuswayConfigurationPlan();
+}
+
+function handleBuswayConfigRunAction(action, key) {
+  if (!state.buswayDraft) return;
+  state.buswayDraft.runSelections ||= {};
+  if (action === 'reset-all') state.buswayDraft.runSelections = {};
+  else if (action === 'reset') delete state.buswayDraft.runSelections[key];
+  else {
+    const source = state.buswayDraft.runSelections[key];
+    if (!source) return;
+    const [rowId] = key.split(':');
+    Object.keys(state.buswayDraft.runSelections).forEach(targetKey => {
+      if (action === 'apply-all' || targetKey.startsWith(`${rowId}:`)) state.buswayDraft.runSelections[targetKey] = { ...source, mode: 'manual' };
+    });
+  }
+  refreshBuswayConfigurationPlan();
+}
+
+function updateBuswayStrategy(target) {
+  if (!state.buswayDraft) return;
+  const strategy = (state.buswayDraft.plugBoxStrategies || []).find(item => item.id === target.dataset.bwStrategyId);
+  if (!strategy) return;
+  strategy.selectionMode = 'manual';
+  strategy[target.dataset.bwStrategyField] = Number(target.value);
+  refreshBuswayConfigurationPlan();
 }
 
 function exportSmartBuswayPng() {
@@ -1430,7 +1519,7 @@ function exportExcel() {
   const buswaySummaryRows = smartResult ? [
     ['智能母线设计', state.project.name], ['拓扑', smartResult.design.topology === 'dual' ? 'A/B双路' : 'A单路'], ['安装方式', smartResult.design.installation === 'cabinet-top' ? '柜顶安装' : '吊装'],
     ['冷通道(mm)', smartResult.design.aisleWidthMm], ['需要系数 Kd', smartResult.design.demandFactor], ['安全系数 Ks', smartResult.design.safetyFactor], ['谐波系数 Kh', smartResult.design.harmonicFactor],
-    ['N线自动建议', smartResult.neutralRecommendation], ['当前N线', smartResult.selectedNeutral], [],
+    ['N线自动建议', smartResult.neutralRecommendation], ['当前N线', smartResult.selectedNeutral], ['监控通信', '产品内置监控；始端箱上传动环；无需串口服务器'], ['始端箱小屏', smartResult.design.terminalSmallScreen ? '选配' : '不配置'], ['10寸监控屏', smartResult.design.monitorScreen10Inch ? `选配（${smartResult.accessories.monitorScreens10Inch}台）` : '不配置'], [],
     ['独立运行', '正常功率(kW)', '单路故障功率(kW)', '计算电流(A)', '选型电流(A)', '推荐母线(A)', '采用母线(A)', '推荐始端箱(A)', '采用始端箱(A)', '带开关', '采用负载率', '选择方式', '校核状态'],
     ...smartResult.runs.map(run => [`${run.rowName}${run.path}路`, run.normalPowerKw, run.failurePowerKw, run.currentA, run.designCurrentA, run.recommendedBuswayCurrentA || '超800', run.selectedBuswayCurrentA || '', run.recommendedTerminalCurrentA || '超800', run.selectedTerminalCurrentA || '', run.terminalWithSwitch ? '是' : '否', run.selectedLoadRate ?? '', run.selectionMode === 'manual' ? '人工采用' : '自动推荐', run.validationStatus === 'ok' ? '正常' : run.issues.map(item => item.message).join('；')])
   ] : [['智能母线设计', '尚未生成']];
@@ -1541,6 +1630,7 @@ function bindEvents() {
     if (profileAdd) {
       document.getElementById(`bw-r${profileAdd.dataset.bwProfileAdd}-profiles`).insertAdjacentHTML('beforeend', quickProfileMarkup({ quantity: 1, widthMm: 600, powerKw: 10, phase: 'auto', feed: 'AB' }));
       updateQuickProfileSummary();
+      refreshBuswayConfigurationPlan();
     }
     const profileCopy = event.target.closest('[data-bw-profile-copy]');
     if (profileCopy) {
@@ -1548,6 +1638,7 @@ function bindEvents() {
       const values = Object.fromEntries([...profile.querySelectorAll('[data-profile-field]')].map(input => [input.dataset.profileField, input.type === 'number' ? Number(input.value) : input.value]));
       profile.insertAdjacentHTML('afterend', quickProfileMarkup(values));
       updateQuickProfileSummary();
+      refreshBuswayConfigurationPlan();
     }
     const profileDelete = event.target.closest('[data-bw-profile-delete]');
     if (profileDelete) {
@@ -1555,6 +1646,7 @@ function bindEvents() {
       profileDelete.closest('[data-bw-profile]').remove();
       if (!list.children.length) list.insertAdjacentHTML('beforeend', quickProfileMarkup({ quantity: 0, widthMm: 600, powerKw: 10, phase: 'auto', feed: 'AB' }));
       updateQuickProfileSummary();
+      refreshBuswayConfigurationPlan();
     }
     const copyRow = event.target.closest('[data-bw-copy-row]');
     if (copyRow) {
@@ -1565,6 +1657,7 @@ function bindEvents() {
       document.getElementById(`bw-r${target}-ac300`).value = document.getElementById(`bw-r${source}-ac300`).value;
       document.getElementById(`bw-r${target}-ac600`).value = document.getElementById(`bw-r${source}-ac600`).value;
       updateQuickProfileSummary();
+      refreshBuswayConfigurationPlan();
     }
     const stepButton = event.target.closest('[data-bw-step]');
     if (stepButton) setBuswayStep(stepButton.dataset.bwStep);
@@ -1577,6 +1670,8 @@ function bindEvents() {
     if (groupAction) handlePlugBoxGroupAction(groupAction.dataset.bwGroupAction);
     const runAction = event.target.closest('[data-bw-run-action]');
     if (runAction) handleSmartBuswayRunAction(runAction.dataset.bwRunAction, runAction.dataset.bwRunKey);
+    const configRunAction = event.target.closest('[data-bw-config-run-action]');
+    if (configRunAction) handleBuswayConfigRunAction(configRunAction.dataset.bwConfigRunAction, configRunAction.dataset.bwConfigRunKey);
     const itemTarget = event.target.closest('[data-bw-item]');
     if (itemTarget) {
       const design = currentBuswayDesign();
@@ -1640,14 +1735,22 @@ function bindEvents() {
     if (event.target.matches('[data-bw-group-field]')) updatePlugBoxGroupField(event.target);
     if (event.target.matches('[data-bw-group-member]')) updatePlugBoxMember(event.target);
     if (event.target.matches('[data-bw-run-field]')) updateSmartBuswayRunSelection(event.target);
-    if (event.target.matches('[data-profile-field], #bw-r1-ac300, #bw-r1-ac600, #bw-r2-ac300, #bw-r2-ac600')) updateQuickProfileSummary();
+    if (event.target.matches('[data-bw-config-run-field]')) updateBuswayConfigRunSelection(event.target);
+    if (event.target.matches('[data-bw-strategy-field]')) updateBuswayStrategy(event.target);
+    if (event.target.matches('[data-profile-field], #bw-r1-ac300, #bw-r1-ac600, #bw-r2-ac300, #bw-r2-ac600, #bw-topology, #bw-aisle-width, #bw-installation, #bw-demand, #bw-safety, #bw-harmonic, #bw-neutral, #bw-terminal-small-screen, #bw-monitor-screen-10')) {
+      updateQuickProfileSummary();
+      refreshBuswayConfigurationPlan();
+    }
     if (event.target.id === 'bw-zoom') {
       state.buswayZoom = Number(event.target.value);
       renderSmartBusway();
     }
   });
   buswayPanel.addEventListener('input', event => {
-    if (event.target.matches('[data-profile-field], #bw-r1-ac300, #bw-r1-ac600, #bw-r2-ac300, #bw-r2-ac600')) updateQuickProfileSummary();
+    if (event.target.matches('[data-profile-field], #bw-r1-ac300, #bw-r1-ac600, #bw-r2-ac300, #bw-r2-ac600, #bw-aisle-width, #bw-demand, #bw-safety, #bw-harmonic')) {
+      updateQuickProfileSummary();
+      refreshBuswayConfigurationPlan();
+    }
   });
   document.getElementById('bw-zoom-in').addEventListener('click', () => { state.buswayZoom = Math.min(1.8, state.buswayZoom + 0.1); renderSmartBusway(); });
   document.getElementById('bw-zoom-out').addEventListener('click', () => { state.buswayZoom = Math.max(0.7, state.buswayZoom - 0.1); renderSmartBusway(); });

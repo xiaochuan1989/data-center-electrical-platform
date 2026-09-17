@@ -273,6 +273,19 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .busway-cooling-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .busway-profile-summary { display: block; margin-top: 10px; color: #315c82; font-size: 11px; font-weight: 700; }
 .smart-busway-basics { margin-top: 18px; }
+.smart-busway-monitor-note { display: flex; gap: 12px; align-items: flex-start; margin-top: 10px; padding: 10px 12px; border-left: 3px solid #2a8b72; color: #607789; background: #f0faf7; font-size: 10px; line-height: 1.55; }
+.smart-busway-monitor-note b { flex: none; color: #21715f; }
+.smart-busway-config-section { margin-top: 22px; padding-top: 4px; border-top: 1px solid #e1eaf1; }
+.smart-busway-config-section .smart-busway-path-grid { margin-top: 4px; }
+.smart-busway-strategy-table { margin-top: 4px; }
+.smart-busway-strategy-table table { min-width: 1040px; }
+.smart-busway-strategy-table td { min-width: 90px; }
+.smart-busway-strategy-table td:first-child { min-width: 105px; }
+.smart-busway-strategy-table select, .smart-busway-strategy-table input { width: 100%; min-width: 78px; min-height: 34px; box-sizing: border-box; }
+.smart-busway-strategy-table tr.warning { background: #fff9e9; }
+.smart-busway-strategy-table tr.danger { background: #fff0f0; }
+.smart-busway-strategy-table code { color: #245b87; font-size: 10px; white-space: nowrap; }
+.smart-busway-config-note { margin: 10px 2px 0; color: #73879a; font-size: 10px; line-height: 1.6; }
 .smart-busway-actions { display: flex; gap: 14px; align-items: center; justify-content: flex-end; margin-top: 18px; }
 .smart-busway-actions span { margin-right: auto; color: #748597; font-size: 11px; }
 .smart-busway-actions button { min-height: 40px; }
@@ -386,9 +399,12 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .smart-busway-group-issues p.ok { color: #176541; background: #e7f7ef; }
 .smart-busway-run-selectors { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 12px; padding: 12px 14px; border-top: 1px solid #e3ebf2; }
 .smart-busway-run-selectors label { display: flex; flex-direction: column; gap: 4px; color: #6c8092; font-size: 10px; }
+.smart-busway-run-selectors label > small { color: #8a9aaa; font-size: 9px; font-weight: 400; }
 .smart-busway-run-selectors .checkbox-field { flex-direction: row; align-items: center; }
 .smart-busway-run-selectors select { min-height: 34px; }
 .smart-busway-run-actions { padding: 0 14px 13px; }
+.smart-busway-run-adopted { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 11px 14px; border-top: 1px solid #e3ebf2; color: #708397; background: #f9fbfd; font-size: 10px; }
+.smart-busway-run-adopted b { color: #244f75; }
 .smart-busway-run-issues { padding: 0 14px 8px; }
 .smart-busway-path-actions { justify-content: flex-end; margin-bottom: 9px; }
 .smart-busway-path-grid { display: grid; grid-template-columns: repeat(2, minmax(280px, 1fr)); gap: 14px; }

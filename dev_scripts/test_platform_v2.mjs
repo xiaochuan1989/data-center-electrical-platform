@@ -95,18 +95,21 @@ assert.match(calculateLithiumBatteryA00({ ...lithiumA00, groupCount: '' }).error
 const smartBusway = calculateSmartBusway({
   row1: { cabinets600: 10, cabinets800: 0, ac300: 0, ac600: 2 },
   row2: { cabinets600: 10, cabinets800: 0, ac300: 0, ac600: 2 },
-  installation: 'cabinet-top', touchscreen: true
+  installation: 'cabinet-top', terminalSmallScreen: true, monitorScreen10Inch: true
 });
 assert.equal(smartBusway.row1LengthM, 8);
 assert.equal(smartBusway.buswayLengthM, 32);
 assert.equal(smartBusway.startBoxes, 4);
-assert.equal(smartBusway.touchscreen, 1);
+assert.equal(smartBusway.terminalSmallScreens, 4);
+assert.equal(smartBusway.monitorScreens10Inch, 1);
+assert.equal('serialServer' in smartBusway, false);
 
 const smartDesign = createSmartBuswayDesign({
   row1: { cabinets600: 2, cabinets800: 1, ac300: 1, ac600: 0 },
   row2: { cabinets600: 1, cabinets800: 0, ac300: 0, ac600: 1 },
   defaultPowerKw: 10,
-  touchscreen: false
+  terminalSmallScreen: false,
+  monitorScreen10Inch: false
 });
 assert.equal(smartDesign.rows[0].items.filter(item => item.kind === 'rack').length, 3);
 assert.equal(smartDesign.rows[0].items[2].kind, 'ac');
@@ -129,9 +132,22 @@ assert.equal(smartResult.design.rows[0].orderLengthM, 3);
 assert.equal(smartResult.accessories.startBoxes, 4);
 assert.equal(smartResult.neutralRecommendation, '100% N');
 assert.ok(smartResult.bom.some(item => item.code === 'IPL-160-T2-1'));
-assert.equal(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').length, 4);
-assert.deepEqual(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').map(item => item.path).sort(), ['第1排A路', '第1排B路', '第2排A路', '第2排B路']);
+assert.equal(smartResult.bom.filter(item => item.code === 'IPL-160-T2-1').length, 1);
+assert.equal(smartResult.bom.find(item => item.code === 'IPL-160-T2-1').quantity, 10);
+assert.deepEqual(smartResult.bom.find(item => item.code === 'IPL-160-T2-1').paths.sort(), ['第1排A路', '第1排B路', '第2排A路', '第2排B路']);
+assert.equal(smartResult.bom.find(item => item.code === 'IPL-TB160').quantity, 4);
 assert.ok(smartResult.bom.every(item => !('price' in item)));
+assert.ok(!smartResult.bom.some(item => item.description.includes('串口服务器')));
+assert.ok(smartResult.bom.some(item => item.category === '始端箱' && item.description.includes('内置防凝露与监控上传')));
+
+const monitoringOptionResult = calculateSmartBuswayDesign(createSmartBuswayDesign({
+  row1: { cabinets600: 1 }, row2: { cabinets600: 1 },
+  terminalSmallScreen: true, monitorScreen10Inch: true
+}));
+assert.equal(monitoringOptionResult.accessories.terminalSmallScreens, 4);
+assert.equal(monitoringOptionResult.accessories.monitorScreens10Inch, 1);
+assert.equal(monitoringOptionResult.bom.find(item => item.description === '始端箱小屏（选配）').quantity, 4);
+assert.equal(monitoringOptionResult.bom.find(item => item.description.startsWith('10寸监控屏')).quantity, 1);
 
 const boundaryDesign = createSmartBuswayDesign({ row1: {}, row2: {}, defaultPowerKw: 1 });
 boundaryDesign.rows[0].items = [{ id: 'edge', kind: 'rack', name: '边界机柜', widthMm: 600, powerKw: 600, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'AB' }];
@@ -157,13 +173,50 @@ const mixedProfiles = createSmartBuswayDesign({
   ] },
   row2: {}
 });
-assert.equal(mixedProfiles.version, 2);
+assert.equal(mixedProfiles.version, 3);
 assert.deepEqual(mixedProfiles.rows[0].items.filter(item => item.kind === 'rack').map(item => item.powerKw), [5, 5, 10, 20]);
 assert.equal(mixedProfiles.rows[0].items.filter(item => item.kind === 'rack')[2].widthMm, 800);
 const mixedResult = calculateSmartBuswayDesign(mixedProfiles);
 assert.equal(mixedResult.runs.length, 2);
 assert.equal(mixedResult.runs.find(run => run.path === 'A').failurePowerKw, 20);
 assert.equal(mixedResult.runs.find(run => run.path === 'B').failurePowerKw, 30);
+
+const plannedDesign = createSmartBuswayDesign({
+  row1: { profiles: [{ id: 'profile-plan', quantity: 5, widthMm: 600, powerKw: 10, phase: 'three', feed: 'AB' }] },
+  row2: {}
+});
+let plannedResult = calculateSmartBuswayDesign(plannedDesign);
+assert.equal(plannedResult.plugBoxStrategies.length, 2);
+assert.ok(plannedResult.plugBoxStrategies.every(strategy => strategy.selectedRatedCurrentA === 32 && strategy.selectedOutputs === 3));
+assert.deepEqual(plannedResult.plugBoxGroups.map(group => group.memberIds.length), [3, 2, 3, 2]);
+const plannedA = plannedResult.design.plugBoxStrategies.find(strategy => strategy.path === 'A');
+plannedA.selectionMode = 'manual';
+plannedA.selectedRatedCurrentA = 40;
+plannedA.selectedOutputs = 2;
+plannedA.spareQuantity = 1;
+plannedResult = calculateSmartBuswayDesign(plannedResult.design);
+assert.deepEqual(plannedResult.plugBoxGroups.filter(group => group.path === 'A').map(group => group.memberIds.length), [2, 2, 1]);
+assert.equal(plannedResult.design.plugBoxStrategies.find(strategy => strategy.path === 'A').plannedQuantity, 3);
+assert.ok(plannedResult.bom.some(item => item.code === 'IPL-DB-40T-2' && item.quantity === 4));
+
+const pendingPlan = createSmartBuswayDesign({
+  row1: { profiles: [{ id: 'profile-pending', quantity: 3, widthMm: 600, powerKw: 20, phase: 'three', feed: 'A' }] },
+  row2: {}, topology: 'single'
+});
+let pendingPlanResult = calculateSmartBuswayDesign(pendingPlan);
+pendingPlanResult.design.plugBoxStrategies[0].selectionMode = 'manual';
+pendingPlanResult.design.plugBoxStrategies[0].selectedRatedCurrentA = 40;
+pendingPlanResult.design.plugBoxStrategies[0].selectedOutputs = 3;
+pendingPlanResult = calculateSmartBuswayDesign(pendingPlanResult.design);
+assert.equal(pendingPlanResult.plugBoxGroups[0].selectedOutputs, 3);
+assert.equal(pendingPlanResult.plugBoxGroups[0].modelStatus, 'pending');
+assert.equal(pendingPlanResult.plugBoxGroups[0].productCode, '');
+
+const singlePlan = calculateSmartBuswayDesign(createSmartBuswayDesign({
+  row1: { profiles: [{ id: 'profile-single', quantity: 3, widthMm: 600, powerKw: 5, phase: 'single', feed: 'AB' }] }, row2: {}
+}));
+assert.ok(singlePlan.plugBoxStrategies.every(strategy => strategy.circuitPhase === 'single'));
+assert.ok(singlePlan.plugBoxGroups.every(group => group.productCode === 'IPL-DB-32S-3'));
 
 const groupingDesign = createSmartBuswayDesign({ row1: {}, row2: {} });
 groupingDesign.rows[0].items = [1, 2, 3].map(index => ({ id: `g32-${index}`, kind: 'rack', name: `32A柜${index}`, widthMm: 600, powerKw: 10, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'A' }));
@@ -179,6 +232,19 @@ const partialManualResult = calculateSmartBuswayDesign(partialManualDesign);
 assert.equal(partialManualResult.plugBoxGroups.length, 2);
 assert.deepEqual(partialManualResult.plugBoxGroups.flatMap(group => group.memberIds).sort(), groupingDesign.rows[0].items.map(item => item.id).sort());
 assert.equal(partialManualResult.plugBoxGroups.find(group => group.selectionMode === 'manual').memberIds.length, 1);
+
+const singlePhaseMergeDesign = createSmartBuswayDesign({
+  row1: { profiles: [{ quantity: 3, widthMm: 600, powerKw: 10, phase: 'single', feed: 'AB' }] },
+  row2: { profiles: [{ quantity: 3, widthMm: 600, powerKw: 10, phase: 'single', feed: 'AB' }] }
+});
+let singlePhaseMergeResult = calculateSmartBuswayDesign(singlePhaseMergeDesign);
+singlePhaseMergeResult.design.plugBoxGroups[0].selectionMode = 'manual';
+singlePhaseMergeResult = calculateSmartBuswayDesign(singlePhaseMergeResult.design);
+const mergedSinglePlug = singlePhaseMergeResult.bom.filter(item => item.code === 'IPL-DB-63S-3');
+assert.equal(mergedSinglePlug.length, 1);
+assert.equal(mergedSinglePlug[0].quantity, 4);
+assert.equal(mergedSinglePlug[0].paths.length, 4);
+assert.equal(mergedSinglePlug[0].selectionMode, 'manual');
 
 groupingDesign.rows[0].items = [1, 2, 3].map(index => ({ id: `g40-${index}`, kind: 'rack', name: `40A柜${index}`, widthMm: 600, powerKw: 20, phase: 'three', powerFactor: 0.95, safetyFactor: 1.25, feed: 'A' }));
 groupingDesign.plugBoxGroups = [];
@@ -446,7 +512,7 @@ assert.ok(smartCatalog.plugBoxes.some(item => item.ratedCurrentA === 40 && item.
 assert.doesNotMatch(JSON.stringify(smartCatalog), /价格|price/i);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.7\.0"/);
+assert.match(index, /const APP_VERSION = "v2\.8\.0"/);
 assert.match(index, /数据中心电气设计与选型平台/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
@@ -463,6 +529,9 @@ assert.match(appShell, /DIN同规格反校（推荐）/);
 assert.match(appShell, /自然对流关联式（独立估算）/);
 assert.match(appShell, /id="busbar-ampacity-view-factor"/);
 assert.match(appShell, /id="busbar-ampacity-surface-factor"/);
+assert.match(appShell, /始端箱 <small>直接修改会自动取消联动<\/small>/);
+assert.match(appShell, /if \(field === 'terminalRatedCurrentA'\) current\.terminalLinked = false/);
+assert.doesNotMatch(appShell, /run\.terminalLinked \|\| !run\.configurable \? ' disabled'/);
 assert.match(appShell, /35 \+ 70 = 105℃/);
 assert.match(appShell, /50K 温升修正（通风 × 1\.3）/);
 assert.match(appShell, /30K 温升基准（DIN 原值）/);
@@ -475,6 +544,15 @@ assert.match(appShell, /GB\/T 24276-2025/);
 assert.match(appShell, /navButton\('cable', '电缆选型'/);
 assert.match(appShell, /navButton\('busway', '智能母线'/);
 assert.match(appShell, /智能母线设计/);
+assert.match(appShell, /方案配置<small>设备选型与策略<\/small>/);
+assert.match(appShell, /布局与回路分配<small>逐柜落位与微调<\/small>/);
+assert.match(appShell, /校核与清单<small>风险、附件与导出<\/small>/);
+assert.match(appShell, /id="smart-busway-config-runs"/);
+assert.match(appShell, /id="smart-busway-config-plugs"/);
+assert.match(appShell, /data-bw-strategy-field="selectedRatedCurrentA"/);
+assert.match(appShell, /id="bw-terminal-small-screen"/);
+assert.match(appShell, /id="bw-monitor-screen-10"/);
+assert.match(appShell, /无需配置显示屏或串口服务器与动环通信/);
 assert.doesNotMatch(appShell, /conductor-catalog/);
 assert.match(appShell, /电缆修正系数数据表/);
 assert.match(appShell, /电缆数据库/);

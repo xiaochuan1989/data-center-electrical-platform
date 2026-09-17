@@ -307,7 +307,7 @@ export function createSmartBuswayDesign(input = {}) {
     ac600: Math.max(0, Math.floor(number(row?.ac600)))
   }));
   return {
-    version: 2,
+    version: 3,
     topology: input.topology === 'single' ? 'single' : 'dual',
     installation: input.installation === 'ceiling' ? 'ceiling' : 'cabinet-top',
     aisleWidthMm: Math.max(600, number(input.aisleWidthMm, 1200)),
@@ -317,10 +317,12 @@ export function createSmartBuswayDesign(input = {}) {
     safetyFactor: Math.max(1, number(input.safetyFactor, 1.15)),
     harmonicFactor: Math.max(0.01, number(input.harmonicFactor, 1)),
     neutralMode: input.neutralMode === '100' || input.neutralMode === '200' ? input.neutralMode : 'auto',
-    touchscreen: Boolean(input.touchscreen),
+    terminalSmallScreen: Boolean(input.terminalSmallScreen),
+    monitorScreen10Inch: Boolean(input.monitorScreen10Inch ?? input.touchscreen),
     quickConfig: { rows: quickRows },
     rows: [makeLayoutRow(quickRows[0], 0, defaults), makeLayoutRow(quickRows[1], 1, defaults)],
-    runSelections: {},
+    runSelections: structuredClone(input.runSelections || {}),
+    plugBoxStrategies: structuredClone(input.plugBoxStrategies || []),
     plugBoxGroups: [],
     selectedItemId: null,
     selectedPlugBoxId: null,
@@ -375,6 +377,88 @@ function resolvePlugProduct(phase, ratedCurrentA, usedOutputs, requestedOutputs 
 
 function groupSignature(rowId, path, memberIds) {
   return `${rowId}:${path}:${memberIds.join(',')}`;
+}
+
+function normalizePlugBoxStrategies(design, pathNames) {
+  const existing = new Map((Array.isArray(design.plugBoxStrategies) ? design.plugBoxStrategies : [])
+    .map(item => [`${item.rowId}:${item.profileId}:${item.path}`, item]));
+  const strategies = [];
+  design.rows.forEach((row, rowIndex) => {
+    const quickProfiles = design.quickConfig?.rows?.[rowIndex]?.profiles || [];
+    quickProfiles.forEach((profile, profileIndex) => {
+      const phase = profile.phase === 'single' || (profile.phase === 'auto' && number(profile.powerKw) < 8) ? 'single' : 'three';
+      const branch = calculateSmartBuswayBranch({
+        powerKw: profile.powerKw,
+        phase,
+        powerFactor: design.powerFactor,
+        safetyFactor: 1.25
+      });
+      const recommendedRatedCurrentA = recommendedPlugRating(phase, branch.breakerA);
+      const recommendedCapacity = Math.min(Math.max(1, number(profile.quantity, 1)), maximumPlugOutputs(phase, recommendedRatedCurrentA || 999));
+      const recommendedProduct = resolvePlugProduct(phase, recommendedRatedCurrentA, recommendedCapacity);
+      pathNames.filter(path => profile.feed === 'AB' || profile.feed === path).forEach(path => {
+        const key = `${row.id}:${profile.id}:${path}`;
+        const prior = existing.get(key) || {};
+        const selectionMode = prior.selectionMode === 'manual' ? 'manual' : 'auto';
+        const selectedRatedCurrentA = selectionMode === 'manual' && number(prior.selectedRatedCurrentA)
+          ? number(prior.selectedRatedCurrentA) : recommendedRatedCurrentA;
+        const maximumOutputs = maximumPlugOutputs(phase, selectedRatedCurrentA || 999);
+        const requestedOutputs = selectionMode === 'manual' ? Math.max(1, Math.floor(number(prior.selectedOutputs, recommendedProduct.outputs))) : recommendedProduct.outputs;
+        const selectedOutputs = Math.min(maximumOutputs, requestedOutputs);
+        const selectedProduct = resolvePlugProduct(phase, selectedRatedCurrentA, 1, selectedOutputs);
+        strategies.push({
+          id: prior.id || `strategy-${row.id}-${profile.id}-${path}`,
+          rowId: row.id, rowIndex, profileId: profile.id, profileIndex, path, circuitPhase: phase,
+          cabinetCount: profile.quantity, powerKw: profile.powerKw, branchCurrentA: branch.designCurrentA,
+          recommendedBreakerA: branch.breakerA, recommendedRatedCurrentA,
+          recommendedOutputs: recommendedProduct.outputs, recommendedProductCode: recommendedProduct.code,
+          selectedRatedCurrentA, selectedOutputs: selectedProduct.outputs, productCode: selectedProduct.code,
+          modelStatus: selectedProduct.modelStatus, selectionMode,
+          spareQuantity: Math.max(0, Math.floor(number(prior.spareQuantity))),
+          plannedQuantity: Math.ceil(Math.max(0, number(profile.quantity)) / Math.max(1, selectedProduct.outputs)),
+          validationStatus: !selectedRatedCurrentA || selectedRatedCurrentA < branch.designCurrentA ? 'danger' : selectedProduct.code ? 'ok' : 'warning'
+        });
+      });
+    });
+  });
+  return strategies;
+}
+
+function groupsFromStrategies(design, strategies, excludedMemberships = new Set()) {
+  const groups = [];
+  let phaseCursor = 0;
+  strategies.forEach(strategy => {
+    const row = design.rows[strategy.rowIndex];
+    if (!row) return;
+    const racks = row.items.filter(item => item.kind === 'rack'
+      && item.profileId === strategy.profileId
+      && (item.feed === 'AB' || item.feed === strategy.path)
+      && !excludedMemberships.has(`${row.id}:${strategy.path}:${item.id}`));
+    const chunkSize = Math.max(1, number(strategy.selectedOutputs, 1));
+    for (let cursor = 0; cursor < racks.length; cursor += chunkSize) {
+      const members = racks.slice(cursor, cursor + chunkSize);
+      const memberIds = members.map(item => item.id);
+      const phases = strategy.circuitPhase === 'single'
+        ? members.map(() => ['L1', 'L2', 'L3'][phaseCursor++ % 3])
+        : members.map(() => 'L1/L2/L3');
+      groups.push({
+        id: `plug-${groupSignature(row.id, strategy.path, memberIds)}`,
+        rowId: row.id, rowIndex: strategy.rowIndex, path: strategy.path,
+        circuitPhase: strategy.circuitPhase, phase: strategy.circuitPhase === 'single' ? phases.join('/') : 'L1/L2/L3',
+        circuitPhases: phases, memberIds, memberNames: members.map(item => item.name),
+        currentA: members.length ? Math.max(...members.map(item => item.branch.designCurrentA)) : 0,
+        recommendedRatedCurrentA: strategy.recommendedRatedCurrentA,
+        selectedRatedCurrentA: strategy.selectedRatedCurrentA,
+        recommendedOutputs: strategy.recommendedOutputs,
+        selectedOutputs: strategy.selectedOutputs,
+        recommendedProductCode: strategy.recommendedProductCode,
+        productCode: strategy.productCode, modelStatus: strategy.modelStatus,
+        selectionMode: 'planned', strategySelectionMode: strategy.selectionMode,
+        sourceStrategyId: strategy.id, validationStatus: 'ok', issues: []
+      });
+    }
+  });
+  return groups;
 }
 
 /** Generate recommendation groups without overwriting persisted manual groups. */
@@ -436,10 +520,12 @@ function mergePlugBoxGroups(design, pathNames) {
   manual.forEach(group => (group.memberIds || []).forEach(id => {
     if (racksById.has(id)) claimed.add(`${group.rowId}:${group.path}:${id}`);
   }));
+  const planned = groupsFromStrategies(design, design.plugBoxStrategies || [], claimed);
+  planned.forEach(group => (group.memberIds || []).forEach(id => claimed.add(`${group.rowId}:${group.path}:${id}`)));
   // Rebuild recommendations from the remaining cabinets. Filtering whole
   // precomputed groups would orphan the unselected members of a manual split.
   const auto = recommendSmartBuswayGroups(design.rows, pathNames, claimed);
-  return [...manual, ...auto];
+  return [...manual, ...planned, ...auto];
 }
 
 /** Validate and enrich persisted plug-box groups against current cabinet data. */
@@ -466,9 +552,10 @@ export function validateSmartBuswayGroups(design, groups, pathNames) {
     });
     const recommendedBreakerA = members.length ? Math.max(...members.map(item => item.branch?.breakerA || 0)) || null : null;
     const recommendedRatedCurrentA = recommendedPlugRating(phase, recommendedBreakerA);
-    const selectedRatedCurrentA = group.selectionMode === 'manual' ? (number(group.selectedRatedCurrentA) || recommendedRatedCurrentA) : recommendedRatedCurrentA;
+    const hasAdoptedSelection = group.selectionMode === 'manual' || group.selectionMode === 'planned';
+    const selectedRatedCurrentA = hasAdoptedSelection ? (number(group.selectedRatedCurrentA) || recommendedRatedCurrentA) : recommendedRatedCurrentA;
     const automatic = resolvePlugProduct(phase, recommendedRatedCurrentA, Math.max(1, members.length));
-    const requestedOutputs = group.selectionMode === 'manual' ? Math.max(1, Math.floor(number(group.selectedOutputs, automatic.outputs))) : automatic.outputs;
+    const requestedOutputs = hasAdoptedSelection ? Math.max(1, Math.floor(number(group.selectedOutputs, automatic.outputs))) : automatic.outputs;
     const selectedProduct = resolvePlugProduct(phase, selectedRatedCurrentA, Math.max(1, members.length), requestedOutputs);
     const maximumOutputs = maximumPlugOutputs(phase, selectedRatedCurrentA || 999);
     if (requestedOutputs > maximumOutputs) groupIssues.push({ severity: 'error', message: `${selectedRatedCurrentA || '未选'}A ${phase === 'single' ? '单相' : '三相'}插接箱最多支持 ${maximumOutputs} 路` });
@@ -500,18 +587,29 @@ export function validateSmartBuswayGroups(design, groups, pathNames) {
 
 function addBom(map, key, item) {
   const current = map.get(key);
-  if (current) current.quantity += item.quantity;
-  else map.set(key, { ...item });
+  if (!current) {
+    map.set(key, { ...item, paths: item.path ? [item.path] : [] });
+    return;
+  }
+  current.quantity += item.quantity;
+  if (item.path && !current.paths.includes(item.path)) current.paths.push(item.path);
+  current.path = current.paths.join('、');
+  if (item.selectionMode === 'manual') current.selectionMode = 'manual';
+  const statusPriority = { ok: 0, confirmed: 0, manual: 1, warning: 2, pending: 3, 'manual-risk': 4, error: 5 };
+  if ((statusPriority[item.status] ?? 0) > (statusPriority[current.status] ?? 0)) current.status = item.status;
 }
 
 /** @returns {{design:SmartBuswayDesign,paths:SmartBuswayPathResult[],plugBoxGroups:PlugBoxGroup[],bom:SmartBuswayBomItem[],warnings:string[]}} */
 export function calculateSmartBuswayDesign(rawDesign = {}) {
   const design = structuredClone(rawDesign?.rows ? rawDesign : createSmartBuswayDesign(rawDesign));
-  design.version = 2;
+  design.version = 3;
   design.topology = design.topology === 'single' ? 'single' : 'dual';
   design.rows = Array.isArray(design.rows) ? design.rows.slice(0, 2) : [];
   while (design.rows.length < 2) design.rows.push({ id: `row-${design.rows.length + 1}`, name: `第${design.rows.length + 1}排`, items: [] });
   design.runSelections = design.runSelections && typeof design.runSelections === 'object' ? design.runSelections : {};
+  design.terminalSmallScreen = Boolean(design.terminalSmallScreen);
+  design.monitorScreen10Inch = Boolean(design.monitorScreen10Inch ?? design.touchscreen);
+  design.plugBoxStrategies = Array.isArray(design.plugBoxStrategies) ? design.plugBoxStrategies : [];
   design.plugBoxGroups = Array.isArray(design.plugBoxGroups) ? design.plugBoxGroups : [];
   const issues = [];
   let rackCount = 0;
@@ -538,6 +636,7 @@ export function calculateSmartBuswayDesign(rawDesign = {}) {
   if (!rackCount) issues.push({ severity: 'warning', message: '当前布局中没有 IT 机柜' });
 
   const pathNames = design.topology === 'single' ? ['A'] : ['A', 'B'];
+  design.plugBoxStrategies = normalizePlugBoxStrategies(design, pathNames);
   const calculatePath = (racks, path) => {
     const normalPowerKw = racks.reduce((sum, item) => sum + (item.feed === path ? number(item.powerKw) : item.feed === 'AB' ? number(item.powerKw) / 2 : 0), 0);
     const failurePowerKw = racks.reduce((sum, item) => sum + (item.feed === path || item.feed === 'AB' ? number(item.powerKw) : 0), 0);
@@ -609,7 +708,9 @@ export function calculateSmartBuswayDesign(rawDesign = {}) {
   const accessories = {
     startBoxes, endCovers: startBoxes, buswayLengthM, connectors, dustCovers: Math.ceil(buswayLengthM * 0.7), fixingPieces,
     supports: design.installation === 'cabinet-top' ? Math.ceil(fixingPieces / 2) + startBoxes : 0,
-    touchscreen: design.touchscreen ? 1 : 0, serialServer: design.touchscreen ? 0 : 1
+    builtInMonitoring: true, antiCondensation: true,
+    terminalSmallScreens: design.terminalSmallScreen ? startBoxes : 0,
+    monitorScreens10Inch: design.monitorScreen10Inch ? Math.ceil(startBoxes / 4) : 0
   };
   const neutralRecommendation = number(design.harmonicFactor, 1) < 1 ? '200% N' : '100% N';
   const selectedNeutral = design.neutralMode === '100' ? '100% N' : design.neutralMode === '200' ? '200% N' : neutralRecommendation;
@@ -625,21 +726,31 @@ export function calculateSmartBuswayDesign(rawDesign = {}) {
         : run.selectionMode === 'manual' && run.selectedBuswayCurrentA !== run.recommendedBuswayCurrentA ? 'manual' : 'ok';
       const terminalStatus = run.selectedTerminalCurrentA < run.designCurrentA ? 'manual-risk'
         : run.selectionMode === 'manual' && (run.selectedTerminalCurrentA !== run.recommendedTerminalCurrentA || run.terminalWithSwitch || !run.terminalLinked) ? 'manual' : 'ok';
-      addBom(bomMap, `bus-${run.key}-${run.selectedBuswayCurrentA}`, { category: '母线槽', code: run.buswayCode, description: `${run.selectedBuswayCurrentA}A 智能母线槽`, quantity: row.orderLengthM, unit: 'm', path: `${row.name}${run.path}路`, status: buswayStatus, selectionMode: run.selectionMode, recommendedCurrentA: run.recommendedBuswayCurrentA, selectedCurrentA: run.selectedBuswayCurrentA });
-      addBom(bomMap, `terminal-${run.key}-${run.selectedTerminalCurrentA}-${run.terminalWithSwitch}`, { category: '始端箱', code: run.terminalCode, description: `${run.selectedTerminalCurrentA}A 始端箱${run.terminalWithSwitch ? '（带开关）' : '（不带开关）'}`, quantity: 1, unit: '个', path: `${row.name}${run.path}路`, status: terminalStatus, selectionMode: run.selectionMode, recommendedCurrentA: run.recommendedTerminalCurrentA, selectedCurrentA: run.selectedTerminalCurrentA });
+      addBom(bomMap, `bus-${run.buswayCode}-${run.recommendedBuswayCurrentA}-${run.selectedBuswayCurrentA}`, { category: '母线槽', code: run.buswayCode, description: `${run.selectedBuswayCurrentA}A 智能母线槽`, quantity: row.orderLengthM, unit: 'm', path: `${row.name}${run.path}路`, status: buswayStatus, selectionMode: run.selectionMode, recommendedCurrentA: run.recommendedBuswayCurrentA, selectedCurrentA: run.selectedBuswayCurrentA });
+      addBom(bomMap, `terminal-${run.terminalCode}-${run.recommendedTerminalCurrentA}-${run.selectedTerminalCurrentA}-${run.terminalWithSwitch}`, { category: '始端箱', code: run.terminalCode, description: `${run.selectedTerminalCurrentA}A 始端箱${run.terminalWithSwitch ? '（带开关）' : '（不带开关）'} · 内置防凝露与监控上传`, quantity: 1, unit: '个', path: `${row.name}${run.path}路`, status: terminalStatus, selectionMode: run.selectionMode, recommendedCurrentA: run.recommendedTerminalCurrentA, selectedCurrentA: run.selectedTerminalCurrentA });
     });
-    if (!plugBoxBomBlocked) plugBoxGroups.forEach(group => addBom(bomMap, `plug-${group.rowId}-${group.path}-${group.productCode || 'pending'}-${group.selectedRatedCurrentA}-${group.selectedOutputs}`, {
-      category: '插接箱', code: group.productCode || '', description: `${group.selectedRatedCurrentA || '超表列'}A ${group.circuitPhase === 'single' ? '单相' : '三相'} ${group.selectedOutputs}路插接箱`, quantity: 1, unit: '个', path: `${design.rows[group.rowIndex]?.name || ''}${group.path}路`, status: group.modelStatus === 'pending' ? 'pending' : group.validationStatus === 'danger' ? 'manual-risk' : group.selectionMode === 'manual' ? 'manual' : group.modelStatus, selectionMode: group.selectionMode, recommendedCurrentA: group.recommendedRatedCurrentA, selectedCurrentA: group.selectedRatedCurrentA
+    if (!plugBoxBomBlocked) plugBoxGroups.forEach(group => {
+      const plugSelectionMode = group.selectionMode === 'manual' || group.strategySelectionMode === 'manual' ? 'manual' : group.selectionMode;
+      addBom(bomMap, `plug-${group.productCode || 'pending'}-${group.circuitPhase}-${group.recommendedRatedCurrentA}-${group.selectedRatedCurrentA}-${group.selectedOutputs}`, {
+        category: '插接箱', code: group.productCode || '', description: `${group.selectedRatedCurrentA || '超表列'}A ${group.circuitPhase === 'single' ? '单相' : '三相'} ${group.selectedOutputs}路插接箱`, quantity: 1, unit: '个', path: `${design.rows[group.rowIndex]?.name || ''}${group.path}路`, status: group.validationStatus === 'danger' ? 'manual-risk' : group.modelStatus === 'pending' ? 'pending' : plugSelectionMode === 'manual' ? 'manual' : group.modelStatus, selectionMode: plugSelectionMode, recommendedCurrentA: group.recommendedRatedCurrentA, selectedCurrentA: group.selectedRatedCurrentA
+      });
+    });
+    design.plugBoxStrategies.filter(strategy => strategy.spareQuantity > 0).forEach(strategy => addBom(bomMap, `plug-${strategy.productCode || 'pending'}-${strategy.circuitPhase}-${strategy.recommendedRatedCurrentA}-${strategy.selectedRatedCurrentA}-${strategy.selectedOutputs}`, {
+      category: '插接箱', code: strategy.productCode || '', description: `${strategy.selectedRatedCurrentA || '超表列'}A ${strategy.circuitPhase === 'single' ? '单相' : '三相'} ${strategy.selectedOutputs}路插接箱（备用）`,
+      quantity: strategy.spareQuantity, unit: '个', path: `${design.rows[strategy.rowIndex]?.name || ''}${strategy.path}路`,
+      status: strategy.validationStatus === 'danger' ? 'manual-risk' : strategy.modelStatus === 'pending' ? 'pending' : 'manual', selectionMode: 'manual',
+      recommendedCurrentA: strategy.recommendedRatedCurrentA, selectedCurrentA: strategy.selectedRatedCurrentA
     }));
     [
       ['连接件', '', '母线连接件', accessories.connectors, '个'], ['附件', '', '末端盖', accessories.endCovers, '个'],
       ['附件', '', '插接口防尘盖', accessories.dustCovers, '个'], ['附件', '', '固定件', accessories.fixingPieces, '个'],
       ['安装', '', design.installation === 'cabinet-top' ? '柜顶安装支架' : '吊装支架（工程配置）', accessories.supports, '个'],
-      ['监控', '', design.touchscreen ? '触摸屏' : '串口服务器', design.touchscreen ? accessories.touchscreen : accessories.serialServer, '台']
+      ['监控', '', '始端箱小屏（选配）', accessories.terminalSmallScreens, '台'],
+      ['监控', '', '10寸监控屏（选配，最多监控4路始端箱/母线）', accessories.monitorScreens10Inch, '台']
     ].forEach(([category, code, description, quantity, unit]) => { if (quantity) addBom(bomMap, `${category}-${description}`, { category, code, description, quantity, unit, path: '共用' }); });
   }
   const warnings = issues.map(issue => issue.message);
-  const result = { runs, paths, plugBoxGroups, accessories, neutralRecommendation, selectedNeutral, issues, warnings, bomBlocked, plugBoxBomBlocked, bom: [...bomMap.values()] };
+  const result = { runs, paths, plugBoxStrategies: design.plugBoxStrategies, plugBoxGroups, accessories, neutralRecommendation, selectedNeutral, issues, warnings, bomBlocked, plugBoxBomBlocked, bom: [...bomMap.values()] };
   design.result = result;
   return { design, ...result };
 }
@@ -653,8 +764,8 @@ export function calculateSmartBusway(input) {
     row2LengthM: calculated.design.rows[1].orderLengthM,
     ...calculated.accessories,
     plugBoxes: calculated.plugBoxGroups.length,
-    serialServer: calculated.accessories.serialServer,
-    touchscreen: calculated.accessories.touchscreen,
+    terminalSmallScreens: calculated.accessories.terminalSmallScreens,
+    monitorScreens10Inch: calculated.accessories.monitorScreens10Inch,
     supports: calculated.accessories.supports
   };
 }
