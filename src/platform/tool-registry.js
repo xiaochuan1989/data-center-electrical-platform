@@ -6,7 +6,6 @@ export const TOOL_GROUPS = [
       { id: 'battery', name: 'UPS 与电池配置', status: 'available', source: '现有成熟功能' },
       { id: 'runtime', name: '后备时间反算', status: 'available', source: '现有成熟功能' },
       { id: 'lead', name: '电池计算（方法一/锂电）', status: 'available', source: '现有成熟功能' },
-      { id: 'dc', name: '数据中心方案校核', status: 'available', source: '现有成熟功能' },
       { id: 'db', name: 'UPS 产品数据库', status: 'available', source: '常用 UPS 速查表 V8.0' }
     ]
   },

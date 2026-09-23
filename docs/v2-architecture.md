@@ -1,28 +1,28 @@
 # v2 平台架构与数据边界
 
-> 当前版本：v2.8.0 · 更新：2026-09-17
+> 当前版本：v2.9.0 · 更新：2026-09-23
 
 ## 架构策略
 
-平台采用渐进式模块化：成熟 UPS、电池、后备时间和产品数据库继续由 `index.html` 承载；Vite 入口 `src/main.js` 加载平台外壳和新工程模块。迁移遵守“先等价、后优化”，当前有效 Excel 仅作为核对源。
+平台采用渐进式模块化：成熟 UPS、电池、后备时间和产品数据库继续由 `index.html` 承载；Vite 入口 `src/main.js` 加载工具中心和新工程模块。正常用户入口只呈现独立专业工具，当前有效 Excel 仅作为公式与产品规则核对源。
 
 ```mermaid
 flowchart LR
   Browser[浏览器] --> Shell[平台外壳]
   Shell --> Legacy[成熟 UPS / 电池 / 产品库]
-  Shell --> Project[项目工作台]
   Shell --> Tools[工具中心]
   Shell --> Engineering[工程计算模块]
-  Project --> IDB[(IndexedDB)]
+  Legacy --> WorkspaceData[本地兼容工作数据]
+  Engineering --> WorkspaceData
+  WorkspaceData --> IDB[(IndexedDB)]
   Engineering --> Data[工程基础数据 JSON]
-  Engineering --> Project
 ```
 
 ## 可见业务链
 
-`项目信息 → 负荷计算 → UPS与电池 → 配电设备 → 电缆/铜排/智能母线 → 电能质量`
+`工具中心 → 选择独立专业工具 → 计算 / 配置 / 导出`
 
-“编码与交付”自 v2.4.0 起暂时隐藏：不出现在侧栏、项目流程和工具中心；代码和项目字段暂留，待确认后恢复。模板中心继续作为资料治理入口。
+“项目工作台”和“数据中心方案校核”自 v2.9.0 起不再作为用户入口：数据中心整案按项目定制，不由平台给出标准化整案结论。旧 schema、IndexedDB 数据和旧校核实现仅作兼容保留，避免破坏历史数据；“编码与交付”继续隐藏，模板中心保留为资料治理入口。
 
 ## 模块边界
 
@@ -30,7 +30,7 @@ flowchart LR
 |---|---|
 | `index.html` | 成熟功能、产品数据、产品数据库双表及导出兼容逻辑 |
 | `src/main.js` | Vite 应用入口 |
-| `src/platform/app-shell.js` | 平台导航、项目表单、工程视图、旧功能桥接 |
+| `src/platform/app-shell.js` | 平台导航、工具中心、工程视图、本地兼容数据和旧功能桥接 |
 | `src/platform/project-schema.js` | 统一项目格式和归一化 |
 | `src/platform/project-store.js` | IndexedDB、JSON 导入导出、旧数据复制迁移 |
 | `src/platform/tool-registry.js` | 工具中心唯一入口、来源和治理状态 |
@@ -60,12 +60,12 @@ viewport
 
 ## 本地数据
 
-- IndexedDB `dc_electrical_platform_db`：项目和迁移元数据。
+- IndexedDB `dc_electrical_platform_db`：工具工作数据和迁移元数据；内部沿用旧项目字段名以兼容历史版本。
 - IndexedDB `ups_data_db`：旧版 UPS 产品数据。
 - localStorage：当前项目 ID、收藏、旧版兼容数据和界面偏好。
 - sessionStorage `ups_auth`：当前前端访问状态。
 
-迁移过程只复制，不删除旧键值。所有业务输入原则上一处填写、多模块引用。
+迁移过程只复制，不删除旧键值。工作数据用于保存工具状态，不再对应可见的“项目工作台”。
 
 ### schema v2 与智能母线
 

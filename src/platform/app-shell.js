@@ -19,12 +19,7 @@ import cableCatalog from '../data/cable-catalog.json';
 import awgCatalog from '../data/awg-catalog.json';
 import smartBuswayCatalog from '../data/smart-busway-catalog.json';
 import {
-  copyProject,
-  createAndSaveProject,
-  exportProject,
   getCurrentProject,
-  importProject,
-  listProjects,
   migrateLegacyBrowserData,
   saveProject
 } from './project-store.js';
@@ -36,7 +31,7 @@ const SIDEBAR_PREF_KEY = 'dc_platform_sidebar_collapsed';
 const state = {
   project: null,
   catalogs: { busbars: [], cables: [], awg: [], smartBusway: {} },
-  activeView: 'project',
+  activeView: 'tools',
   buswayStep: 1,
   buswayZoom: 1,
   buswayDrag: null,
@@ -83,14 +78,12 @@ function buildSidebar() {
     <button type="button" class="platform-sidebar-control" data-sidebar-toggle aria-label="收起平台导航" aria-expanded="true" title="收起左侧导航">
       ${navIcon('chevron-down')}<span class="platform-nav-text platform-sidebar-control-text">收起导航</span>
     </button>
-    ${navButton('project', '项目工作台', 'clipboard-data', true)}
     ${navButton('tools', '工具中心', 'tool', true)}
     <div class="platform-nav-label">UPS 与电池</div>
     ${navButton('home', '智能选型', 'target')}
     ${navButton('battery', 'UPS 与电池配置', 'battery-3')}
     ${navButton('runtime', '后备时间反算', 'clock-hour-4')}
     ${navButton('lead', '电池方法一 / 锂电', 'calculator')}
-    ${navButton('dc', '数据中心方案校核', 'building')}
     ${navButton('db', '产品数据库', 'database')}
     <div class="platform-nav-label">工程设计</div>
     ${navButton('load', '负荷与配电', 'chart-dots-3')}
@@ -103,48 +96,8 @@ function buildSidebar() {
   </aside>`;
 }
 
-function projectView() {
-  const steps = [
-    ['项目信息', 'project'], ['负荷计算', 'load'], ['UPS与电池', 'battery'], ['配电设备', 'load'],
-    ['电缆/铜排/母线', 'cable'], ['电能质量', 'power-quality']
-  ];
-  return viewPanel('project', '项目工作台', '一个项目、一套参数，计算结果可在模块之间复用。', `
-    <div class="project-toolbar">
-      <label>当前项目<select id="platform-project-select"></select></label>
-      <button data-project-action="new">＋ 新建</button><button data-project-action="copy">复制</button>
-      <button data-project-action="save" class="primary">保存项目</button>
-      <button data-project-action="import">导入 JSON</button><button data-project-action="export">导出 JSON</button>
-      <input id="platform-project-import" type="file" accept="application/json,.json" hidden>
-    </div>
-    <div class="project-overview-grid">
-      <div class="project-info-card">
-        <h2>项目信息</h2>
-        <div class="platform-form-grid cols-2">
-          <label>项目名称<input id="project-name" autocomplete="off"></label>
-          <label>客户名称<input id="project-customer" autocomplete="off"></label>
-          <label>项目地点<input id="project-location" autocomplete="off"></label>
-          <label>设计阶段<select id="project-stage"><option>方案设计</option><option>初步设计</option><option>施工图设计</option><option>投标配合</option></select></label>
-          <label>设计人员<input id="project-designer" autocomplete="off"></label>
-          <label>供电冗余<select id="project-redundancy"><option>N</option><option>N+1</option><option>2N</option><option>2N+1</option></select></label>
-        </div>
-      </div>
-      <aside class="project-status-card"><h2>本地数据说明</h2>
-        <p>项目、用户填写价格和 AI 配置只保存在本机浏览器。访问密码仅为提示性门槛，不具备真正的数据保密能力。</p>
-        <div id="migration-status" class="migration-status">正在检查旧版数据…</div>
-      </aside>
-    </div>
-    <div class="project-flow" aria-label="项目设计流程">${steps.map(([name, view], index) => `
-      <button data-platform-view="${view}"><span>${index + 1}</span><b>${name}</b></button>`).join('')}</div>
-    <div class="platform-metrics">
-      <div><small>有功负荷</small><strong id="dashboard-active-power">—</strong><em>kW</em></div>
-      <div><small>视在功率</small><strong id="dashboard-apparent-power">—</strong><em>kVA</em></div>
-      <div><small>设计电流</small><strong id="dashboard-current">—</strong><em>A</em></div>
-      <div><small>建议变压器</small><strong id="dashboard-transformer">—</strong><em>kVA</em></div>
-    </div>`);
-}
-
 function toolsView() {
-  return viewPanel('tools', '工具中心', '按业务能力整合重复版本；正常入口只显示当前有效能力。', `
+  return viewPanel('tools', '工具中心', '独立工程工具按需使用；数据中心方案为定制成果，平台不生成标准化整案结论。', `
     <div class="tool-search"><input id="platform-tool-search" placeholder="搜索工具、来源或模块…"></div>
     <div class="tool-groups" id="platform-tool-groups">${TOOL_GROUPS.map(group => `
       <section class="tool-group" data-search="${htmlEscape(group.name)}"><h2><span>${group.icon}</span>${group.name}</h2>
@@ -154,7 +107,7 @@ function toolsView() {
 }
 
 function loadView() {
-  return viewPanel('load', '负荷与配电', '负荷汇总、变压器初选、支路断路器和母线电流使用同一组项目参数。', `
+  return viewPanel('load', '负荷与配电', '独立完成负荷汇总、变压器初选、支路断路器和母线电流计算。', `
     <div class="engineering-tabs"><button class="active" data-calc-tab="load-summary">负荷汇总</button><button data-calc-tab="branch">支路与母线</button></div>
     <div class="calc-pane" data-calc-pane="load-summary">
       <div class="platform-form-grid compact cols-4">
@@ -164,7 +117,7 @@ function loadView() {
         <div class="field-action"><button id="add-load-row">＋ 添加负荷</button></div>
       </div>
       <div class="data-entry-table"><table><thead><tr><th>负荷名称</th><th>数量</th><th>单台功率(kW)</th><th>需要系数</th><th>功率因数</th><th></th></tr></thead><tbody id="load-rows"></tbody></table></div>
-      <button id="calculate-load" class="platform-primary-action">计算并写入项目</button>
+      <button id="calculate-load" class="platform-primary-action">计算负荷结果</button>
       <div id="load-result" class="result-grid"></div>
     </div>
     <div class="calc-pane" data-calc-pane="branch" hidden>
@@ -458,7 +411,7 @@ function templatesView() {
 }
 
 function shellViews() {
-  return [projectView(), toolsView(), loadView(), cableView(), busbarView(), buswayView(), powerQualityView(), deliveryView(), templatesView()].join('');
+  return [toolsView(), loadView(), cableView(), busbarView(), buswayView(), powerQualityView(), deliveryView(), templatesView()].join('');
 }
 
 function resultCards(items) {
@@ -496,12 +449,13 @@ function readLoadRows() {
 function fillProjectForm() {
   const project = state.project;
   if (!project) return;
-  document.getElementById('project-name').value = project.name || '';
-  document.getElementById('project-customer').value = project.info?.customer || '';
-  document.getElementById('project-location').value = project.info?.location || '';
-  document.getElementById('project-stage').value = project.info?.stage || '方案设计';
-  document.getElementById('project-designer').value = project.info?.designer || '';
-  document.getElementById('project-redundancy').value = project.topology?.redundancy || 'N+1';
+  const setValue = (id, value) => { const input = document.getElementById(id); if (input) input.value = value; };
+  setValue('project-name', project.name || '');
+  setValue('project-customer', project.info?.customer || '');
+  setValue('project-location', project.info?.location || '');
+  setValue('project-stage', project.info?.stage || '方案设计');
+  setValue('project-designer', project.info?.designer || '');
+  setValue('project-redundancy', project.topology?.redundancy || 'N+1');
   document.getElementById('load-voltage').value = project.topology?.voltage || 380;
   const tbody = document.getElementById('load-rows');
   tbody.innerHTML = '';
@@ -517,29 +471,23 @@ function fillProjectForm() {
 }
 
 function collectProjectForm() {
-  state.project.name = document.getElementById('project-name').value.trim() || '未命名项目';
+  const value = (id, fallback = '') => document.getElementById(id)?.value ?? fallback ?? '';
+  state.project.name = value('project-name', state.project.name).trim() || '本地工作数据';
   state.project.info = {
     ...state.project.info,
-    customer: document.getElementById('project-customer').value.trim(),
-    location: document.getElementById('project-location').value.trim(),
-    stage: document.getElementById('project-stage').value,
-    designer: document.getElementById('project-designer').value.trim()
+    customer: value('project-customer', state.project.info?.customer).trim(),
+    location: value('project-location', state.project.info?.location).trim(),
+    stage: value('project-stage', state.project.info?.stage || '方案设计'),
+    designer: value('project-designer', state.project.info?.designer).trim()
   };
   state.project.topology = {
     ...state.project.topology,
     voltage: numberValue('load-voltage', 380),
-    redundancy: document.getElementById('project-redundancy').value
+    redundancy: value('project-redundancy', state.project.topology?.redundancy || 'N+1')
   };
   state.project.loads.rows = readLoadRows();
   try { state.project.legacy.ups_config = JSON.parse(localStorage.getItem('ups_config') || 'null'); } catch { /* retain prior */ }
   return state.project;
-}
-
-async function refreshProjectSelect() {
-  const select = document.getElementById('platform-project-select');
-  const projects = await listProjects();
-  select.innerHTML = projects.map(project => `<option value="${project.id}">${htmlEscape(project.name)}</option>`).join('');
-  select.value = state.project.id;
 }
 
 function updateDashboard() {
@@ -1559,7 +1507,7 @@ function exportExcel() {
 
 function buildAiDrawer() {
   document.body.insertAdjacentHTML('beforeend', `<button class="global-ai-fab" id="global-ai-fab" title="打开全局 AI 助手">AI</button>
-    <aside class="global-ai-drawer" id="global-ai-drawer" aria-label="全局 AI 助手" aria-hidden="true"><header><div><b>全局 AI 助手</b><small>基于当前项目参数生成检查提示</small></div><button id="global-ai-close">×</button></header>
+    <aside class="global-ai-drawer" id="global-ai-drawer" aria-label="全局 AI 助手" aria-hidden="true"><header><div><b>全局 AI 助手</b><small>基于当前工具数据生成检查提示</small></div><button id="global-ai-close">×</button></header>
       <div id="global-ai-context" class="global-ai-context"></div><label>需要 AI 协助的内容<textarea id="global-ai-request" rows="7" placeholder="例如：根据当前负荷和 N+1 架构，检查 UPS 初选口径并列出待确认条件。"></textarea></label>
       <button id="global-ai-open-selector" class="primary">带入独立智能选型</button><p>AI 配置保存在本机浏览器。输出必须由工程人员复核。</p></aside>`);
   const drawer = document.getElementById('global-ai-drawer');
@@ -1569,7 +1517,7 @@ function buildAiDrawer() {
   document.getElementById('global-ai-open-selector').addEventListener('click', async () => {
     const request = document.getElementById('global-ai-request').value.trim();
     const summary = state.project.loads?.summary;
-    const prompt = [`项目：${state.project.name}`, `冗余：${state.project.topology?.redundancy || '未填写'}`, summary ? `负荷：${format(summary.activePowerKw)}kW / ${format(summary.apparentPowerKva)}kVA` : '负荷：尚未计算', request].filter(Boolean).join('\n');
+    const prompt = [`当前方案：${state.project.name}`, `冗余：${state.project.topology?.redundancy || '未填写'}`, summary ? `负荷：${format(summary.activePowerKw)}kW / ${format(summary.apparentPowerKva)}kVA` : '负荷：尚未计算', request].filter(Boolean).join('\n');
     const target = document.getElementById('requirement');
     if (target) target.value = prompt;
     toggle(false);
@@ -1780,32 +1728,6 @@ function bindEvents() {
     if (button.dataset.cableTab === 'catalog') renderCableCatalog();
     if (button.dataset.cableTab === 'awg') { renderAwgResult(); renderAwgCatalog(); }
   }));
-  document.getElementById('platform-project-select').addEventListener('change', async event => {
-    const projects = await listProjects();
-    state.project = projects.find(project => project.id === event.target.value) || state.project;
-    localStorage.setItem('dc_platform_current_project_id', state.project.id);
-    fillProjectForm();
-  });
-  document.querySelectorAll('[data-project-action]').forEach(button => button.addEventListener('click', async () => {
-    const action = button.dataset.projectAction;
-    try {
-      if (action === 'new') state.project = await createAndSaveProject(`新项目 ${new Date().toLocaleDateString('zh-CN')}`);
-      if (action === 'copy') state.project = await copyProject(collectProjectForm());
-      if (action === 'save') state.project = await saveProject(collectProjectForm());
-      if (action === 'export') exportProject(collectProjectForm());
-      if (action === 'import') document.getElementById('platform-project-import').click();
-      if (['new', 'copy', 'save'].includes(action)) {
-        await refreshProjectSelect(); fillProjectForm(); window.showToast?.('项目已保存在本机浏览器');
-      }
-    } catch (error) { window.showToast?.(`项目操作失败：${error.message}`); }
-  }));
-  document.getElementById('platform-project-import').addEventListener('change', async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    try { state.project = await importProject(file); await refreshProjectSelect(); fillProjectForm(); window.showToast?.('项目导入成功'); }
-    catch (error) { window.showToast?.(`项目导入失败：${error.message}`); }
-    event.target.value = '';
-  });
   const appbar = document.querySelector('.appbar-inner');
   if (appbar) appbar.insertAdjacentHTML('afterbegin', `<button type="button" class="platform-sidebar-toggle" data-sidebar-toggle aria-label="打开平台导航" aria-expanded="false" title="打开左侧导航">${navIcon('stack-2')}</button>`);
   const applySidebarState = collapsed => {
@@ -1846,9 +1768,9 @@ export async function initializePlatform() {
   workspace.appendChild(container);
   container.insertAdjacentHTML('afterbegin', shellViews());
 
-  const migration = await migrateLegacyBrowserData();
+  await migrateLegacyBrowserData();
   state.project = await getCurrentProject();
-  await Promise.all([refreshProjectSelect(), loadCatalogs()]);
+  await loadCatalogs();
   fillProjectForm();
   renderBusbarCatalog();
   syncBusbarAmpacityControls();
@@ -1856,12 +1778,10 @@ export async function initializePlatform() {
   renderAwgResult();
   renderCableCatalog();
   renderAwgCatalog();
-  const migrationElement = document.getElementById('migration-status');
-  migrationElement.textContent = `旧版数据已安全复制：${migration.copiedKeys?.length || 0} 项；旧数据仍保留。`;
   bindEvents();
   buildAiDrawer();
   updateAiContext();
-  await activateView('project');
+  await activateView('tools');
 
   window.dcPlatform = { state, activateView, save: () => saveProject(collectProjectForm()), tools: allTools() };
 }
