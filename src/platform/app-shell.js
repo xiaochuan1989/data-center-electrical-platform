@@ -86,18 +86,15 @@ function buildSidebar() {
     ${navButton('lead', '电池方法一 / 锂电', 'calculator')}
     ${navButton('db', '产品数据库', 'database')}
     <div class="platform-nav-label">工程设计</div>
-    ${navButton('load', '负荷与配电', 'chart-dots-3')}
     ${navButton('cable', '电缆选型', 'plug')}
     ${navButton('busbar', '铜排计算', 'stack-2')}
     ${navButton('busway', '智能母线', 'device-desktop-analytics')}
     ${navButton('power-quality', '电能质量', 'calculator')}
-    <div class="platform-nav-label">资料管理</div>
-    ${navButton('templates', '模板中心', 'clipboard-data')}
   </aside>`;
 }
 
 function toolsView() {
-  return viewPanel('tools', '工具中心', '独立工程工具按需使用；数据中心方案为定制成果，平台不生成标准化整案结论。', `
+  return viewPanel('tools', '工具中心', 'UPS、电池、电缆、铜排、智能母线和电能质量工具按需独立使用。', `
     <div class="tool-search"><input id="platform-tool-search" placeholder="搜索工具、来源或模块…"></div>
     <div class="tool-groups" id="platform-tool-groups">${TOOL_GROUPS.map(group => `
       <section class="tool-group" data-search="${htmlEscape(group.name)}"><h2><span>${group.icon}</span>${group.name}</h2>
@@ -1454,7 +1451,7 @@ function exportExcel() {
   collectProjectForm();
   const summary = state.project.loads?.summary || {};
   const overview = [
-    ['数据中心电气设计与选型平台', '项目汇总'], ['项目名称', state.project.name], ['客户名称', state.project.info.customer],
+    ['UPS与配电选型助手', '项目汇总'], ['项目名称', state.project.name], ['客户名称', state.project.info.customer],
     ['项目地点', state.project.info.location], ['设计阶段', state.project.info.stage], ['设计人员', state.project.info.designer],
     ['供电冗余', state.project.topology.redundancy], ['有功负荷(kW)', summary.activePowerKw ?? ''], ['视在功率(kVA)', summary.apparentPowerKva ?? ''],
     ['设计电流(A)', summary.designCurrentA ?? ''], ['建议变压器(kVA)', summary.transformerKva ?? ''],

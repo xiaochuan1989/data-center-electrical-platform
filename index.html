@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232d6a9f'/%3E%3Cpath d='M36 4 14 36h16l-2 24 22-34H34z' fill='%23fff'/%3E%3C/svg%3E">
-<title>数据中心电气设计与选型平台</title>
+<title>UPS与配电选型助手</title>
 <script>
-const APP_VERSION = "v2.9.0";
+const APP_VERSION = "v2.10.0";
 const DEBUG_MODE = false;
 const CLIENT_SIDE_ACCESS_CODE = '173205';
 const PRICE_VIEW_CODE = '314159';
 function debugLog(...args) {
   if (DEBUG_MODE) console.debug(...args);
 }
-document.title = "数据中心电气设计与选型平台 " + APP_VERSION;
+document.title = "UPS与配电选型助手 " + APP_VERSION;
 document.addEventListener("DOMContentLoaded", function() {
   const versionEl = document.getElementById("app-version");
   if (versionEl) versionEl.textContent = APP_VERSION;
@@ -179,6 +179,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
   .req-area { width: 100%; height: 160px; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 14px; font-size: 14px; resize: vertical; font-family: inherit; line-height: 1.6; transition: border-color 0.2s; }
   .req-area:focus { outline: none; border-color: #2563eb; }
+  .ups-criteria { margin-top:16px;padding:16px;border:1px solid #cbdcf3;border-radius:10px;background:#f7faff; }
+  .ups-criteria-head { display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px; }
+  .ups-criteria-head h3 { margin:0;font-size:14px;color:#173a60; }
+  .ups-criteria-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px; }
+  .ups-criteria-grid label { display:flex;flex-direction:column;gap:5px;font-size:12px;color:#4b6077; }
+  .ups-criteria-grid input,.ups-criteria-grid select { min-width:0;width:100%;padding:8px;border:1px solid #bfcfe2;border-radius:6px;background:white;font:inherit; }
+  .ups-criteria-confirm { display:flex;align-items:center;gap:8px;margin-top:13px;font-size:12px;color:#294c6f; }
+  .ups-criteria-note { margin:8px 0 0;font-size:12px;color:#8a5a14;white-space:pre-wrap; }
+  .ups-audit-badge { display:inline-block;padding:2px 7px;margin-top:4px;border-radius:99px;font-size:11px;font-weight:600; }
+  .ups-audit-badge.pass { background:#e9f7ee;color:#187444; }.ups-audit-badge.unknown { background:#fff4df;color:#955d00; }
+  .ups-audit-badge.fail { background:#fce9e9;color:#b42318; }
+  .ups-audit-summary { margin:0 0 15px;padding:12px 14px;border:1px solid #cbdcf3;border-radius:8px;background:#f7faff;font-size:12px;line-height:1.6; }
+  .ups-audit-summary strong { color:#173a60; }.ups-audit-summary .warn { color:#a23026; }
+  .ups-audit-list { padding:8px 0;font-size:12px;line-height:1.7; }
+  .ups-audit-list div { padding:4px 0;border-bottom:1px solid #edf0f4; }
+  .ups-catalog-meta { padding:14px;border:1px solid #e1e9f2;border-radius:8px;background:#f8fbff;font-size:12px;line-height:1.6; }
+  .ups-catalog-meta select { padding:6px;border:1px solid #bfcfe2;border-radius:5px; }
+  .ups-import-diff { max-height:360px;overflow:auto;font-size:12px;line-height:1.7;white-space:pre-wrap; }
+  @media(max-width:800px){.ups-criteria-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ups-criteria-head{align-items:flex-start;flex-direction:column}}
   .req-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
   .req-hint { font-size: 12px; color: #aaa; }
   .analyze-btn { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; border: none; border-radius: 8px; padding: 12px 32px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
@@ -479,7 +498,7 @@ function ensureLib(globalName) {
 <div id="auth-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#1a3a5c,#2563eb);display:flex;align-items:center;justify-content:center;z-index:99999;">
   <form onsubmit="checkAuth();return false" style="background:white;border-radius:16px;padding:48px 40px;width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
     <div class="iteaq-logo" style="width:186px;height:92px;margin:0 auto 16px" aria-label="iTeaQ 艾特网能"></div>
-    <h2 style="font-size:20px;font-weight:700;color:#16324f;margin-bottom:6px;">数据中心电气设计与选型平台</h2>
+    <h2 style="font-size:20px;font-weight:700;color:#16324f;margin-bottom:6px;">UPS与配电选型助手</h2>
     <p style="font-size:12px;color:#93a1b0;margin-bottom:4px;letter-spacing:.5px;">智能选型 · 电池配置 · 独立工程工具</p>
     <p style="font-size:13px;color:#888;margin-bottom:28px;">请输入访问密码</p>
     <input id="auth-input" type="password" placeholder="请输入密码"
@@ -518,7 +537,7 @@ function checkAuth(){
     <div class="appbar-brand">
       <div class="appbar-logo"><span class="iteaq-logo" aria-label="iTeaQ 艾特网能"></span></div>
       <div>
-        <div class="appbar-name">数据中心电气设计与选型平台</div>
+        <div class="appbar-name">UPS与配电选型助手</div>
         <div class="appbar-sub" id="data-source-label">内置数据 V8.0 | 太行UR / 昆仑UE / 祁连UM / 泰山UT | 共105款产品</div>
       </div>
     </div>
@@ -1391,9 +1410,28 @@ function checkAuth(){
 - 要求支持并机扩容
 - 安装方式：落地式
 - 需要SNMP远程监控"></textarea>
+    <div class="ups-criteria" id="ups-criteria">
+      <div class="ups-criteria-head"><h3>技术条件确认单 · 人工确认后才参与校核</h3><button type="button" onclick="extractUpsCriteria()">从需求文字提取</button></div>
+      <div class="ups-criteria-grid">
+        <label>UPS 额定容量下限 (kVA)<input id="ups-crit-capacity" type="number" min="0" step="any" placeholder="未明确"></label>
+        <label>负荷功率 (kW)<input id="ups-crit-load-kw" type="number" min="0" step="any" placeholder="未明确"></label>
+        <label>负荷容量 (kVA)<input id="ups-crit-load-kva" type="number" min="0" step="any" placeholder="未明确"></label>
+        <label>输出功率因数下限<input id="ups-crit-pf" type="number" min="0" max="1" step="0.01" placeholder="未明确"></label>
+        <label>输入/输出制式<select id="ups-crit-phase"><option value="">未明确</option><option value="1:1">单进单出</option><option value="3:1">三进单出</option><option value="3:3">三进三出</option><option value="1:3">单进三出</option></select></label>
+        <label>并机台数<input id="ups-crit-parallel" type="number" min="1" step="1" placeholder="未明确"></label>
+        <label>冗余架构<select id="ups-crit-redundancy"><option value="">未明确</option><option value="N">N</option><option value="N+1">N+1</option><option value="2N">2N</option></select></label>
+        <label>后备时间 (分钟)<input id="ups-crit-runtime" type="number" min="0" step="any" placeholder="待电池校核"></label>
+        <label>电池节数/组<input id="ups-crit-cells" type="number" min="1" step="1" placeholder="未明确"></label>
+        <label>电池类型<select id="ups-crit-battery"><option value="">未明确</option><option value="lead-acid">铅酸</option><option value="lithium">锂电</option></select></label>
+        <label>安装方式<select id="ups-crit-install"><option value="">未明确</option><option value="机架式">机架式</option><option value="塔式">落地/塔式</option></select></label>
+        <label style="justify-content:center"><span>通讯要求</span><span><input id="ups-crit-snmp" type="checkbox" style="width:auto"> SNMP</span></label>
+      </div>
+      <label class="ups-criteria-confirm"><input id="ups-criteria-confirmed" type="checkbox"> 我已核对上述技术条件；空白项保持“资料不足”，不由 AI 猜测</label>
+      <p id="ups-criteria-note" class="ups-criteria-note">先从原文提取，再核对和修改字段。未核对的条件不会作为已确认条件。</p>
+    </div>
     <div class="req-bottom">
       <div style="display:flex;flex-direction:column;gap:6px">
-        <span class="req-hint">💡 支持粘贴原始技术文档，AI 会自动提取关键参数</span>
+        <span class="req-hint">💡 粘贴需求后可提取常见参数；未识别内容请手工补充并确认</span>
         <div style="display:flex;align-items:center;gap:10px">
           <label class="doc-upload-label" title="支持 TXT / DOCX 文件，AI 自动提取需求">
             📎 上传文档
@@ -1420,23 +1458,36 @@ function checkAuth(){
   </div>
 
   <div class="result-section" id="result-section">
+    <div class="ups-audit-summary" id="ups-audit-summary"></div>
+    <div class="card" style="padding:16px" id="ups-adoption-card">
+      <h2 data-icon="✍">人工采用值</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <select id="ups-adopt-model" style="min-width:220px;max-width:100%;padding:8px;border:1px solid #bfcfe2;border-radius:6px"></select>
+        <input id="ups-adopt-reason" style="flex:1;min-width:220px;padding:8px;border:1px solid #bfcfe2;border-radius:6px" placeholder="与推荐不一致或仍需复核时，填写采用理由与风险说明">
+        <button type="button" onclick="adoptUpsModel()">记录采用型号</button>
+      </div>
+      <p id="ups-adoption-status" style="margin:9px 0 0;font-size:12px;color:#7b4a08">采用值不会改变程序校核结论；不满足或资料不足的型号必须注明理由。</p>
+    </div>
     <div class="card">
-      <h2 data-icon="🤖">AI 分析</h2>
+      <h2 data-icon="🔎">选型分析</h2>
       <div class="ai-analysis" id="ai-analysis"></div>
     </div>
     <div class="card" style="padding-bottom:16px">
       <div class="products-header">
-        <h2 data-icon="📦" style="margin:0">推荐产品</h2>
-        <div style="display:flex;gap:10px">
+        <h2 data-icon="📦" style="margin:0">选型候选与校核</h2>
+      <div style="display:flex;gap:10px">
           <button class="compare-btn" onclick="showCompare()" id="compare-btn" disabled style="opacity:0.5">📊 对比选中 (<span id="compare-count">0</span>)</button>
-          <button class="export-btn" onclick="exportDoc()">📄 导出推荐方案</button>
+          <button class="export-btn" onclick="exportUpsSelectionExcel()">📊 导出校核表</button>
+          <button class="export-btn" onclick="printUpsSelection()">🖨 打印/PDF</button>
+          <button class="export-btn" onclick="exportDoc()">📄 导出技术说明</button>
+          <button class="export-btn" onclick="exportCurrentUpsSnapshot()">备份方案 JSON</button>
         </div>
       </div>
 
       <!-- 推荐方案 -->
       <div id="rec-section">
         <div style="font-size:12px;font-weight:700;color:#1a5c2a;padding:5px 10px;background:#edfbf3;border-left:3px solid #27ae60;border-radius:0 4px 4px 0;margin-bottom:6px;display:flex;align-items:center;gap:8px">
-          ★ 推荐方案 <span id="rec-count" style="font-weight:400;color:#666;font-size:11px"></span>
+          ★ 已满足的候选 <span id="rec-count" style="font-weight:400;color:#666;font-size:11px"></span>
         </div>
         <div style="overflow-x:auto;margin-bottom:16px">
           <table class="product-table" id="product-table-rec">
@@ -1454,7 +1505,7 @@ function checkAuth(){
       <!-- 备选方案 -->
       <div id="alt-section" style="display:none">
         <div style="font-size:12px;font-weight:700;color:#1a3a5c;padding:5px 10px;background:#eef4fb;border-left:3px solid #2563eb;border-radius:0 4px 4px 0;margin-bottom:6px;display:flex;align-items:center;gap:8px">
-          ○ 备选方案 <span id="alt-count" style="font-weight:400;color:#666;font-size:11px"></span>
+          ○ 资料不足、待确认 <span id="alt-count" style="font-weight:400;color:#666;font-size:11px"></span>
         </div>
         <div style="overflow-x:auto">
           <table class="product-table" id="product-table-alt">
@@ -1499,14 +1550,24 @@ function checkAuth(){
     </div>
     <div id="modal-desc" style="padding:12px 24px;background:#f8fbff;font-size:13px;color:#555;border-bottom:1px solid #eee"></div>
     <div id="modal-reason" style="padding:10px 24px;background:#fff8e8;font-size:13px;border-bottom:1px solid #eee;display:none">
-      <strong>推荐理由：</strong><span id="modal-reason-text"></span>
+      <strong>说明与校核依据：</strong><span id="modal-reason-text"></span>
     </div>
+    <div id="modal-audit" style="padding:14px 24px"></div>
     <div id="modal-params" style="padding:16px 24px;display:grid;grid-template-columns:1fr 1fr;gap:0"></div>
   </div>
 </div>
 
+<div id="catalog-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1100;overflow:auto;padding:40px 16px">
+  <div style="max-width:760px;margin:auto;background:#fff;border-radius:12px;padding:22px;box-shadow:0 12px 36px #1234">
+    <h3 style="margin:0 0 8px">产品目录导入预览</h3>
+    <p>先核对新增、变化及从新表中消失的型号。变化和新增型号的在售状态会变为“待核对”。</p>
+    <div id="catalog-import-diff" class="ups-import-diff"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px"><button type="button" onclick="finishCatalogImport(false)">取消</button><button type="button" class="save-btn" onclick="finishCatalogImport(true)">确认更新本机目录</button></div>
+  </div>
+</div>
+
 <!-- 产品对比模态框 -->
-<div id="compare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;overflow-y:auto;padding:40px 16px">
+<div id="compare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1001;overflow-y:auto;padding:40px 16px">
   <div style="max-width:95%;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.2);max-height:90vh;display:flex;flex-direction:column">
     <div style="background:linear-gradient(135deg,#9b59b6,#8e44ad);color:white;padding:18px 24px;display:flex;justify-content:space-between;align-items:center">
       <div style="font-size:18px;font-weight:700">📊 产品对比</div>
@@ -1516,7 +1577,7 @@ function checkAuth(){
   </div>
 </div>
 
-<div class="footer">数据中心电气设计与选型平台 <span id="app-version"></span> · UPS数据来源：常用UPS速查表V8.0</div>
+<div class="footer">UPS与配电选型助手 <span id="app-version"></span> · UPS目录：<span id="ups-footer-catalog-source">常用UPS速查表V8.0</span></div>
 <div id="battery-data-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;overflow-y:auto;padding:20px">
   <div style="max-width:1200px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden">
     <div style="background:linear-gradient(135deg,#1a3a5c,#2563eb);color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center">
@@ -1877,11 +1938,19 @@ document.addEventListener('DOMContentLoaded', function() {
       debugLog('找到持久化数据:', data.products.length, '条');
       PRODUCTS.length = 0;
       data.products.forEach(p => PRODUCTS.push(p));
+      const metadata = loadUpsCatalogMetadata();
+      if (!metadata.importedAt) {
+        metadata.source = data.source || '历史导入目录';
+        metadata.catalogVersion = data.importTime || '历史导入';
+        metadata.importedAt = data.importTime || null;
+        saveUpsCatalogMetadata(metadata);
+      }
       const catalogMatchCount = enrichProductsWithCatalog(PRODUCTS);
       debugLog('目录价严格匹配回填:', catalogMatchCount, '条');
       const label = document.getElementById('data-source-label');
       label.textContent = '外部数据 ' + data.source + ' | 导入于 ' + data.importTime + ' | 共 ' + PRODUCTS.length + ' 款产品';
       label.style.color = '#a8f0c0';
+      document.getElementById('ups-footer-catalog-source').textContent = metadata.source;
       // 显示"恢复内置数据"按钮
       const restoreBtn = document.getElementById('restore-btn');
       if (restoreBtn) restoreBtn.style.display = 'inline-block';
@@ -1987,8 +2056,157 @@ async function testApi() {
   }
 }
 
-let lastResult = null, lastRequirement = "";
+const UPS_CATALOG_META_KEY = 'ups_catalog_metadata_v1';
+let lastResult = null, lastRequirement = "", lastConfirmedRequirement = null, lastSelectionAudit = null;
+let lastAdoptedModel = '', lastAdoptionReason = '', lastHistoryRecordId = null;
 let chatHistory = [];
+
+function loadUpsCatalogMetadata() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(UPS_CATALOG_META_KEY) || 'null');
+    if (stored && stored.version === 1 && stored.entries && typeof stored.entries === 'object') return stored;
+  } catch (error) { console.warn('目录元数据读取失败', error); }
+  return { version: 1, source: '常用UPS速查表-V8.0.xlsx', catalogVersion: 'V8.0', importedAt: null, entries: {} };
+}
+
+function saveUpsCatalogMetadata(metadata) {
+  localStorage.setItem(UPS_CATALOG_META_KEY, JSON.stringify(metadata));
+}
+
+function getUpsCatalogEntry(model) {
+  const metadata = loadUpsCatalogMetadata();
+  return { source: metadata.source, version: metadata.catalogVersion,
+    status: 'unverified', reviewedAt: null, ...(metadata.entries[model] || {}) };
+}
+
+function setUpsCatalogStatus(model, status) {
+  if (!['active', 'unverified', 'discontinued'].includes(status)) return;
+  const metadata = loadUpsCatalogMetadata();
+  metadata.entries[model] = { ...(metadata.entries[model] || {}), source: metadata.source,
+    version: metadata.catalogVersion, status, reviewedAt: status === 'unverified' ? null : new Date().toISOString().slice(0, 10) };
+  saveUpsCatalogMetadata(metadata);
+  if (lastConfirmedRequirement && lastResult) refreshUpsSelectionAudit();
+  showDetail(model, allRecsCache.find(item => item.model === model)?.reason || '');
+}
+
+function setUpsCatalogStatusFromSelect(select) {
+  setUpsCatalogStatus(select.dataset.model, select.value);
+}
+
+const UPS_CRITERIA_FIELDS = {
+  capacityKva: 'ups-crit-capacity', loadKw: 'ups-crit-load-kw', loadKva: 'ups-crit-load-kva',
+  outputPowerFactor: 'ups-crit-pf', inputOutputPhase: 'ups-crit-phase', parallelUnits: 'ups-crit-parallel',
+  redundancy: 'ups-crit-redundancy', backupMinutes: 'ups-crit-runtime', batteryCells: 'ups-crit-cells',
+  batteryType: 'ups-crit-battery', installation: 'ups-crit-install'
+};
+
+function extractUpsCriteria() {
+  const source = document.getElementById('requirement').value;
+  const parsed = window.upsSelection?.parseUpsRequirement(source);
+  if (!parsed) { showToast('选型校核模块尚未加载'); return; }
+  Object.entries(UPS_CRITERIA_FIELDS).forEach(([field, id]) => {
+    document.getElementById(id).value = parsed[field] ?? '';
+  });
+  document.getElementById('ups-crit-snmp').checked = parsed.needsSnmp;
+  document.getElementById('ups-criteria-confirmed').checked = false;
+  document.getElementById('ups-criteria-note').textContent = '已提取可识别条件。请逐项核对；未识别的条件请手工补充，完成后勾选确认。';
+}
+
+function readUpsCriteria() {
+  const input = { sourceText: document.getElementById('requirement').value,
+    needsSnmp: document.getElementById('ups-crit-snmp').checked,
+    confirmedAt: document.getElementById('ups-criteria-confirmed').checked ? new Date().toISOString() : null };
+  Object.entries(UPS_CRITERIA_FIELDS).forEach(([field, id]) => { input[field] = document.getElementById(id).value; });
+  return window.upsSelection.normalizeUpsRequirement(input);
+}
+
+function fillUpsCriteria(requirement) {
+  const normalized = window.upsSelection.normalizeUpsRequirement(requirement || {});
+  document.getElementById('requirement').value = normalized.sourceText || '';
+  Object.entries(UPS_CRITERIA_FIELDS).forEach(([field, id]) => {
+    document.getElementById(id).value = normalized[field] ?? '';
+  });
+  document.getElementById('ups-crit-snmp').checked = normalized.needsSnmp;
+  document.getElementById('ups-criteria-confirmed').checked = Boolean(normalized.confirmedAt);
+}
+
+document.querySelectorAll('#ups-criteria input, #ups-criteria select').forEach(control => {
+  if (control.id !== 'ups-criteria-confirmed') control.addEventListener('input', () => {
+    document.getElementById('ups-criteria-confirmed').checked = false;
+  });
+});
+document.getElementById('requirement').addEventListener('input', () => {
+  document.getElementById('ups-criteria-confirmed').checked = false;
+});
+
+function getUpsCatalogEntries() {
+  const metadata = loadUpsCatalogMetadata();
+  return Object.fromEntries(PRODUCTS.map(product => [product['型号'], {
+    source: metadata.source, version: metadata.catalogVersion, status: 'unverified', reviewedAt: null,
+    ...(metadata.entries[product['型号']] || {})
+  }]));
+}
+
+function auditedUpsResult(requirement, aiResult = null) {
+  const audit = window.upsSelection.rankUpsProducts(PRODUCTS, requirement, getUpsCatalogEntries(), 5);
+  const aiReasons = new Map([...(aiResult?.recommended || []), ...(aiResult?.also_consider || [])]
+    .map(item => [String(item.model || '').replace(/\s/g, ''), item.reason || '']));
+  const itemToRec = item => ({ model: item.model, reason: aiReasons.get(item.model.replace(/\s/g, '')) ||
+    item.checks.map(check => `${check.label}：${check.detail}`).join('；'), audit: item });
+  const requirementCount = ['capacityKva', 'loadKw', 'loadKva', 'inputOutputPhase', 'parallelUnits', 'outputPowerFactor']
+    .filter(key => requirement[key] != null).length;
+  const explanation = `程序校核：${audit.counts.qualified} 款满足、${audit.counts.pending} 款资料不足、${audit.counts.rejected} 款不满足。` +
+    (audit.counts.qualified === 0 ? '\n没有可直接作为完全匹配推荐的型号；待确认产品须补齐资料，不能视为满足。' : '') +
+    (requirementCount < 3 ? '\n已确认条件较少，请补充容量、制式和负荷等关键条件。' : '') +
+    (aiResult?.analysis ? `\n\nAI 辅助说明（不代替下方程序校核）：\n${aiResult.analysis}` : '');
+  return { result: { analysis: explanation, recommended: audit.qualified.slice(0, 3).map(itemToRec),
+    also_consider: audit.pending.slice(0, 5).map(itemToRec) }, audit };
+}
+
+function refreshUpsSelectionAudit() {
+  if (!lastConfirmedRequirement) return;
+  const { result, audit } = auditedUpsResult(lastConfirmedRequirement);
+  if (lastAdoptedModel) {
+    const product = findProduct(lastAdoptedModel);
+    result.manualAdoption = product ? { model: lastAdoptedModel, reason: lastAdoptionReason,
+      audit: window.upsSelection.assessUpsProduct(product, lastConfirmedRequirement, getUpsCatalogEntry(lastAdoptedModel)) } : null;
+  }
+  lastResult = result;
+  lastSelectionAudit = audit;
+  updateCurrentUpsHistory();
+  renderResult(result);
+}
+
+function renderUpsAdoption() {
+  const select = document.getElementById('ups-adopt-model');
+  const current = lastAdoptedModel || select.value;
+  const priority = [...(lastResult?.recommended || []), ...(lastResult?.also_consider || [])].map(item => item.model);
+  const ordered = [...new Set([...priority, ...PRODUCTS.map(item => item['型号'])])];
+  select.innerHTML = '<option value="">选择人工采用型号（可选）</option>' + ordered.map(model =>
+    `<option value="${escapeHtml(model)}"${model === current ? ' selected' : ''}>${escapeHtml(model)}</option>`).join('');
+  document.getElementById('ups-adopt-reason').value = lastAdoptionReason;
+  const audit = lastAdoptedModel && lastConfirmedRequirement
+    ? window.upsSelection.assessUpsProduct(findProduct(lastAdoptedModel), lastConfirmedRequirement, getUpsCatalogEntry(lastAdoptedModel)) : null;
+  document.getElementById('ups-adoption-status').innerHTML = audit
+    ? `最终采用：<b>${escapeHtml(lastAdoptedModel)}</b> ${upsAuditBadge(audit)}。${escapeHtml(lastAdoptionReason || '与推荐一致；仍须按项目规范复核。')}`
+    : '采用值不会改变程序校核结论；不满足或资料不足的型号必须注明理由。';
+}
+
+function adoptUpsModel() {
+  const model = document.getElementById('ups-adopt-model').value;
+  const reason = document.getElementById('ups-adopt-reason').value.trim();
+  if (!model || !lastConfirmedRequirement) { showToast('请先完成技术条件确认与校核，并选择型号'); return; }
+  const product = findProduct(model);
+  if (!product) { showToast('目录中不存在该型号'); return; }
+  const audit = window.upsSelection.assessUpsProduct(product, lastConfirmedRequirement, getUpsCatalogEntry(model));
+  if (audit.overall !== 'pass' && !reason) { showToast('此型号尚未满足全部条件，请填写采用理由和待复核风险'); return; }
+  lastAdoptedModel = model;
+  lastAdoptionReason = reason;
+  lastResult.manualAdoption = { model, reason, audit };
+  updateCurrentUpsHistory();
+  renderUpsAdoption();
+  showToast(audit.overall === 'pass' ? '已记录采用型号' : '已记录人工采用；风险标记将在导出中保留');
+}
 
 function buildProductSummary() {
   return PRODUCTS.map(p => {
@@ -1999,9 +2217,17 @@ function buildProductSummary() {
 
 async function analyze() {
   const req = document.getElementById("requirement").value.trim();
-  if (!req) { showToast("请先输入客户需求"); return; }
-
-  let fullReq = req;
+  if (!window.upsSelection) { showToast('选型校核模块尚未加载'); return; }
+  if (!document.getElementById('ups-criteria-confirmed').checked) {
+    document.getElementById('ups-criteria-note').textContent = '请先核对技术条件并勾选确认，再生成选型结果。';
+    document.getElementById('ups-criteria').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const confirmed = readUpsCriteria();
+  if (!confirmed.capacityKva && !confirmed.loadKw && !confirmed.loadKva) {
+    document.getElementById('ups-criteria-note').textContent = '至少需要填写 UPS 容量下限、负荷 kW 或负荷 kVA 之一。';
+    return;
+  }
 
   const btn = document.getElementById("analyze-btn");
   btn.disabled = true; btn.classList.add("loading");
@@ -2009,32 +2235,35 @@ async function analyze() {
   document.getElementById("btn-text").textContent = "分析中...";
 
   try {
-    const productSummary = buildProductSummary();
-    const validModels = PRODUCTS.map(p => p["型号"]);
-
-    const systemPrompt = getCustomPrompt()
-      + `\n\n【产品数据库】（格式：型号|系列|容量|安装|并机|PF|输入电压|描述）：\n${productSummary}\n\n【合法型号清单】（model字段只能从此列表取值）：\n${validModels.join("\n")}\n\n严格按以下JSON格式回复，不要有任何其他文字：\n{\n  "analysis": "按格式要求填写分析内容",\n  "recommended": [\n    {"model": "必须与合法型号清单完全一致的型号", "reason": "不少于80字的推荐理由"}\n  ],\n  "also_consider": [\n    {"model": "必须与合法型号清单完全一致的型号", "reason": "备选理由"}\n  ]\n}`;
-
-    const aiResp = await callAI(fullReq, systemPrompt);
-    let result;
-    try {
-      const m = aiResp.match(/\{[\s\S]*\}/);
-      result = JSON.parse(m ? m[0] : aiResp);
-    } catch {
-      result = { analysis: aiResp, recommended: [], also_consider: [] };
+    let aiResult = null;
+    const apiKey = document.getElementById('apikey')?.value.trim();
+    if (apiKey && req) {
+      try {
+        const productSummary = buildProductSummary();
+        const validModels = PRODUCTS.map(p => p['型号']);
+        const systemPrompt = getCustomPrompt()
+          + `\n\n【工程师已确认的技术条件，优先于原文】\n${JSON.stringify(confirmed)}\n\n【产品数据库】\n${productSummary}\n\n【合法型号清单】\n${validModels.join('\n')}`
+          + '\n\n仅辅助解释需求与候选差异，不作最终合格判定。严格输出 JSON：{"analysis":"说明","recommended":[{"model":"合法型号","reason":"理由"}],"also_consider":[]}';
+        const aiResp = await callAI(req, systemPrompt);
+        try {
+          const m = aiResp.match(/\{[\s\S]*\}/);
+          aiResult = validateModels(JSON.parse(m ? m[0] : aiResp), validModels);
+        } catch { aiResult = { analysis: aiResp, recommended: [], also_consider: [] }; }
+      } catch (error) {
+        aiResult = { analysis: `AI 辅助不可用：${error.message}。以下仍为本地程序校核结果。`, recommended: [], also_consider: [] };
+      }
     }
-
-    // 前端验证：过滤掉数据库中不存在的幻觉型号
-    result = validateModels(result, validModels);
+    const { result, audit } = auditedUpsResult(confirmed, aiResult);
 
     chatHistory = [
-      { role: "user",      content: "客户需求：" + fullReq },
+      { role: "user",      content: "客户需求：" + req },
       { role: "assistant", content: JSON.stringify(result) }
     ];
-    lastResult = result; lastRequirement = fullReq;
-    saveSelectionHistory(result, fullReq, window.projectSummary);
+    lastAdoptedModel = ''; lastAdoptionReason = '';
+    lastResult = result; lastRequirement = req; lastConfirmedRequirement = confirmed; lastSelectionAudit = audit;
+    saveSelectionHistory(result, req, window.projectSummary, confirmed, audit);
     renderResult(result);
-    document.getElementById("followup-card").style.display = "block";
+    document.getElementById("followup-card").style.display = apiKey ? "block" : "none";
     document.getElementById("chat-history").innerHTML = "";
   } catch(e) {
     showToast("选型失败：" + e.message);
@@ -2221,7 +2450,7 @@ function buildProductRow(rec, idx) {
     trFrame.innerHTML =
       '<td><input type="checkbox" class="product-checkbox" data-model="'+rec.model+'" data-idx="'+idx+'" onchange="updateCompareBtn()"></td>'
       +'<td><span class="badge '+bc+'">'+series+'</span></td>'
-      +'<td style="white-space:nowrap;font-weight:600;font-size:13px">'+modularInfo.frame+'</td>'
+      +'<td style="white-space:nowrap;font-weight:600;font-size:13px">'+escapeHtml(modularInfo.frame)+upsAuditBadge(rec.audit)+'</td>'
       +'<td><span style="background:#9b59b6;color:white;padding:2px 6px;border-radius:4px;font-size:11px;white-space:nowrap">机框</span></td>'
       +'<td style="font-size:12px;color:#555">'+(p?.["描述"]||"")+'</td>'
       +'<td style="white-space:nowrap">'+(kva ? kva+'kVA' : "")+'</td>'
@@ -2274,7 +2503,7 @@ function buildProductRow(rec, idx) {
   tr.innerHTML =
     '<td><input type="checkbox" class="product-checkbox" data-model="'+rec.model+'" data-idx="'+idx+'" onchange="updateCompareBtn()"></td>'
     +'<td><span class="badge '+bc+'">'+series+'</span></td>'
-    +'<td style="white-space:nowrap;font-weight:600;font-size:13px">'+rec.model+'</td>'
+    +'<td style="white-space:nowrap;font-weight:600;font-size:13px">'+escapeHtml(rec.model)+upsAuditBadge(rec.audit)+'</td>'
     +'<td>'+(typeBadgeStyle ? '<span style="'+typeBadgeStyle+';padding:2px 6px;border-radius:4px;font-size:11px;white-space:nowrap">'+prodType.label+'</span>' : '')+'</td>'
     +'<td style="font-size:12px;color:#555">'+(p?.["描述"]||"")+'</td>'
     +'<td style="white-space:nowrap">'+(kva ? kva+'kVA' : "")+'</td>'
@@ -2289,7 +2518,21 @@ function buildProductRow(rec, idx) {
   return tr;
 }
 
+function upsAuditBadge(audit) {
+  if (!audit) return '<small class="ups-audit-badge unknown">历史结果待重新校核</small>';
+  const label = audit.overall === 'pass' ? '满足' : audit.overall === 'fail' ? '不满足' : '资料不足';
+  return `<br><span class="ups-audit-badge ${audit.overall}">${label}</span>`;
+}
+
 function renderResult(result) {
+  const summary = document.getElementById('ups-audit-summary');
+  if (lastSelectionAudit) {
+    const counts = lastSelectionAudit.counts;
+    const meta = loadUpsCatalogMetadata();
+    summary.innerHTML = `<strong>程序校核：</strong>满足 ${counts.qualified} 款 · 资料不足 ${counts.pending} 款 · 不满足 ${counts.rejected} 款。` +
+      `<br>目录：${escapeHtml(meta.source)} · ${escapeHtml(meta.catalogVersion)}；规则：${escapeHtml(window.upsSelection.UPS_SELECTION_RULE_VERSION)}。` +
+      (counts.qualified ? '' : '<br><span class="warn">当前没有可直接标为完全匹配的型号；待确认项需补齐依据。</span>');
+  } else summary.textContent = '该历史记录尚无结构化技术条件及程序校核，请重新确认后选型。';
   document.getElementById("ai-analysis").textContent = (result.analysis || "").trim();
 
   const recs = (result.recommended   || []).map(r => ({...r, level:"best"}));
@@ -2329,6 +2572,7 @@ function renderResult(result) {
   });
 
   document.getElementById("result-section").classList.add("show");
+  renderUpsAdoption();
   document.getElementById("result-section").scrollIntoView({ behavior: "smooth" });
   
   // 更新电池配置面板的UPS型号下拉选项
@@ -2418,16 +2662,14 @@ async function sendFollowup() {
     const validModels2 = PRODUCTS.map(p => p["型号"]);
     result = validateModels(result, validModels2);
 
-    // 若AI回复知识性问题导致推荐列表为空，保留上一轮推荐结果
-    if (lastResult && (!result.recommended || result.recommended.length === 0)) {
-      result.recommended = lastResult.recommended || [];
-      result.also_consider = lastResult.also_consider || [];
-    }
-
     chatHistory.push({ role: "assistant", content: aiText });
-    appendChat("ai", result.analysis || aiText);
-    lastResult = result;
-    renderResult(result);
+    appendChat("ai", (result.analysis || aiText) + '\n如追问改变了容量、制式或冗余条件，请回到技术条件确认单更新并重新校核。');
+    if (lastConfirmedRequirement) {
+      const audited = auditedUpsResult(lastConfirmedRequirement, result);
+      lastResult = audited.result;
+      lastSelectionAudit = audited.audit;
+      renderResult(lastResult);
+    }
 
   } catch(e) {
     appendChat("ai", "出错：" + e.message);
@@ -2456,6 +2698,7 @@ function validateModels(result, validModels) {
 
   function checkList(list) {
     return (list || []).filter(rec => {
+      if (!rec || typeof rec.model !== 'string') return false;
       const found = validModels.some(vm =>
         vm === rec.model ||
         vm.replace(/\s/g,"") === rec.model.replace(/\s/g,"")
@@ -2493,6 +2736,19 @@ function showDetail(model, reason) {
     reasonDiv.style.display = "none";
   }
 
+  const audit = lastConfirmedRequirement && window.upsSelection
+    ? window.upsSelection.assessUpsProduct(p, lastConfirmedRequirement, getUpsCatalogEntry(p['型号'])) : null;
+  const entry = getUpsCatalogEntry(p['型号']);
+  document.getElementById('modal-audit').innerHTML = `<div class="ups-catalog-meta"><b>目录依据</b>：${escapeHtml(entry.source)} · ${escapeHtml(entry.version)}<br>` +
+    `核对日期：${escapeHtml(entry.reviewedAt || '未核对')}　` +
+    `在售状态：<select aria-label="在售状态" data-model="${escapeHtml(p['型号'])}" onchange="setUpsCatalogStatusFromSelect(this)">` +
+    `<option value="unverified"${entry.status === 'unverified' ? ' selected' : ''}>待核对</option>` +
+    `<option value="active"${entry.status === 'active' ? ' selected' : ''}>已核对在售</option>` +
+    `<option value="discontinued"${entry.status === 'discontinued' ? ' selected' : ''}>已停产/失效</option></select></div>` +
+    (audit ? `<div class="ups-audit-list"><b>技术条件校核 ${upsAuditBadge(audit)}</b>` +
+      audit.checks.map(check => `<div><span class="ups-audit-badge ${check.status}">${check.status === 'pass' ? '满足' : check.status === 'fail' ? '不满足' : '待确认'}</span> ` +
+        `${escapeHtml(check.label)}：${escapeHtml(check.detail)}</div>`).join('') + '</div>' : '');
+
   // 所有参数分组展示
   const skip = new Set(["系列","型号","描述","序号",""]);
   const params = Object.entries(p).filter(([k]) => !skip.has(k) && k && p[k]);
@@ -2502,8 +2758,8 @@ function showDetail(model, reason) {
   params.forEach(([k, v]) => {
     const item = document.createElement("div");
     item.style.cssText = "padding:8px 12px;border-bottom:1px solid #f0f0f0;display:flex;gap:8px;align-items:flex-start";
-    item.innerHTML = '<span style="min-width:130px;font-size:12px;color:#888;flex-shrink:0">'+k+'</span>'
-      + '<span style="font-size:13px;color:#1a1a1a;word-break:break-all">'+v+'</span>';
+    item.innerHTML = '<span style="min-width:130px;font-size:12px;color:#888;flex-shrink:0">'+escapeHtml(k)+'</span>'
+      + '<span style="font-size:13px;color:#1a1a1a;word-break:break-all">'+escapeHtml(v)+'</span>';
     container.appendChild(item);
   });
 
@@ -2642,51 +2898,105 @@ document.getElementById('compare-modal').addEventListener('click', function(e) {
   if (e.target === this) closeCompare();
 });
 
+function buildUpsSelectionDocument() {
+  if (!lastResult || !lastConfirmedRequirement) return null;
+  const meta = loadUpsCatalogMetadata();
+  const audit = lastSelectionAudit;
+  const requirement = lastConfirmedRequirement;
+  const criteria = [
+    ['额定容量下限', requirement.capacityKva, 'kVA'], ['负荷功率', requirement.loadKw, 'kW'],
+    ['负荷容量', requirement.loadKva, 'kVA'], ['输出功率因数下限', requirement.outputPowerFactor, ''],
+    ['输入/输出制式', requirement.inputOutputPhase, ''], ['并机台数', requirement.parallelUnits, '台'],
+    ['冗余架构', requirement.redundancy, ''], ['后备时间目标', requirement.backupMinutes, '分钟'],
+    ['电池节数', requirement.batteryCells, '节'], ['电池类型', requirement.batteryType, ''],
+    ['安装方式', requirement.installation, ''], ['SNMP', requirement.needsSnmp ? '需要' : null, '']
+  ].filter(([, value]) => value != null);
+  const candidates = [...(lastResult.recommended || []), ...(lastResult.also_consider || [])];
+  const candidateRows = candidates.map(item => {
+    const product = findProduct(item.model);
+    const check = product && window.upsSelection.assessUpsProduct(product, requirement, getUpsCatalogEntry(item.model));
+    return `<tr><td>${escapeHtml(item.model)}</td><td>${escapeHtml(check?.product.capacityKva ?? '待确认')} kVA</td>` +
+      `<td>${escapeHtml(check?.product.outputKw?.toFixed(1) ?? '待确认')} kW</td>` +
+      `<td>${escapeHtml(check?.overall === 'pass' ? '满足' : check?.overall === 'fail' ? '不满足' : '资料不足')}</td>` +
+      `<td>${escapeHtml(check?.checks.filter(row => row.status !== 'pass').map(row => `${row.label}：${row.detail}`).join('；') || '无')}</td></tr>`;
+  }).join('');
+  const adopted = lastAdoptedModel && findProduct(lastAdoptedModel)
+    ? window.upsSelection.assessUpsProduct(findProduct(lastAdoptedModel), requirement, getUpsCatalogEntry(lastAdoptedModel)) : null;
+  return `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>UPS选型技术说明</title><style>
+body{font-family:-apple-system,"Microsoft YaHei",sans-serif;max-width:950px;margin:30px auto;padding:0 20px;color:#1b2b3c;line-height:1.65}
+h1{color:#163a60}h2{color:#2563eb;border-bottom:2px solid #dce8f6;padding-bottom:7px;margin-top:28px}
+.meta{font-size:12px;color:#66788a}.note{padding:12px;background:#f7faff;border:1px solid #dbe7f5;white-space:pre-wrap;font-size:13px}
+.risk{background:#fff1ef;border-color:#f1aaa3;color:#9b251d}table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:8px;border:1px solid #d9e2ec;text-align:left;vertical-align:top}th{background:#eef4fb}
+@media print{body{max-width:none;margin:10px}.note,table{break-inside:avoid}}
+</style></head><body>
+<h1>UPS 选型技术说明</h1><div class="meta">UPS与配电选型助手 · ${escapeHtml(new Date().toLocaleString('zh-CN'))} · 规则 ${escapeHtml(window.upsSelection.UPS_SELECTION_RULE_VERSION)} · 目录 ${escapeHtml(meta.source)} / ${escapeHtml(meta.catalogVersion)}</div>
+<h2>一、客户原始需求</h2><div class="note">${escapeHtml(lastRequirement || '未提供原文')}</div>
+<h2>二、工程师确认的技术条件</h2><table><tbody>${criteria.map(([label, value, unit]) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value)} ${unit}</td></tr>`).join('')}</tbody></table>
+<p class="meta">确认时间：${escapeHtml(requirement.confirmedAt || '未记录')}。空白项不得按满足处理。</p>
+<h2>三、程序校核与候选</h2><p>满足 ${audit?.counts.qualified || 0} 款；资料不足 ${audit?.counts.pending || 0} 款；不满足 ${audit?.counts.rejected || 0} 款。</p>
+<table><thead><tr><th>型号</th><th>容量</th><th>有功容量</th><th>结论</th><th>待确认或风险</th></tr></thead><tbody>${candidateRows || '<tr><td colspan="5">无合格候选</td></tr>'}</tbody></table>
+<h2>四、最终采用</h2><div class="note${adopted?.overall !== 'pass' ? ' risk' : ''}">${lastAdoptedModel
+    ? `型号：${escapeHtml(lastAdoptedModel)}；当前校核：${adopted?.overall === 'pass' ? '满足' : adopted?.overall === 'fail' ? '不满足，人工偏离' : '资料不足，待复核'}。\n人工说明：${escapeHtml(lastAdoptionReason || '无')}`
+    : '尚未指定最终采用型号。候选结果不能代替工程师决策。'}</div>
+<h2>五、分析说明</h2><div class="note">${escapeHtml(lastResult.analysis || '')}</div>
+<p class="meta">初步选型，仅供方案比较；订货前应结合厂家现行资料、项目规范及电池放电曲线复核。</p></body></html>`;
+}
+
 function exportDoc() {
-  if (!lastResult) return;
-  const date = new Date().toLocaleDateString("zh-CN");
-  const allRecs = [
-    ...(lastResult.recommended  ||[]).map(r=>({...r,tag:"★ 首选推荐"})),
-    ...(lastResult.also_consider||[]).map(r=>({...r,tag:"○ 备选方案"})),
+  const doc = buildUpsSelectionDocument();
+  if (!doc) { showToast('请先完成技术条件确认与选型'); return; }
+  const url = URL.createObjectURL(new Blob([doc], { type: 'text/html;charset=utf-8' }));
+  Object.assign(document.createElement('a'), { href: url, download: `UPS选型技术说明_${new Date().toISOString().slice(0, 10)}.html` }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function printUpsSelection() {
+  const doc = buildUpsSelectionDocument();
+  if (!doc) { showToast('请先完成技术条件确认与选型'); return; }
+  const page = window.open('', '_blank');
+  if (!page) { showToast('浏览器阻止了打印窗口，请允许此站点打开弹窗'); return; }
+  page.addEventListener('load', () => page.print(), { once: true });
+  page.document.open(); page.document.write(doc); page.document.close();
+}
+
+function exportUpsSelectionExcel() {
+  if (!lastResult || !lastConfirmedRequirement) { showToast('请先完成技术条件确认与选型'); return; }
+  if (!ensureLib('XLSX')) return;
+  const metadata = loadUpsCatalogMetadata();
+  const requirement = lastConfirmedRequirement;
+  const wb = XLSX.utils.book_new();
+  const overview = [
+    ['UPS与配电选型助手', 'UPS选型校核表'], ['目录来源', metadata.source], ['目录版本', metadata.catalogVersion],
+    ['规则版本', window.upsSelection.UPS_SELECTION_RULE_VERSION], ['原始需求', lastRequirement],
+    ['工程师确认时间', requirement.confirmedAt || ''], ['最终采用型号', lastAdoptedModel || '未指定'],
+    ['采用理由/风险', lastAdoptionReason || ''], ['满足数量', lastSelectionAudit?.counts.qualified || 0],
+    ['资料不足数量', lastSelectionAudit?.counts.pending || 0], ['不满足数量', lastSelectionAudit?.counts.rejected || 0]
   ];
-
-  const productsHtml = allRecs.map(rec => {
-    const p = findProduct(rec.model);
-    if (!p) return `<h3>${rec.model}</h3><p>${rec.reason}</p>`;
-    const specs = Object.entries(p).filter(([k])=>k&&k!=="序号").map(([k,v])=>
-      `<tr><td style="width:180px;color:#666;padding:6px 12px;background:#f9f9f9">${k}</td><td style="padding:6px 12px">${v}</td></tr>`
-    ).join("");
-    return `<div style="margin-bottom:28px;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden">
-      <div style="background:#f5f7fa;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0;font-size:16px">${p["型号"]}</h3>
-        <span style="background:${rec.tag.includes("首选")?"#27ae60":"#3498db"};color:white;padding:3px 10px;border-radius:4px;font-size:12px">${rec.tag}</span>
-      </div>
-      <div style="padding:10px 16px;background:#fafcff;font-size:13px;color:#555">${p["描述"]||""}</div>
-      <div style="padding:10px 16px;background:#fff8e8;font-size:13px"><strong>推荐理由：</strong>${rec.reason}</div>
-      <table style="width:100%;border-collapse:collapse;font-size:13px">${specs}</table>
-    </div>`;
-  }).join("");
-
-  const doc = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>UPS选型推荐方案</title>
-<style>body{font-family:-apple-system,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;color:#1a1a1a}
-h1{color:#1a3a5c}h2{color:#2563eb;border-bottom:2px solid #e8e8e8;padding-bottom:8px;margin-top:32px}
-.meta{color:#888;font-size:13px;margin:8px 0 24px}.req{background:#f8fbff;border-left:4px solid #2563eb;padding:16px;border-radius:0 8px 8px 0;white-space:pre-wrap;font-size:13px;line-height:1.8}
-.analysis{background:#f0fff4;border:1px solid #a8e6c4;border-radius:8px;padding:16px;white-space:pre-wrap;font-size:13px;line-height:1.8}
-@media print{body{margin:20px}}</style></head><body>
-<h1>⚡ UPS 选型推荐方案</h1>
-<div class="meta">生成日期：${date} &nbsp;|&nbsp; 数据来源：常用UPS速查表V8.0</div>
-<h2>一、客户技术需求</h2><div class="req">${lastRequirement}</div>
-<h2>二、需求分析</h2><div class="analysis">${lastResult.analysis||""}</div>
-<h2>三、推荐产品详情</h2>${productsHtml}
-<div style="margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#aaa;text-align:center">
-本方案由 数据中心电气设计与选型平台 自动生成，仅供参考，具体选型请结合现场情况确认</div>
-</body></html>`;
-
-  const a = Object.assign(document.createElement("a"), {
-    href: URL.createObjectURL(new Blob([doc], {type:"text/html;charset=utf-8"})),
-    download: `UPS选型方案_${date.replace(/\//g,"-")}.html`
-  });
-  a.click();
+  for (const [key, value] of Object.entries(requirement)) if (!['sourceText', 'confirmedAt'].includes(key)) overview.push([key, value ?? '']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(overview), '技术条件');
+  const rows = [['型号', '类别', '校核', '容量(kVA)', '有功容量(kW)', '目录来源', '目录版本', '核对日期', '在售状态', '风险或待确认项']];
+  for (const item of [...(lastResult.recommended || []), ...(lastResult.also_consider || [])]) {
+    const product = findProduct(item.model);
+    if (!product) continue;
+    const check = window.upsSelection.assessUpsProduct(product, requirement, getUpsCatalogEntry(item.model));
+    rows.push([item.model, lastAdoptedModel === item.model ? '最终采用' : '候选',
+      check.overall === 'pass' ? '满足' : check.overall === 'fail' ? '不满足' : '资料不足',
+      check.product.capacityKva ?? '', check.product.outputKw ?? '', check.source, check.catalogVersion,
+      check.reviewedAt || '', check.lifecycle,
+      [lastAdoptedModel === item.model && lastAdoptionReason ? `人工采用说明：${lastAdoptionReason}` : '',
+        ...check.checks.filter(row => row.status !== 'pass').map(row => `${row.label}：${row.detail}`)]
+        .filter(Boolean).join('；')]);
+  }
+  if (lastAdoptedModel && !rows.some(row => row[0] === lastAdoptedModel)) {
+    const product = findProduct(lastAdoptedModel);
+    const check = window.upsSelection.assessUpsProduct(product, requirement, getUpsCatalogEntry(lastAdoptedModel));
+    rows.push([lastAdoptedModel, '最终采用', check.overall === 'pass' ? '满足' : check.overall === 'fail' ? '人工偏离、不满足' : '人工偏离、资料不足',
+      check.product.capacityKva ?? '', check.product.outputKw ?? '', check.source, check.catalogVersion, check.reviewedAt || '',
+      check.lifecycle, `${lastAdoptionReason}；${check.checks.filter(row => row.status !== 'pass').map(row => `${row.label}：${row.detail}`).join('；')}`]);
+  }
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), '候选与校核');
+  XLSX.writeFile(wb, `UPS选型校核_${new Date().toISOString().slice(0, 10)}.xlsx`);
 }
 
 function escapeHtml(value) {
@@ -2818,11 +3128,21 @@ function exportTechnicalBrief() {
       ${buildSummaryRowsHtml()}
     </section>` : '';
 
+  var currentUpsAudit = lastConfirmedRequirement && lastResult
+    ? (lastAdoptedModel && findProduct(lastAdoptedModel)
+      ? window.upsSelection.assessUpsProduct(findProduct(lastAdoptedModel), lastConfirmedRequirement, getUpsCatalogEntry(lastAdoptedModel))
+      : null) : null;
+  var currentCatalog = loadUpsCatalogMetadata();
   var aiHtml = lastResult ? `
     <section>
-      <h2>五、AI选型需求与推荐</h2>
+      <h2>五、UPS 技术条件与选型校核</h2>
       <h3>客户需求</h3><div class="note pre">${escapeHtml(lastRequirement || '')}</div>
-      <h3>需求分析</h3><div class="note pre">${escapeHtml(lastResult.analysis || '')}</div>
+      <h3>工程师确认条件</h3><div class="note pre">${escapeHtml(lastConfirmedRequirement ? JSON.stringify(lastConfirmedRequirement, null, 2) : '旧记录未保存结构化技术条件，请重新确认并校核。')}</div>
+      <h3>校核概况</h3><div class="note pre">${escapeHtml(lastResult.analysis || '')}</div>
+      <h3>最终采用与风险</h3><div class="note warn">${escapeHtml(lastAdoptedModel
+        ? `${lastAdoptedModel}；${currentUpsAudit?.overall === 'pass' ? '满足' : currentUpsAudit?.overall === 'fail' ? '人工偏离、不满足' : '资料不足、待复核'}；${lastAdoptionReason || '未填写采用说明'}`
+        : '未指定最终采用型号。')}</div>
+      <div class="meta">目录 ${escapeHtml(currentCatalog.source)} / ${escapeHtml(currentCatalog.catalogVersion)}；规则 ${escapeHtml(window.upsSelection?.UPS_SELECTION_RULE_VERSION || '旧版未记录')}</div>
     </section>` : '';
 
   var doc = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>UPS项目技术说明</title>
@@ -2838,9 +3158,9 @@ th,td{border:1px solid #d9e2ec;padding:8px 10px;vertical-align:top}.summary-tabl
 @media print{body{margin:16px;max-width:none}.kpi-grid,.three-col{break-inside:avoid}}
 </style></head><body>
 <h1>UPS项目技术说明</h1>
-<div class="meta">生成日期：${escapeHtml(date)} | 工具版本：${escapeHtml(APP_VERSION)} | 数据来源：常用UPS速查表V8.0</div>
+<div class="meta">生成日期：${escapeHtml(date)} | 工具版本：${escapeHtml(APP_VERSION)} | UPS目录：${escapeHtml(currentCatalog.source)} / ${escapeHtml(currentCatalog.catalogVersion)}</div>
 ${dcHtml}${runtimeHtml}${batteryHtml}${summaryHtml}${aiHtml}
-<div class="meta" style="margin-top:32px;border-top:1px solid #e5eef7;padding-top:12px">本说明由数据中心电气设计与选型平台自动生成，正式投标或设计交付前请结合现场条件、厂家曲线和项目规范复核。</div>
+<div class="meta" style="margin-top:32px;border-top:1px solid #e5eef7;padding-top:12px">本说明由UPS与配电选型助手自动生成，正式投标或设计交付前请结合现场条件、厂家曲线和项目规范复核。</div>
 </body></html>`;
 
   var fileDate = new Date().toISOString().slice(0, 10);
@@ -3002,6 +3322,24 @@ document.addEventListener('DOMContentLoaded', function() {
 // 产品信息列（上栏）：来自基本表的字段
 const DB_TOP_SET = new Set(["系列","型号","描述","产品编码","目录价","目录价版本","目录价备注","功率因数","满载效率","安装","并机数量","并机卡","并机线","LBS","电池","中性线","电池启动","冷启动","高度","模块高度","主旁不同源","输入THDI","输出THDU","通讯","显示屏","备注","泰尔","CQC节能认证","类别","产品系列","产品名称","含税成本"]);
 
+let resolveUpsCatalogImport = null;
+function showCatalogImportPreview(diff, fileName, nextCount) {
+  return new Promise(resolve => {
+    resolveUpsCatalogImport = resolve;
+    const list = (title, values) => `${title} ${values.length}：${values.length ? values.slice(0, 30).join('、') + (values.length > 30 ? '……' : '') : '无'}`;
+    document.getElementById('catalog-import-diff').textContent =
+      `文件：${fileName}\n导入后：${nextCount} 款\n\n${list('新增', diff.added)}\n\n${list('参数变化', diff.changed)}\n\n${list('新表中消失/待核查失效', diff.removed)}\n\n未变化：${diff.unchanged.length} 款。`;
+    document.getElementById('catalog-import-modal').style.display = 'block';
+  });
+}
+
+function finishCatalogImport(approved) {
+  document.getElementById('catalog-import-modal').style.display = 'none';
+  const resolve = resolveUpsCatalogImport;
+  resolveUpsCatalogImport = null;
+  resolve?.(Boolean(approved));
+}
+
 async function importExcel(input) {
   const file = input.files[0];
   if (!file) return;
@@ -3131,6 +3469,23 @@ async function importExcel(input) {
       return;
     }
 
+    const diff = window.upsSelection.diffUpsCatalog(PRODUCTS, newProducts);
+    const confirmed = await showCatalogImportPreview(diff, file.name, newProducts.length);
+    if (!confirmed) {
+      label.textContent = '已取消导入：' + file.name;
+      input.value = '';
+      return;
+    }
+    const previousMeta = loadUpsCatalogMetadata();
+    const nextEntries = {};
+    for (const model of diff.unchanged) if (previousMeta.entries[model]) nextEntries[model] = previousMeta.entries[model];
+    for (const model of [...diff.added, ...diff.changed]) nextEntries[model] = { status: 'unverified', reviewedAt: null, source: file.name, version: file.name };
+    for (const model of diff.removed) nextEntries[model] = { status: 'discontinued', reviewedAt: new Date().toISOString().slice(0, 10), source: file.name, version: file.name };
+    // 产品先落盘成功，再切换页面目录及其元数据，避免保存失败时状态分叉。
+    await saveProductsToDB(newProducts, file.name);
+    saveUpsCatalogMetadata({ version: 1, source: file.name, catalogVersion: file.name,
+      importedAt: new Date().toISOString(), entries: nextEntries });
+
     PRODUCTS.length = 0;
     newProducts.forEach(p => PRODUCTS.push(p));
     const catalogMatchCount = enrichProductsWithCatalog(PRODUCTS);
@@ -3139,18 +3494,11 @@ async function importExcel(input) {
     const summary = importedInfo.join('、') || ('共 ' + PRODUCTS.length + ' 款');
     label.textContent = '外部数据 ' + file.name + ' | ' + summary + ' | 共 ' + PRODUCTS.length + ' 款产品';
     label.style.color = '#a8f0c0';
+    document.getElementById('ups-footer-catalog-source').textContent = file.name;
 
     showImportToast('已成功导入 ' + PRODUCTS.length + ' 款产品（' + summary + '）');
 
-    // 保存到 IndexedDB（持久化）
-    debugLog('开始保存数据到IndexedDB...');
-    saveProductsToDB(newProducts, file.name).then(() => {
-      debugLog('数据已保存到本地存储');
-      // 验证保存
-      loadProductsFromDB().then(data => {
-        debugLog('验证保存结果:', data);
-      }).catch(e => console.error('验证保存失败:', e));
-    }).catch(e => console.error('保存数据失败:', e));
+    debugLog('目录数据已保存到本地存储');
 
     // 显示"恢复内置数据"按钮
     const restoreBtn = document.getElementById('restore-btn');
@@ -3317,6 +3665,7 @@ async function restoreBuiltinData() {
   if (!confirm('确定恢复为内置数据？当前导入的数据将被清除。')) return;
   try {
     await clearProductsDB();
+    localStorage.removeItem(UPS_CATALOG_META_KEY);
     location.reload();
   } catch (e) {
     showToast('清除数据失败：' + e.message);
@@ -30865,7 +31214,7 @@ function buildDatabaseProductPopoutHtml(product) {
 @media(max-width:1200px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:760px){.summary{grid-template-columns:repeat(3,minmax(0,1fr))}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.window-tip{white-space:normal}.content{padding:14px}.header{padding:16px}.title{font-size:20px}}
 </style></head><body>
 <header class="header"><div class="topline"><div class="eyebrow">UPS 型号数据全景 · 独立窗口</div><div class="window-tip">可拖到另一台显示器 · 上下左右边缘均可调整大小</div></div><div class="title-line"><span class="series">${escapeHtml(product['系列'] || 'UPS')}</span><h1 class="title">${escapeHtml(product['型号'] || '未命名型号')}</h1></div><p class="desc">${escapeHtml(product['描述'] || '暂无产品描述')}</p></header>
-<main class="content"><div class="summary">${summaryHtml}</div><section class="section"><div class="section-head blue"><span>📋 产品信息</span><span class="count">${productCount} 项</span></div><div class="grid">${productFields}</div></section><section class="section"><div class="section-head green"><span>🔧 技术规格（泰尔参数）</span><span class="count">${techCount} 项</span></div><div class="grid">${techFields}</div></section></main><footer class="footer">数据中心电气设计与选型平台 ${escapeHtml(APP_VERSION)} · 主页面点击其他型号时本窗口自动更新</footer>
+<main class="content"><div class="summary">${summaryHtml}</div><section class="section"><div class="section-head blue"><span>📋 产品信息</span><span class="count">${productCount} 项</span></div><div class="grid">${productFields}</div></section><section class="section"><div class="section-head green"><span>🔧 技术规格（泰尔参数）</span><span class="count">${techCount} 项</span></div><div class="grid">${techFields}</div></section></main><footer class="footer">UPS与配电选型助手 ${escapeHtml(APP_VERSION)} · 主页面点击其他型号时本窗口自动更新</footer>
 </body></html>`;
 }
 
@@ -31073,6 +31422,9 @@ function sortDataTable(colIdx, section) {
         <option value="50" selected>显示50条</option>
       </select>
       <button onclick="exportHistory()" style="background:#27ae60;color:#fff">📥 导出Excel</button>
+      <button onclick="exportUpsHistoryJson()">备份 JSON</button>
+      <label style="cursor:pointer;padding:7px 9px;border:1px solid #ccd6e3;border-radius:6px">恢复备份<input type="file" accept=".json,application/json" hidden onchange="importUpsHistoryJson(this)"></label>
+      <button onclick="compareUpsHistory()">比较选中方案</button>
       <button onclick="clearSelectionHistory()" style="background:#e74c3c;color:#fff">🗑 清空</button>
     </div>
     <div id="history-list" style="max-height:500px;overflow-y:auto"></div>
@@ -31138,7 +31490,11 @@ function generateHistoryId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 }
 
-function saveSelectionHistory(result, requirement, projectSummary) {
+function upsProductSnapshot(product) {
+  return Object.fromEntries(Object.entries(product || {}).filter(([key]) => !/价格|目录价|成本|报价|折扣|供应商/.test(key)));
+}
+
+function saveSelectionHistory(result, requirement, projectSummary, confirmedRequirement = null, audit = null) {
   const history = loadSelectionHistoryRaw();
   const record = {
     id: generateHistoryId(),
@@ -31147,6 +31503,13 @@ function saveSelectionHistory(result, requirement, projectSummary) {
     analysis: result.analysis || "",
     recommended: result.recommended || [],
     also_consider: result.also_consider || [],
+    confirmedRequirement: confirmedRequirement ? JSON.parse(JSON.stringify(confirmedRequirement)) : null,
+    auditCounts: audit?.counts || null,
+    catalog: (() => { const meta = loadUpsCatalogMetadata(); return { source: meta.source, version: meta.catalogVersion, importedAt: meta.importedAt }; })(),
+    ruleVersion: window.upsSelection?.UPS_SELECTION_RULE_VERSION || null,
+    manualAdoption: result.manualAdoption || null,
+    productSnapshots: [...(result.recommended || []), ...(result.also_consider || [])]
+      .map(item => findProduct(item.model)).filter(Boolean).map(upsProductSnapshot),
     projectSummary: JSON.parse(JSON.stringify(projectSummary || {})),
     savedUpsConfigurations: JSON.parse(JSON.stringify(getSavedUpsConfigurations()))
   };
@@ -31154,6 +31517,20 @@ function saveSelectionHistory(result, requirement, projectSummary) {
   if (history.records.length > HISTORY_MAX) {
     history.records = history.records.slice(0, HISTORY_MAX);
   }
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  lastHistoryRecordId = record.id;
+  return record;
+}
+
+function updateCurrentUpsHistory() {
+  if (!lastHistoryRecordId) return;
+  const history = loadSelectionHistoryRaw();
+  const record = history.records.find(item => item.id === lastHistoryRecordId);
+  if (!record) return;
+  record.manualAdoption = lastResult?.manualAdoption || null;
+  record.analysis = lastResult?.analysis || record.analysis;
+  record.recommended = lastResult?.recommended || [];
+  record.also_consider = lastResult?.also_consider || [];
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
 
@@ -31207,6 +31584,20 @@ function restoreHistory(record, event) {
     also_consider: record.also_consider || []
   };
   lastRequirement = record.requirement;
+  lastHistoryRecordId = record.id;
+  lastConfirmedRequirement = record.confirmedRequirement || null;
+  if (record.confirmedRequirement && window.upsSelection) {
+    fillUpsCriteria(record.confirmedRequirement);
+    const audited = auditedUpsResult(record.confirmedRequirement);
+    lastResult = { ...audited.result, manualAdoption: record.manualAdoption || null };
+    lastSelectionAudit = audited.audit;
+  } else {
+    document.getElementById('requirement').value = record.requirement || '';
+    document.getElementById('ups-criteria-confirmed').checked = false;
+    lastSelectionAudit = null;
+  }
+  lastAdoptedModel = record.manualAdoption?.model || '';
+  lastAdoptionReason = record.manualAdoption?.reason || '';
 
   chatHistory = [
     { role: "user", content: "客户需求：" + record.requirement },
@@ -31255,19 +31646,24 @@ function renderHistoryList(records) {
     html += `
       <div class="history-item" onclick="expandHistoryItem(this)">
         <div class="history-item-header">
-          <span class="history-item-time">🕐 ${record.timestamp}</span>
+          <span class="history-item-time"><input type="checkbox" class="ups-history-compare" value="${escapeHtml(record.id)}" onclick="event.stopPropagation()" aria-label="选择方案进行比较"> 🕐 ${escapeHtml(record.timestamp)}</span>
           <div class="history-actions">
-            <button class="btn-restore" onclick="restoreHistory(${JSON.stringify(record).replace(/"/g, '&quot;')}, event)">恢复</button>
-            <button class="btn-delete" onclick="deleteSelectionHistory('${record.id}', event)">删除</button>
+            <button class="btn-restore" onclick="restoreUpsHistoryById('${escapeHtml(record.id)}', event)">恢复</button>
+            <button class="btn-delete" onclick="deleteSelectionHistory('${escapeHtml(record.id)}', event)">删除</button>
           </div>
         </div>
-        <div class="history-item-models">★ ${recModels || '无'}${alsoModels ? ' | ○ ' + alsoModels : ''}</div>
-        <div class="history-item-requirement" title="${record.requirement.replace(/"/g, '&quot;')}">需求：${record.requirement}</div>
-        <div class="history-item-detail">${record.analysis || '无分析内容'}</div>
+        <div class="history-item-models">★ ${escapeHtml(recModels || '无')}${alsoModels ? ' | ○ ' + escapeHtml(alsoModels) : ''}${record.manualAdoption ? ' | 最终采用 ' + escapeHtml(record.manualAdoption.model) : ''}</div>
+        <div class="history-item-requirement" title="${escapeHtml(record.requirement)}">需求：${escapeHtml(record.requirement)}</div>
+        <div class="history-item-detail">${escapeHtml(record.analysis || '无分析内容')}</div>
       </div>
     `;
   });
   container.innerHTML = html;
+}
+
+function restoreUpsHistoryById(id, event) {
+  const record = loadSelectionHistoryRaw().records.find(item => item.id === id);
+  if (record) restoreHistory(record, event);
 }
 
 function expandHistoryItem(el) {
@@ -31348,6 +31744,97 @@ function exportHistory() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '选型历史');
   XLSX.writeFile(wb, `选型历史_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+function downloadUpsJson(value, filename) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json;charset=utf-8' }));
+  const link = Object.assign(document.createElement('a'), { href: url, download: filename });
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function sanitizeUpsHistoryRecord(record) {
+  return { ...record,
+    productSnapshots: (record.productSnapshots || []).map(upsProductSnapshot),
+    projectSummary: {}, savedUpsConfigurations: [] };
+}
+
+function exportCurrentUpsSnapshot() {
+  if (!lastResult || !lastConfirmedRequirement) { showToast('请先完成并确认选型'); return; }
+  const record = loadSelectionHistoryRaw().records.find(item => item.id === lastHistoryRecordId);
+  if (!record) { showToast('当前选型记录不存在'); return; }
+  downloadUpsJson({ kind: 'ups-selection-snapshot', version: 1, record: sanitizeUpsHistoryRecord(record) },
+    `UPS选型方案_${new Date().toISOString().slice(0, 10)}.json`);
+}
+
+function exportUpsHistoryJson() {
+  const history = loadSelectionHistoryRaw();
+  const records = history.records.map(sanitizeUpsHistoryRecord);
+  downloadUpsJson({ kind: 'ups-selection-backup', version: 1, exportedAt: new Date().toISOString(), records },
+    `UPS选型记录备份_${new Date().toISOString().slice(0, 10)}.json`);
+}
+
+async function importUpsHistoryJson(input) {
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file) return;
+  if (file.size > 5_000_000) { showToast('备份文件超过 5MB，请拆分后导入'); return; }
+  try {
+    const payload = JSON.parse(await file.text());
+    const records = payload.kind === 'ups-selection-snapshot' ? [payload.record]
+      : payload.kind === 'ups-selection-backup' ? payload.records : null;
+    if (payload.version !== 1 || !Array.isArray(records) || records.length > 500 ||
+      records.some(item => !item || typeof item.id !== 'string' || !/^[a-z0-9_-]{1,60}$/i.test(item.id) ||
+        typeof item.requirement !== 'string' || !Array.isArray(item.recommended))) {
+      throw new Error('不是兼容的 UPS 选型备份');
+    }
+    const history = loadSelectionHistoryRaw();
+    const seen = new Set(history.records.map(item => item.id));
+    let added = 0;
+    for (const record of records) {
+      if (seen.has(record.id)) continue;
+      history.records.unshift(sanitizeUpsHistoryRecord(record));
+      seen.add(record.id);
+      added++;
+    }
+    history.records = history.records.slice(0, HISTORY_MAX);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    filterHistory();
+    showToast(`已恢复 ${added} 条 UPS 选型记录；目录数据未被覆盖`);
+  } catch (error) { showToast('恢复失败：' + error.message); }
+}
+
+function compareUpsHistory() {
+  const ids = [...document.querySelectorAll('.ups-history-compare:checked')].map(input => input.value);
+  if (ids.length < 2 || ids.length > 3) { showToast('请选择 2–3 条记录比较'); return; }
+  const records = ids.map(id => loadSelectionHistoryRaw().records.find(record => record.id === id)).filter(Boolean);
+  const requirementSet = new Set(records.map(record => (record.requirement || '').trim()));
+  if (requirementSet.size > 1) { showToast('所选记录不是同一份客户需求，请选择同一需求的 2–3 个方案'); return; }
+  const cells = records.map((record, index) => {
+    const model = record.manualAdoption?.model || record.recommended?.[0]?.model || record.also_consider?.[0]?.model || '';
+    const product = record.productSnapshots?.find(item => item['型号'] === model) || findProduct(model) || {};
+    const normalized = window.upsSelection.normalizeUpsProduct(product);
+    const requirement = record.confirmedRequirement || {};
+    const audit = model && window.upsSelection.assessUpsProduct(product, requirement, getUpsCatalogEntry(model));
+    const marginKw = normalized.outputKw && requirement.loadKw ? normalized.outputKw - requirement.loadKw : null;
+    return { name: `方案 ${index + 1}`, model, capacity: normalized.capacityKva, outputKw: normalized.outputKw,
+      marginKw, backup: requirement.backupMinutes, status: audit?.overall || 'unknown',
+      reason: record.manualAdoption?.reason || '', source: record.catalog?.source || '历史目录未记录',
+      rule: record.ruleVersion || '历史规则未记录' };
+  });
+  const row = (label, values) => `<tr><th style="text-align:left;padding:9px;border:1px solid #dbe3ed;background:#f5f8fc">${label}</th>${values.map(value =>
+    `<td style="padding:9px;border:1px solid #dbe3ed">${escapeHtml(value ?? '待确认')}</td>`).join('')}</tr>`;
+  document.getElementById('compare-content').innerHTML = `<p>同一客户需求下的独立方案快照。后备时间仅显示目标，未完成电池曲线校核时不视为满足。</p>` +
+    `<table style="border-collapse:collapse;width:100%;font-size:13px">${row('项目', cells.map(item => item.name))}` +
+    row('采用/首选型号', cells.map(item => item.model)) + row('额定容量', cells.map(item => item.capacity && `${item.capacity} kVA`)) +
+    row('单机有功容量', cells.map(item => item.outputKw && `${item.outputKw} kW`)) +
+    row('负荷余量', cells.map(item => item.marginKw != null ? `${item.marginKw.toFixed(1)} kW` : null)) +
+    row('后备时间目标', cells.map(item => item.backup ? `${item.backup} 分钟` : null)) +
+    row('当前校核', cells.map(item => ({ pass: '满足', unknown: '资料不足', fail: '不满足' })[item.status])) +
+    row('人工偏离说明', cells.map(item => item.reason || '无')) + row('目录来源', cells.map(item => item.source)) +
+    row('规则版本', cells.map(item => item.rule)) + '</table>';
+  document.getElementById('compare-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
 }
 
 function openHistoryModal() {

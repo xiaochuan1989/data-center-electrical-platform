@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-数据中心电气设计与选型平台 - 测试入口
+UPS与配电选型助手 - 测试入口
 ===========================
 
 整合所有开发验证脚本，统一入口。
@@ -181,7 +181,7 @@ def main():
 
     # 打印标题
     print("="*50)
-    print("⚡ 数据中心电气设计与选型平台 - 测试系统")
+    print("⚡ UPS与配电选型助手 - 测试系统")
     print("="*50)
     print(f"项目路径: {PROJECT_ROOT}")
     print(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

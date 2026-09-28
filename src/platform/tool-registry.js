@@ -12,18 +12,10 @@ export const TOOL_GROUPS = [
   {
     id: 'engineering', name: '工程主链', icon: '▦',
     tools: [
-      { id: 'load', name: '负荷与变压器校核', status: 'available', source: '数据中心负荷计算表/微模块电气负荷计算表 A00' },
-      { id: 'load', name: '支路断路器与母线电流', status: 'available', source: '数据中心母线电流计算 A00' },
       { id: 'cable', name: '电缆选型', status: 'available', source: 'B-电缆选型 A00 / GB 50217-2018' },
       { id: 'busbar', name: '铜排双向计算与载流量表', status: 'available', source: '铜排载流量 A03 / 工程计算器 A00 / DIN43671-1975' },
       { id: 'busway', name: '智能母线配置', status: 'available', source: '智能母线配置与选型' },
       { id: 'power-quality', name: 'APF / SVG 校核', status: 'available', source: 'APF容量配置 / SVG+APF 交互计算' }
-    ]
-  },
-  {
-    id: 'templates', name: '资料与模板', icon: '▤',
-    tools: [
-      { id: 'templates', name: '模板中心', status: 'governed', source: '仅发布已脱敏当前有效版' }
     ]
   }
 ];
