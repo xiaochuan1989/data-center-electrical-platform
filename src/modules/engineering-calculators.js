@@ -180,7 +180,7 @@ export function calculateLithiumBatteryA00(input = {}) {
     platformVoltageRule = '>6C';
   } else {
     return {
-      error: 'A00 Excel 的平台电压公式在 3C～4C 区间没有定义，请调整放电时间或确认平台电压口径',
+      error: '3C～4C 区间缺少平台电压取值依据，请调整后备时间或核对电芯放电参数',
       dischargeRateC,
       excelFormulaGap: true
     };
@@ -835,6 +835,51 @@ export function calculateBusbarSelection(catalog, input = {}) {
   };
 }
 
+/**
+ * 按《铜排载流量.xlsx》的环境温度与放置方式选择最小满足规格。
+ * 只做原表离散查表，不对温度、规格或并联根数插值。
+ */
+export function calculateBusbarTableLookup(catalog, input = {}) {
+  const loadCurrentA = number(input.loadCurrentA, NaN);
+  if (!Number.isFinite(loadCurrentA) || loadCurrentA <= 0 || loadCurrentA > 20000) {
+    return { error: '负载电流必须大于 0A 且不超过 20000A' };
+  }
+  const ambientC = [25, 35, 40].includes(Number(input.ambientC)) ? Number(input.ambientC) : 35;
+  const orientation = input.orientation === 'vertical' ? 'vertical' : 'flat';
+  const configuration = ['单片', '多根'].includes(input.configuration) ? input.configuration : '';
+  const available = (catalog || []).map(item => ({
+    ...item,
+    currentA: number(item.currents?.[String(ambientC)]?.[orientation], NaN)
+  })).filter(item => Number.isFinite(item.currentA) && (!configuration || item.configuration === configuration));
+  const selected = [...available]
+    .filter(item => item.currentA >= loadCurrentA)
+    .sort((a, b) => a.currentA - b.currentA || number(a.totalAreaMm2) - number(b.totalAreaMm2))[0] || null;
+  const maximumCurrentA = available.reduce((maximum, item) => Math.max(maximum, item.currentA), 0);
+  if (!selected) {
+    return {
+      error: '当前温度、放置方式和结构范围内没有满足条件的规格',
+      loadCurrentA,
+      ambientC,
+      orientation,
+      configuration,
+      maximumCurrentA
+    };
+  }
+  const loadRate = loadCurrentA / selected.currentA;
+  return {
+    loadCurrentA,
+    ambientC,
+    orientation,
+    configuration,
+    selected,
+    ratedCurrentA: selected.currentA,
+    loadRate,
+    spareCurrentA: selected.currentA - loadCurrentA,
+    availableCount: available.length,
+    requiresShortCircuitCheck: loadCurrentA >= 4000
+  };
+}
+
 const STEFAN_BOLTZMANN = 5.670374419e-8;
 const DIN_REFERENCE_AMBIENT_C = 35;
 const DIN_REFERENCE_RISE_K = 30;
@@ -1127,7 +1172,7 @@ export function calculateCableSelection(catalog, input = {}) {
   const requiredCurrentA = Math.max(0, number(input.requiredCurrentA));
   if (requiredCurrentA <= 0) return { error: '请输入大于 0A 的电流' };
   if (requiredCurrentA > 1600) {
-    return { error: '电流超过工作簿的 1600A 适用上限，建议改用密集母线', requiredCurrentA, useBusway: true };
+    return { error: '电流超过当前电缆选型数据的 1600A 上限，建议改用密集母线', requiredCurrentA, useBusway: true };
   }
 
   const type = input.type || 'YJV、YJLV、YJY、YJLY型(铜芯)';
@@ -1162,7 +1207,7 @@ export function calculateCableSelection(catalog, input = {}) {
   if (!selected) {
     const maximumCurrentA = matches.reduce((maximum, item) => Math.max(maximum, item.correctedCurrentA), 0);
     return {
-      error: matches.length ? '当前组合没有满足电流的表列线径，请增加并联根数或调整敷设条件' : '当前组合在工作簿数据库中没有对应数据',
+      error: matches.length ? '当前组合没有满足电流的表列线径，请增加并联根数或调整敷设条件' : '当前组合在参考数据库中没有对应数据',
       requiredCurrentA,
       maximumCurrentA,
       correctionFactor,

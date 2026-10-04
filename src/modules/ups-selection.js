@@ -1,4 +1,5 @@
 // UPS 选型的确定性校核。未知参数不推断为满足，AI 只能补充文字解释。
+import { normalizeEvidence } from './ups-evidence.js';
 export const UPS_SELECTION_RULE_VERSION = '1.1';
 export const BUILTIN_CATALOG = Object.freeze({ source: '常用UPS速查表-V8.0.xlsx', version: 'V8.0' });
 
@@ -40,7 +41,8 @@ export function normalizeUpsRequirement(value = {}) {
     batteryType: ['lead-acid', 'lithium'].includes(value.batteryType) ? value.batteryType : null,
     installation: ['机架式', '塔式'].includes(value.installation) ? value.installation : null,
     redundancy: ['N', 'N+1', '2N'].includes(value.redundancy) ? value.redundancy : null,
-    needsSnmp: Boolean(value.needsSnmp), sourceText: text(value.sourceText), confirmedAt: value.confirmedAt || null
+    needsSnmp: Boolean(value.needsSnmp), sourceText: String(value.sourceText ?? ''), confirmedAt: value.confirmedAt || null,
+    ...normalizeEvidence(value)
   };
 }
 

@@ -1,0 +1,45 @@
+import assert from 'node:assert/strict';
+import { requirementReviewPage, createRequirementDrafts, isRequirementTodo } from '../src/platform/requirement-review-state.js';
+const sourceA={id:'A',name:'资料A',type:'text',text:'额定电流：32A\n原文2',segments:[{start:0,end:8},{start:9,end:12}]};
+const sourceB={id:'B',name:'资料B',type:'xlsx',text:'≥98%',segments:[{start:0,end:4,sheet:'Sheet1',cell:'C8',contextTitle:'效率'}]};
+const make=(i)=>({id:`r${i}`,equipmentId:i%3===0?'e1':null,field:'clause',reviewStatus:i%4===0?'confirmed':'pending',
+  confirmedValue:null,candidates:[{value:`原文${i}`,evidence:{sourceId:'A',start:i,end:i+1,quote:`原文${i}`}}]});
+const pack={sources:[sourceA,sourceB],equipment:[{id:'e1',label:'柜1'}],requirements:Array.from({length:1196},(_,i)=>make(i))};
+const before=JSON.stringify(pack),seen=[];
+for(let page=1;page<=60;page++) {
+  const result=requirementReviewPage(pack,{page});assert.ok(result.items.length<=20);seen.push(...result.items.map(r=>r.id));
+  assert.equal(result.total,1196);assert.equal(result.totalPages,60);
+}
+assert.equal(new Set(seen).size,1196);assert.deepEqual(seen,pack.requirements.map(r=>r.id));
+assert.equal(JSON.stringify(pack),before,'分页不可修改全量包');
+assert.equal(requirementReviewPage(pack,{page:999}).page,60);
+assert.equal(requirementReviewPage(pack,{page:0}).page,1);
+assert.equal(requirementReviewPage(pack,{pageSize:999}).pageSize,20);
+assert.equal(requirementReviewPage({...pack,requirements:Array.from({length:1500},(_,i)=>make(i))},{pageSize:50,page:30}).items.length,50);
+assert.equal(requirementReviewPage(pack,{sourceId:'B'}).total,0);
+assert.equal(requirementReviewPage(pack,{equipmentId:'unassigned'}).total,pack.requirements.filter(r=>!r.equipmentId).length);
+assert.equal(requirementReviewPage(pack,{status:'todo'}).total,pack.requirements.filter(isRequirementTodo).length);
+assert.equal(requirementReviewPage(pack,{status:'confirmed',equipmentId:'e1'}).total,pack.requirements.filter(r=>r.reviewStatus==='confirmed'&&r.equipmentId==='e1').length);
+assert.equal(requirementReviewPage(pack,{keyword:'原文1195'}).total,1);
+assert.equal(requirementReviewPage(pack,{keyword:'['}).total,0,'关键词不能当正则');
+assert.equal(requirementReviewPage(pack,{keyword:'资料a'}).total,1196);
+const pool={...make(2),id:'pool',candidates:[...make(2).candidates,{value:98,evidence:{sourceId:'B',start:0,end:4,quote:'≥98%'}}]};
+const multi={...pack,requirements:[pool]};
+assert.equal(requirementReviewPage(multi,{sourceId:'B',keyword:'效率'}).items[0].candidates.length,2,'筛选保留完整跨来源冲突池');
+assert.equal(requirementReviewPage(multi,{keyword:'Sheet1'}).total,1);
+const reversed={...pack,requirements:[...pack.requirements].reverse()};
+assert.deepEqual(requirementReviewPage(reversed).items.map(r=>r.id),pack.requirements.slice(0,20).map(r=>r.id),'稳定按证据位置而非映射追加位置');
+const empty=requirementReviewPage({...pack,requirements:[]});assert.equal(empty.totalPages,0);assert.equal(empty.start,0);assert.equal(empty.end,0);
+const drafts=createRequirementDrafts(),values={equipment:'e1',field:'ratedCurrentA',value:'40',forbidden:'true',response:'met',reason:'尚未记录'};
+drafts.remember(pack,'r1',values);drafts.remember(pack,'r2',{...values,value:'50'});assert.equal(drafts.size,2);
+const fetched=drafts.get('r1');fetched.value='999';assert.equal(drafts.get('r1').value,'40');
+assert.deepEqual(drafts.sync(JSON.parse(JSON.stringify(pack))),[],'克隆/无关提交不清除会话草稿');
+const unrelated={...pack,equipment:[...pack.equipment,{id:'e2',label:'PDU'}]};assert.deepEqual(drafts.sync(unrelated),[]);
+const mutated=JSON.parse(JSON.stringify(pack));mutated.requirements[1].reviewStatus='stale';
+assert.deepEqual(drafts.sync(mutated),['r1']);assert.equal(drafts.size,1);
+const textChanged=JSON.parse(JSON.stringify(pack));textChanged.sources[0].text+='（新版）';
+assert.deepEqual(drafts.sync(textChanged),['r2'],'同ID/同候选但原文变化也使草稿失效');
+drafts.remember(pack,'r1',values);drafts.clear('r1');assert.equal(drafts.size,0);
+drafts.remember(pack,'r1',values);assert.deepEqual(drafts.sync({...pack,requirements:[]}),['r1']);
+assert.throws(()=>drafts.remember(pack,'missing',values),/不存在/);
+console.log('条款分页/资料交集、1196及1500无重漏、证据稳定顺序、跨来源池与会话草稿失效回归通过');

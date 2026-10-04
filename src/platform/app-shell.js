@@ -5,6 +5,7 @@ import {
   calculateBranch,
   calculateBusbarAmpacity,
   calculateBusbarSelection,
+  calculateBusbarTableLookup,
   calculateCableSelection,
   calculateBusway,
   calculateLoadSummary,
@@ -14,7 +15,9 @@ import {
   calculateSvg
 } from '../modules/engineering-calculators.js';
 import { allTools, TEMPLATE_CATALOG, TOOL_GROUPS } from './tool-registry.js';
+import { nonstandardRequirementView, mountNonstandardRequirements } from './nonstandard-requirement-view.js';
 import busbarCatalog from '../data/busbar-catalog.json';
+import busbarAmpacityTable from '../data/busbar-ampacity-table.json';
 import cableCatalog from '../data/cable-catalog.json';
 import awgCatalog from '../data/awg-catalog.json';
 import smartBuswayCatalog from '../data/smart-busway-catalog.json';
@@ -30,7 +33,7 @@ const SIDEBAR_PREF_KEY = 'dc_platform_sidebar_collapsed';
 
 const state = {
   project: null,
-  catalogs: { busbars: [], cables: [], awg: [], smartBusway: {} },
+  catalogs: { busbars: [], busbarAmpacityTable: [], cables: [], awg: [], smartBusway: {} },
   activeView: 'tools',
   buswayStep: 1,
   buswayZoom: 1,
@@ -90,6 +93,7 @@ function buildSidebar() {
     ${navButton('busbar', '铜排计算', 'stack-2')}
     ${navButton('busway', '智能母线', 'device-desktop-analytics')}
     ${navButton('power-quality', '电能质量', 'calculator')}
+    ${navButton('requirements', '非标配电售前方案', 'tool')}
   </aside>`;
 }
 
@@ -135,7 +139,7 @@ function cableView() {
   const typeYj = 'YJV、YJLV、YJY、YJLY型(铜芯)';
   const airColumns = [1, 2, 3, 4, 5, 6];
   const trayColumns = [1, 2, 3, 4];
-  return viewPanel('cable', '电缆选型', '按 B-电缆选型-A00 工作簿进行电缆计算；导体选型已移除，铜排请使用独立计算页。', `
+  return viewPanel('cable', '电缆选型', '按负载电流、敷设条件和修正系数推荐电缆规格；铜排请使用独立计算页。', `
     <div class="engineering-tabs cable-tabs" role="tablist" aria-label="电缆工具">
       <button class="active" role="tab" aria-selected="true" data-cable-tab="calculator">电缆智能选型</button>
       <button role="tab" aria-selected="false" data-cable-tab="correction">电缆修正系数数据表</button>
@@ -143,7 +147,7 @@ function cableView() {
       <button role="tab" aria-selected="false" data-cable-tab="awg">中美线规对照表 <span>${awgCatalog.length} 条</span></button>
     </div>
     <div class="cable-pane" data-cable-pane="calculator">
-      <div class="busbar-source-note cable-source-note"><b>计算口径</b><span>基础载流量、输入条件和推荐逻辑均来自 B-电缆选型-A00；修正系数采用 GB 50217-2018 表 D.0.5、D.0.6。</span></div>
+      <div class="busbar-source-note cable-source-note"><b>计算口径</b><span>按电缆基础载流量及并联、并列、桥架叠层等条件修正；相关系数参考 GB 50217-2018 表 D.0.5、D.0.6。</span></div>
       <div class="platform-form-grid cols-4 cable-inputs">
         <label>电缆类型<select id="cable-type"><option>BV、BVR型(铜芯)</option><option selected>${typeYj}</option></select></label>
         <label>芯数<select id="cable-core-count"><option>单芯</option><option>三芯/五芯</option></select></label>
@@ -163,7 +167,7 @@ function cableView() {
       <p class="engineering-warning">⚠ 空气中单层并列系数不适用于三相交流系统单芯电缆；超过 1600A 建议采用密集母线。最终选型仍需校核电压降、短路热稳定和实际敷设条件。</p>
     </div>
     <div class="cable-pane" data-cable-pane="correction" hidden>
-      <div class="reference-table-intro"><b>GB 50217-2018 修正系数</b><span>完整保留工作簿中的表 D.0.5 与表 D.0.6，便于核对当前计算采用的系数。</span></div>
+      <div class="reference-table-intro"><b>GB 50217-2018 修正系数</b><span>展示表 D.0.5 与表 D.0.6 的参考值，便于核对当前计算采用的系数。</span></div>
       <div class="correction-table-grid">
         <section class="reference-table-card">
           <header><div><h2>表 D.0.5</h2><p>空气中单层并列时的载流量校正系数</p></div><span>电缆根数</span></header>
@@ -196,7 +200,7 @@ function cableView() {
         <thead><tr><th>电缆类型</th><th>芯数</th><th>敷设方式</th><th>环境温度(℃)</th><th>允许载流量(A)</th><th>线径(mm²)</th><th>排列方式</th></tr></thead>
         <tbody id="cable-catalog-body"></tbody>
       </table></div>
-      <p class="busbar-table-footnote">此处展示工作簿的基础载流量数据；实际推荐结果还会叠加并联根数、并列根数或桥架叠层修正系数。</p>
+      <p class="busbar-table-footnote">此处为基础载流量参考数据；实际推荐结果还会叠加并联根数、并列根数或桥架叠层修正系数。</p>
     </div>
     <div class="cable-pane" data-cable-pane="awg" hidden>
       <div class="awg-query">
@@ -212,7 +216,7 @@ function cableView() {
         <thead><tr><th>AWG线号</th><th>美国线径(mm)</th><th>中国线径(mm)</th><th>截面积(mm²)</th><th>阻值(Ω/km)</th><th>正常载流量(A)</th><th>最大载流量(A)</th></tr></thead>
         <tbody id="awg-catalog-body"></tbody>
       </table></div>
-      <p class="busbar-table-footnote">线径、截面积、阻值及载流量来自 B-电缆选型-A00 的“中美线规对照表”。</p>
+      <p class="busbar-table-footnote">线径、截面积、阻值及载流量按线规对照参考数据展示；工程选型仍需结合实际敷设条件校核。</p>
     </div>`);
 }
 
@@ -222,13 +226,14 @@ function busbarView() {
       <button class="active" role="tab" aria-selected="true" data-busbar-tab="selection">按电流选铜排</button>
       <button role="tab" aria-selected="false" data-busbar-tab="ampacity">按规格算载流量</button>
       <button role="tab" aria-selected="false" data-busbar-tab="catalog">载流量数据表 <span>${busbarCatalog.length} 条</span></button>
+      <button role="tab" aria-selected="false" data-busbar-tab="condition-table">温度/放置查表 <span>${busbarAmpacityTable.length} 条</span></button>
     </div>
     <div class="busbar-pane" data-busbar-pane="selection">
-      <div class="busbar-source-note"><b>计算口径</b><span>基础载流量来自 DIN43671-1975，环境温度 35°C。A03 原表的“涂层”列不再等同于热缩套管；全镀锡、热缩或特殊结构请转到“按规格算载流量”并填写经验证的热工参数。</span></div>
+      <div class="busbar-source-note"><b>适用条件</b><span>原始数据表标注环境温度 35℃、铜排温升 30K。表中“涂层”未注明材料和工艺，仅可在项目条件一致且经验证时采用；热缩、镀锡及特殊结构请转到“按规格算载流量”核算。</span></div>
       <div class="platform-form-grid cols-4 busbar-inputs">
         <label>负载电流(A)<input id="busbar-load-current" type="number" min="1" max="20000" step="1" value="1600"></label>
         <label>安装环境<select id="busbar-environment"><option value="ventilated">通风</option><option value="sealed">IP54 / 密封</option></select></label>
-        <label>载流量数据列<select id="busbar-surface"><option value="bare">裸排列（A03 原表）</option><option value="coated">涂层列（A03 原表，非热缩）</option></select></label>
+        <label>铜排表面状态<select id="busbar-surface"><option value="bare">裸铜排（基准载流量）</option><option value="coated">涂层铜排（工艺需核对）</option></select></label>
         <label>选型温升口径<select id="busbar-temperature-rise"><option value="iec50">50K 温升修正（通风 × 1.3）</option><option value="din30">30K 温升基准（DIN 原值）</option></select></label>
       </div>
       <div class="busbar-formula-strip" aria-label="计算说明">
@@ -256,7 +261,7 @@ function busbarView() {
         <label>外部环境温度 (℃)<input id="busbar-ampacity-room-temperature" type="number" min="-50" max="100" step="1" value="35"><small>GB/T 7251 常用基准环境温度</small></label>
         <label>工程控制温升 (K)<input id="busbar-ampacity-rise-limit" type="number" min="1" max="105" step="1" value="70"><small>相对外部环境；项目默认采用 70K</small></label>
         <label>铜排最高温度 (℃)<input id="busbar-ampacity-maximum-temperature" type="number" value="105" readonly><small>外部环境温度 + 工程控制温升（自动计算）</small></label>
-        <label>柜内空气温升 (K)<input id="busbar-ampacity-internal-rise" type="number" min="0" max="100" step="1" value="15"><small>密闭柜体 Excel 默认 15K；开放空气可填 0K</small></label>
+        <label>柜内空气温升 (K)<input id="busbar-ampacity-internal-rise" type="number" min="0" max="100" step="1" value="15"><small>历史模型采用 15K；开放空气可填 0K</small></label>
         <label>电流类型<select id="busbar-ampacity-current-type"><option value="dc">直流 / 忽略交流附加损耗</option><option value="ac">交流（使用修正系数）</option></select></label>
         <label>设计裕量系数<select id="busbar-ampacity-design-factor"><option value="0.7">70%</option><option value="0.8" selected>80%（建议默认）</option><option value="0.9">90%</option><option value="1">100%（热平衡极限，不推荐）</option></select></label>
         <label>DIN同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量（35℃ / 30K）</option></select><small>对照时自动统一到DIN温升条件</small></label>
@@ -267,7 +272,7 @@ function busbarView() {
           <label>对流计算模型<select id="busbar-ampacity-convection-model"><option value="din-calibrated" selected>DIN同规格反校（推荐）</option><option value="natural-correlation">自然对流关联式（独立估算）</option><option value="custom">自定义等效换热系数</option></select><small>不再对全部规格固定使用 h=5</small></label>
           <label>安装方向<select id="busbar-ampacity-orientation" disabled><option value="edgewise-horizontal" selected>铜排水平、宽面竖直</option><option value="vertical-run">铜排沿长度方向竖直</option><option value="flat-horizontal">铜排水平、宽面水平</option></select><small>仅自然对流关联式使用</small></label>
           <label>自定义等效 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5" disabled><small>W/(m²·K)；仅自定义模式使用</small></label>
-          <label>表面状态 / 发射率<select id="busbar-ampacity-surface-mode"><option value="bright-tin" selected>新亮全镀锡（ε=0.05，建议默认）</option><option value="conservative-tin">电镀铜保守校核（ε=0.03）</option><option value="excel">原 Excel 历史参数（状态未注明，ε=0.35）</option><option value="custom">自定义发射率</option></select><small>0.35 不代表镀锡；氧化、粗糙或特殊表面须依据实测</small></label>
+          <label>表面状态 / 发射率<select id="busbar-ampacity-surface-mode"><option value="bright-tin" selected>新亮全镀锡（ε=0.05，建议默认）</option><option value="conservative-tin">电镀铜保守校核（ε=0.03）</option><option value="excel">历史参考参数（状态未注明，ε=0.35）</option><option value="custom">自定义发射率</option></select><small>0.35 不代表镀锡；氧化、粗糙或特殊表面须依据实测</small></label>
           <label>计算采用的发射率 ε<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.05" disabled><small>这是辐射散热参数，不是铜排电阻发热系数</small></label>
           <label>辐射视角系数 F<input id="busbar-ampacity-view-factor" type="number" min="0.05" max="1" step="0.05" value="0.8"><small>1为完全可见；柜壁、相邻铜排会降低视角系数</small></label>
           <label>有效散热面积系数<input id="busbar-ampacity-surface-factor" type="number" min="0.1" max="1" step="0.05" value="1"><small>四面无遮挡取1；支撑、遮挡或邻近结构应降低</small></label>
@@ -294,10 +299,30 @@ function busbarView() {
         <div class="busbar-table-summary" id="busbar-table-summary"></div>
       </div>
       <div class="data-entry-table busbar-data-table"><table>
-        <thead><tr><th>ID</th><th>规格名称</th><th>配置</th><th>涂层载流(A)</th><th>裸排载流(A)</th><th>截面积(mm²)</th><th>备注</th></tr></thead>
+        <thead><tr><th>ID</th><th>规格名称</th><th>配置</th><th>涂层参考载流量 (A)</th><th>裸排基准载流量 (A)</th><th>截面积 (mm²)</th><th>备注</th></tr></thead>
         <tbody id="busbar-catalog-body"></tbody>
       </table></div>
-      <p class="busbar-table-footnote">数据口径：DIN43671-1975，允许温升 30K，环境温度 35°C。标注“根据插入法计算”的规格为 A03 原表插值数据。</p>
+      <p class="busbar-table-footnote">参考数据标注 DIN43671-1975、环境温度 35℃、允许温升 30K。涂层工艺未注明；标记“根据插入法计算”的规格为插值数据。</p>
+    </div>
+    <div class="busbar-pane" data-busbar-pane="condition-table" hidden>
+      <div class="busbar-source-note"><b>查表范围</b><span>提供单片与多根矩形铜排的载流量参考数据；按 25℃、35℃、40℃及平放、竖放条件离散查表，不对缺失工况或规格插值。</span></div>
+      <div class="platform-form-grid cols-4 busbar-inputs busbar-condition-inputs">
+        <label>负载电流 (A)<input id="busbar-table-load-current" type="number" min="1" max="20000" step="1" value="1600"></label>
+        <label>环境温度<select id="busbar-table-ambient"><option value="25">25℃</option><option value="35" selected>35℃</option><option value="40">40℃</option></select></label>
+        <label>放置方式<select id="busbar-table-orientation"><option value="flat">平放</option><option value="vertical">竖放</option></select></label>
+        <label>结构范围<select id="busbar-table-configuration"><option value="">全部结构</option><option value="单片">单片</option><option value="多根">多根</option></select></label>
+      </div>
+      <button id="calculate-busbar-table" class="platform-primary-action">按查表条件推荐规格</button>
+      <div id="busbar-table-result" class="busbar-result" aria-live="polite"></div>
+      <div class="busbar-condition-toolbar">
+        <label>规格筛选<input id="busbar-table-search" placeholder="输入 80 x 10、4 × 等关键词"></label>
+        <div class="busbar-table-summary" id="busbar-condition-summary"></div>
+      </div>
+      <div class="data-entry-table busbar-data-table busbar-condition-table"><table>
+        <thead><tr><th>规格</th><th>结构</th><th>根数</th><th>总截面(mm²)</th><th>25℃平放</th><th>25℃竖放</th><th>35℃平放</th><th>35℃竖放</th><th>40℃平放</th><th>40℃竖放</th></tr></thead>
+        <tbody id="busbar-condition-body"></tbody>
+      </table></div>
+      <p class="busbar-table-footnote">表中数值为参考持续载流量（A）。“—”表示该工况无数据；仅在已有数据中推荐满足需求的最小规格。短路耐受、间距、柜内温升与并排互热仍须专项复核。</p>
     </div>
     <p class="engineering-warning">⚠ 铜排间距、相间距、柜内温升、短路耐受能力和实际散热条件仍需结合成套结构复核；大于等于 4000A 时必须专项校核 Icw。</p>`);
 }
@@ -408,7 +433,7 @@ function templatesView() {
 }
 
 function shellViews() {
-  return [toolsView(), loadView(), cableView(), busbarView(), buswayView(), powerQualityView(), deliveryView(), templatesView()].join('');
+  return [toolsView(), loadView(), cableView(), busbarView(), buswayView(), powerQualityView(), nonstandardRequirementView(), deliveryView(), templatesView()].join('');
 }
 
 function resultCards(items) {
@@ -418,6 +443,7 @@ function resultCards(items) {
 async function loadCatalogs() {
   state.catalogs = {
     busbars: busbarCatalog,
+    busbarAmpacityTable,
     cables: cableCatalog,
     awg: awgCatalog,
     smartBusway: smartBuswayCatalog
@@ -545,7 +571,7 @@ async function activateView(view) {
   if (view === 'delivery') renderDeliverySummary();
   if (view === 'busway') renderSmartBusway();
   syncProjectToView(view);
-  if (window.innerWidth < 900) document.body.classList.remove('platform-sidebar-open');
+  if (window.innerWidth <= 900) document.body.classList.remove('platform-sidebar-open');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -610,7 +636,7 @@ function updateCableControls() {
   trayType.disabled = usesAirFactor;
   document.getElementById('cable-group-hint').textContent = usesAirFactor
     ? '当前参与空气中单层并列修正'
-    : '可按原表选择；当前条件不采用并列系数';
+    : '可选择并列根数；当前条件不采用并列系数';
   const preview = calculateCableSelection(state.catalogs.cables, { ...readCableInput(), requiredCurrentA: 1 });
   document.getElementById('cable-factor-preview').innerHTML = `<span>当前修正系数</span><strong>${format(preview.correctionFactor, 2)}</strong><small>${htmlEscape(preview.correctionMode || '—')}</small>`;
 }
@@ -696,9 +722,60 @@ function renderBusbarCatalog() {
   });
   body.innerHTML = rows.map(item => {
     const sourceIndex = state.catalogs.busbars.indexOf(item) + 1;
-    return `<tr><td>${sourceIndex}</td><td><b>${htmlEscape(item.spec)}</b></td><td>${htmlEscape(item.configuration)}</td><td>${format(item.coatedCurrentA, 0)}</td><td>${format(item.bareCurrentA, 0)}</td><td>${format(item.areaMm2, 0)}</td><td>${htmlEscape(item.note || '标准实测数据')}</td></tr>`;
+    return `<tr><td>${sourceIndex}</td><td><b>${htmlEscape(item.spec)}</b></td><td>${htmlEscape(item.configuration)}</td><td>${format(item.coatedCurrentA, 0)}</td><td>${format(item.bareCurrentA, 0)}</td><td>${format(item.areaMm2, 0)}</td><td>${htmlEscape(item.note || '未注明')}</td></tr>`;
   }).join('');
   document.getElementById('busbar-table-summary').textContent = `显示 ${rows.length} / ${state.catalogs.busbars.length} 条`;
+}
+
+function busbarTableCurrent(item, ambientC, orientation) {
+  const value = Number(item.currents?.[String(ambientC)]?.[orientation]);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function renderBusbarConditionTable() {
+  const body = document.getElementById('busbar-condition-body');
+  if (!body) return;
+  const configuration = document.getElementById('busbar-table-configuration')?.value || '';
+  const query = (document.getElementById('busbar-table-search')?.value || '').trim().toLowerCase();
+  const rows = state.catalogs.busbarAmpacityTable.filter(item => {
+    if (configuration && item.configuration !== configuration) return false;
+    return !query || `${item.displaySpec} ${item.spec} ${item.configuration} ${item.conductorCount}`.toLowerCase().includes(query);
+  });
+  const cell = value => value === null ? '<span class="table-missing">—</span>' : format(value, 0);
+  body.innerHTML = rows.map(item => `<tr>
+    <td><b>${htmlEscape(item.displaySpec)}</b></td><td>${htmlEscape(item.configuration)}</td><td>${format(item.conductorCount, 0)}</td><td>${format(item.totalAreaMm2, 0)}</td>
+    <td>${cell(busbarTableCurrent(item, 25, 'flat'))}</td><td>${cell(busbarTableCurrent(item, 25, 'vertical'))}</td>
+    <td>${cell(busbarTableCurrent(item, 35, 'flat'))}</td><td>${cell(busbarTableCurrent(item, 35, 'vertical'))}</td>
+    <td>${cell(busbarTableCurrent(item, 40, 'flat'))}</td><td>${cell(busbarTableCurrent(item, 40, 'vertical'))}</td>
+  </tr>`).join('');
+  document.getElementById('busbar-condition-summary').textContent = `显示 ${rows.length} / ${state.catalogs.busbarAmpacityTable.length} 条`;
+}
+
+function calculateBusbarTableResult() {
+  const result = calculateBusbarTableLookup(state.catalogs.busbarAmpacityTable, {
+    loadCurrentA: numberValue('busbar-table-load-current'),
+    ambientC: numberValue('busbar-table-ambient', 35),
+    orientation: document.getElementById('busbar-table-orientation').value,
+    configuration: document.getElementById('busbar-table-configuration').value
+  });
+  const target = document.getElementById('busbar-table-result');
+  if (result.error) {
+    target.innerHTML = `<div class="no-result"><b>${htmlEscape(result.error)}</b>${result.maximumCurrentA ? `<span>当前筛选条件下最大参考载流量为 ${format(result.maximumCurrentA, 0)}A。</span>` : ''}</div>`;
+    return;
+  }
+  const warningClass = result.loadRate > 0.92 ? 'warning' : 'safe';
+  const orientationLabel = result.orientation === 'vertical' ? '竖放' : '平放';
+  target.innerHTML = `
+    <div class="busbar-result-hero busbar-table-result-hero">
+      <div class="busbar-best-spec"><span>推荐规格</span><strong>${htmlEscape(result.selected.displaySpec)}</strong><small>${htmlEscape(result.selected.configuration)} · 满足需求的最小查表值</small></div>
+      <div class="busbar-capacity"><span>最大允许持续电流</span><strong>${format(result.ratedCurrentA, 0)} A</strong><small>${result.ambientC}℃ · ${orientationLabel}</small></div>
+      <div class="busbar-load-gauge ${warningClass}"><span>负载率</span><strong>${format(result.loadRate * 100, 1)}%</strong><small>余量 ${format(result.spareCurrentA, 0)}A</small></div>
+      <div><span>铜排总截面</span><strong>${format(result.selected.totalAreaMm2, 0)} mm²</strong><small>${result.selected.conductorCount} 根 × ${htmlEscape(result.selected.spec)}</small></div>
+    </div>
+    <div class="busbar-notices">
+      <p class="${result.loadRate > 0.92 ? 'warning' : 'safe'}">本结果依据离散参考数据，当前负载率 ${format(result.loadRate * 100, 1)}%；未叠加额外设计裕量。</p>
+      <p class="${result.requiresShortCircuitCheck ? 'warning' : 'neutral'}">${result.requiresShortCircuitCheck ? '负载电流达到 4000A 及以上，必须专项校核短路耐受能力 Icw。' : '仍需按实际间距、柜内温升、连接件与短路电流复核。'}</p>
+    </div>`;
 }
 
 function calculateBusbar() {
@@ -721,7 +798,7 @@ function calculateBusbar() {
     <div class="busbar-result-hero">
       <div class="busbar-best-spec"><span>最佳规格</span><strong>${htmlEscape(result.selected.spec)}</strong><small>${htmlEscape(result.selected.configuration)} · 全表最接近需求</small></div>
       <div class="busbar-priority-spec"><span>主母线结构优先</span><strong>${htmlEscape(result.prioritySelected.spec)}</strong><small>${htmlEscape(result.prioritySelected.configuration)}${priorityMatchesBest ? ' · 与最佳规格相同' : ' · 按结构顺序推荐'}</small></div>
-      <div class="busbar-capacity"><span>系统额定载流</span><strong>${format(result.ratedCurrentA, 0)} A</strong><small>${result.currentField === 'bareCurrentA' ? '裸排载流量列' : '涂层载流量列'}</small></div>
+      <div class="busbar-capacity"><span>30K 基准载流量</span><strong>${format(result.ratedCurrentA, 0)} A</strong><small>${result.currentField === 'bareCurrentA' ? '裸铜排 · 35℃ 环境' : '涂层铜排 · 35℃ 环境'}</small></div>
       <div class="busbar-load-gauge ${warningClass}"><span>负载率</span><strong>${format(result.loadRate * 100, 1)}%</strong><small>${htmlEscape(result.loadWarning)}</small></div>
     </div>
     <div class="result-grid busbar-result-grid">${resultCards([
@@ -731,7 +808,8 @@ function calculateBusbar() {
       ['PE排推荐', format(result.peAreaMm2, 0), 'mm²']
     ])}</div>
     <div class="busbar-notices">
-      <p class="${result.isInterpolated ? 'warning' : 'safe'}">${result.isInterpolated ? '该规格为 A03 原表插值计算数据，订货前请复核。' : '该规格为 A03 中的 DIN 原值数据。'}</p>
+      <p class="${result.isInterpolated ? 'warning' : 'neutral'}">${result.isInterpolated ? '该规格为原数据表插值，订货前请复核。' : '该规格未标记为插值；仍需结合实际安装条件复核。'}</p>
+      ${result.currentField === 'coatedCurrentA' ? '<p class="warning">涂层参考值未注明材料和工艺，使用前须核对制造商或试验数据；不可直接用于热缩、镀锡铜排。</p>' : ''}
       <p class="${result.requiresShortCircuitCheck ? 'warning' : 'neutral'}">${result.requiresShortCircuitCheck ? '大电流达到 4000A 及以上，请务必校核短路耐受能力 Icw。' : '当前电流低于 4000A，仍需按项目短路电流复核。'}</p>
     </div>`;
 }
@@ -864,7 +942,7 @@ function calculateBusbarAmpacityResult() {
     <div class="busbar-notices">
       <p class="${result.convectionFallback ? 'warning' : 'safe'}">${result.convectionFallback ? '当前规格在DIN表中没有完全匹配项，已自动回退到自然对流关联式；请重点复核安装方向和结构条件。' : `当前采用${htmlEscape(convectionModelLabel)}，不再对所有规格固定使用 h=5。`}</p>
       <p class="neutral">70K 为本项目采用的工程控制口径，并非所有母线场景的统一限值；实际最高温度还应受端子、绝缘、连接件、相邻元件和验证条件中的最低限值约束。</p>
-      <p class="${surfaceModeElement.value === 'excel' ? 'warning' : 'neutral'}">${surfaceModeElement.value === 'excel' ? '当前使用原 Excel 的 ε=0.35 历史参数，其表面状态和依据未注明；它不代表新亮镀锡铜排，可能使载流量估算偏高。' : '新亮镀锡默认采用 ε=0.05；需要更保守时可选择 ε=0.03，其他表面状态应采用实测或验证值。'}</p>
+      <p class="${surfaceModeElement.value === 'excel' ? 'warning' : 'neutral'}">${surfaceModeElement.value === 'excel' ? '当前使用 ε=0.35 历史参考参数，其表面状态和依据未注明；它不代表新亮镀锡铜排，可能使载流量估算偏高。' : '新亮镀锡默认采用 ε=0.05；需要更保守时可选择 ε=0.03，其他表面状态应采用实测或验证值。'}</p>
       <p class="${isThermalLimit ? 'warning' : 'neutral'}">${isThermalLimit ? '当前选择100%：结果是达到最高温度时的理论热平衡极限，没有连续运行设计裕量。' : `当前已采用 ${format(result.designFactor * 100, 0)}% 设计系数；该系数是工程裕量，不是标准统一规定。`}</p>
       <p class="warning">柜内空气温升、安装方向、有效散热面积、辐射视角系数和设计裕量都会影响结果；并排互热及接头损耗仍需专项校核。</p>
       <p class="${result.requiresAcVerification ? 'warning' : 'neutral'}">${result.requiresAcVerification ? '当前选择交流，但交流电阻修正系数仍为1.00，尚未计入集肤、邻近和谐波附加损耗。' : `当前采用${result.currentType === 'ac' ? `交流电阻系数 ${format(result.acResistanceFactor, 2)}` : '直流电阻'}进行计算。`}</p>
@@ -1553,6 +1631,7 @@ function bindEvents() {
   document.getElementById('awg-catalog-search').addEventListener('input', renderAwgCatalog);
   document.getElementById('calculate-busbar').addEventListener('click', calculateBusbar);
   document.getElementById('calculate-busbar-ampacity').addEventListener('click', calculateBusbarAmpacityResult);
+  document.getElementById('calculate-busbar-table').addEventListener('click', calculateBusbarTableResult);
   document.getElementById('busbar-ampacity-surface-mode').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-convection-model').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-current-type').addEventListener('change', syncBusbarAmpacityControls);
@@ -1560,6 +1639,9 @@ function bindEvents() {
   document.getElementById('busbar-ampacity-rise-limit').addEventListener('input', syncBusbarAmpacityControls);
   document.getElementById('busbar-catalog-configuration').addEventListener('change', renderBusbarCatalog);
   document.getElementById('busbar-catalog-search').addEventListener('input', renderBusbarCatalog);
+  ['busbar-table-ambient', 'busbar-table-orientation', 'busbar-table-configuration']
+    .forEach(id => document.getElementById(id).addEventListener('change', renderBusbarConditionTable));
+  document.getElementById('busbar-table-search').addEventListener('input', renderBusbarConditionTable);
   document.getElementById('generate-smart-busway').addEventListener('click', generateBuswayConfig);
   document.getElementById('recalculate-smart-busway').addEventListener('click', () => calculateBuswayConfig());
   document.getElementById('bw-export-png').addEventListener('click', exportSmartBuswayPng);
@@ -1714,6 +1796,7 @@ function bindEvents() {
     });
     document.querySelectorAll('[data-busbar-pane]').forEach(pane => { pane.hidden = pane.dataset.busbarPane !== button.dataset.busbarTab; });
     if (button.dataset.busbarTab === 'catalog') renderBusbarCatalog();
+    if (button.dataset.busbarTab === 'condition-table') renderBusbarConditionTable();
   }));
   document.querySelectorAll('[data-cable-tab]').forEach(button => button.addEventListener('click', () => {
     document.querySelectorAll('[data-cable-tab]').forEach(item => {
@@ -1738,9 +1821,9 @@ function bindEvents() {
       text.textContent = collapsed ? '展开导航' : '收起导航';
     });
   };
-  if (window.innerWidth >= 900) applySidebarState(localStorage.getItem(SIDEBAR_PREF_KEY) === '1');
+  if (window.innerWidth > 900) applySidebarState(localStorage.getItem(SIDEBAR_PREF_KEY) === '1');
   document.querySelectorAll('[data-sidebar-toggle]').forEach(toggle => toggle.addEventListener('click', () => {
-    if (window.innerWidth < 900) {
+    if (window.innerWidth <= 900) {
       document.body.classList.toggle('platform-sidebar-open');
       toggle.setAttribute('aria-expanded', String(document.body.classList.contains('platform-sidebar-open')));
       return;
@@ -1770,12 +1853,16 @@ export async function initializePlatform() {
   await loadCatalogs();
   fillProjectForm();
   renderBusbarCatalog();
+  renderBusbarConditionTable();
   syncBusbarAmpacityControls();
   updateCableControls();
   renderAwgResult();
   renderCableCatalog();
   renderAwgCatalog();
   bindEvents();
+  mountNonstandardRequirements(document.getElementById('platform-view-requirements'), {
+    buswayDesign: () => state.project?.busbars?.smartBuswayDesign?.rows ? structuredClone(state.project.busbars.smartBuswayDesign) : null
+  });
   buildAiDrawer();
   updateAiContext();
   await activateView('tools');

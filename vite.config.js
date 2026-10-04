@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite';
+import { localParserPlugin } from './dev_scripts/local_parser_assets.mjs';
 
 export default defineConfig({
   base: './',
   plugins: [
+    localParserPlugin(),
     {
       name: 'strip-embedded-catalog-prices',
       transformIndexHtml(html) {

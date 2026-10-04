@@ -1,16 +1,20 @@
 {
   "name": "data-center-electrical-design-platform",
   "private": true,
-  "version": "2.10.0",
+  "version": "2.12.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node dev_scripts/test_platform_v2.mjs && node dev_scripts/test_ups_selection.mjs",
+    "test": "node dev_scripts/test_platform_v2.mjs && node dev_scripts/test_ups_selection.mjs && node dev_scripts/test_ups_evidence.mjs && node dev_scripts/test_nonstandard_presales.mjs && node dev_scripts/test_nonstandard_requirements.mjs && node dev_scripts/test_nonstandard_deliverable.mjs && node dev_scripts/test_cabinet_assistant.mjs && node dev_scripts/test_pdu_assistant.mjs && node dev_scripts/test_busway_assistant.mjs && node dev_scripts/test_local_file_reading.mjs && node dev_scripts/test_requirement_review.mjs",
     "test:build": "npm run build && node dev_scripts/check_public_build.mjs"
   },
   "devDependencies": {
-    "vite": "^7.1.5"
+    "mammoth": "1.13.0",
+    "pdfjs-dist": "6.3.289",
+    "vite": "^7.1.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "xlsx-js-style": "1.2.0"
   }
 }

@@ -42,6 +42,9 @@ jobs:
       - name: Run full quality suite
         run: python dev_scripts/test.py --all
 
+      - name: Run deterministic module regressions
+        run: npm test
+
       - name: Verify production build boundary
         run: npm run test:build
 

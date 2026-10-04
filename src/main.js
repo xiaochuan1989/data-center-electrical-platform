@@ -2,9 +2,11 @@ import './css/platform-v2.css';
 import { initializePlatform } from './platform/app-shell.js';
 import { calculateLithiumBatteryA00 } from './modules/engineering-calculators.js';
 import * as upsSelection from './modules/ups-selection.js';
+import * as upsEvidence from './modules/ups-evidence.js';
 
 window.calculateLithiumBatteryA00 = calculateLithiumBatteryA00;
 window.upsSelection = upsSelection;
+window.upsEvidence = upsEvidence;
 
 function start() {
   initializePlatform().catch(error => {

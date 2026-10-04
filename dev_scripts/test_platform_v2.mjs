@@ -9,6 +9,7 @@ import {
   calculateBranch,
   calculateBusbarAmpacity,
   calculateBusbarSelection,
+  calculateBusbarTableLookup,
   calculateCableSelection,
   calculateBusway,
   calculateLoadSummary,
@@ -388,6 +389,34 @@ assert.equal(largeBusbar.peAreaMm2, 500);
 assert.ok(Math.abs(largeBusbar.loadRate - 0.964552) < 0.00001);
 assert.match(calculateBusbarSelection(busbarCatalog, { loadCurrentA: 0 }).error, /大于 0A/);
 
+const busbarAmpacityTable = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'busbar-ampacity-table.json'), 'utf8'));
+assert.equal(busbarAmpacityTable.length, 75);
+assert.equal(busbarAmpacityTable.filter(item => item.configuration === '单片').length, 37);
+assert.equal(busbarAmpacityTable.filter(item => item.configuration === '多根').length, 38);
+assert.equal(busbarAmpacityTable[0].currents['40'].vertical, 100);
+const busbarTableLookup = calculateBusbarTableLookup(busbarAmpacityTable, {
+  loadCurrentA: 1600,
+  ambientC: 35,
+  orientation: 'flat'
+});
+assert.equal(busbarTableLookup.selected.displaySpec, '100 x 8');
+assert.equal(busbarTableLookup.ratedCurrentA, 1684);
+assert.ok(Math.abs(busbarTableLookup.loadRate - 1600 / 1684) < 1e-12);
+const verticalSingleBusbar = calculateBusbarTableLookup(busbarAmpacityTable, {
+  loadCurrentA: 1600,
+  ambientC: 35,
+  orientation: 'vertical',
+  configuration: '单片'
+});
+assert.equal(verticalSingleBusbar.selected.displaySpec, '80 x 10');
+assert.equal(verticalSingleBusbar.ratedCurrentA, 1670);
+assert.equal(calculateBusbarTableLookup(busbarAmpacityTable, {
+  loadCurrentA: 8000,
+  ambientC: 40,
+  orientation: 'flat',
+  configuration: '单片'
+}).maximumCurrentA, 1932);
+
 const busbarAmpacityInput = {
   widthMm: 120,
   thicknessMm: 10,
@@ -496,7 +525,7 @@ for (const [input, expectedFactor, expectedSize] of cableCases) {
 assert.match(calculateCableSelection(cableCatalog, { requiredCurrentA: 0 }).error, /大于 0A/);
 assert.equal(calculateCableSelection(cableCatalog, { requiredCurrentA: 1601 }).useBusway, true);
 
-for (const filename of ['busbar-catalog.json', 'cable-catalog.json', 'awg-catalog.json']) {
+for (const filename of ['busbar-catalog.json', 'busbar-ampacity-table.json', 'cable-catalog.json', 'awg-catalog.json']) {
   const file = path.join(root, 'src', 'data', filename);
   const data = JSON.parse(fs.readFileSync(file, 'utf8'));
   assert.ok(data.length >= 50, `${filename} 数据量不足`);
@@ -512,20 +541,31 @@ assert.ok(smartCatalog.plugBoxes.some(item => item.ratedCurrentA === 40 && item.
 assert.doesNotMatch(JSON.stringify(smartCatalog), /价格|price/i);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.10\.0"/);
+assert.match(index, /const APP_VERSION = "v2\.12\.0"/);
 assert.match(index, /UPS与配电选型助手/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
-assert.match(index, /计算方法说明与 Excel 单元格对应关系/);
-assert.match(index, /原表 J2 的 IFS 公式未定义 3C～4C 区间/);
+assert.match(index, /计算所需电池容量/);
+assert.match(index, /计算方法与适用边界/);
+assert.match(index, /3C～4C 区间缺少平台电压取值依据/);
+assert.doesNotMatch(index, /按 Excel A00 计算|Excel A00 对照结果|计算方法说明与 Excel 单元格对应关系/);
 assert.doesNotMatch(index, /id="tab-dc"/);
 assert.match(index, /智能选型 · 电池配置 · 独立工程工具/);
 const appShell = fs.readFileSync(path.join(root, 'src', 'platform', 'app-shell.js'), 'utf8');
 assert.match(appShell, /navButton\('busbar'/);
 assert.match(appShell, /按电流选铜排/);
+assert.match(appShell, /铜排表面状态<select id="busbar-surface"/);
+assert.match(appShell, /裸铜排（基准载流量）/);
+assert.match(appShell, /涂层铜排（工艺需核对）/);
+assert.doesNotMatch(appShell, /裸排列（A03 原表）|涂层列（A03 原表/);
+assert.match(appShell, /涂层参考值未注明材料和工艺/);
+assert.match(appShell, /30K 基准载流量/);
 assert.match(appShell, /按规格算载流量/);
+assert.match(appShell, /温度\/放置查表/);
+assert.match(appShell, /id="calculate-busbar-table"/);
+assert.match(appShell, /提供单片与多根矩形铜排的载流量参考数据/);
 assert.match(appShell, /id="calculate-busbar-ampacity"/);
 assert.match(appShell, /新亮全镀锡（ε=0\.05，建议默认）/);
-assert.match(appShell, /原 Excel 历史参数（状态未注明，ε=0\.35）/);
+assert.match(appShell, /历史参考参数（状态未注明，ε=0\.35）/);
 assert.match(appShell, /id="busbar-ampacity-rise-limit"/);
 assert.match(appShell, /DIN同规格反校（推荐）/);
 assert.match(appShell, /自然对流关联式（独立估算）/);

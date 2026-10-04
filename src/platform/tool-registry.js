@@ -12,10 +12,11 @@ export const TOOL_GROUPS = [
   {
     id: 'engineering', name: '工程主链', icon: '▦',
     tools: [
-      { id: 'cable', name: '电缆选型', status: 'available', source: 'B-电缆选型 A00 / GB 50217-2018' },
-      { id: 'busbar', name: '铜排双向计算与载流量表', status: 'available', source: '铜排载流量 A03 / 工程计算器 A00 / DIN43671-1975' },
+      { id: 'cable', name: '电缆选型', status: 'available', source: '载流量与敷设修正 / GB 50217-2018' },
+      { id: 'busbar', name: '铜排双向计算与载流量表', status: 'available', source: '铜排载流量参考数据 / 稳态热平衡 / 温度与放置方式查表' },
       { id: 'busway', name: '智能母线配置', status: 'available', source: '智能母线配置与选型' },
-      { id: 'power-quality', name: 'APF / SVG 校核', status: 'available', source: 'APF容量配置 / SVG+APF 交互计算' }
+      { id: 'power-quality', name: 'APF / SVG 校核', status: 'available', source: 'APF容量配置 / SVG+APF 交互计算' },
+      { id: 'requirements', name: '非标配电售前方案', status: 'foundation', source: '要求复核、柜/PDU/母线区域辅助草稿、同源清单基础版，待业务验收' }
     ]
   }
 ];
@@ -25,7 +26,7 @@ export const TEMPLATE_CATALOG = [
   { category: '微模块', current: '微模块电气负荷计算表-A00.xlsx', migration: '已并入负荷模块', publish: false },
   { category: '母线电流', current: '数据中心母线电流计算-A00.xlsx', migration: '已网页化', publish: false },
   { category: '电缆选型', current: 'B-电缆选型-A00.xlsx', migration: '已按原表公式网页化', publish: false },
-  { category: '铜排', current: '铜排载流量-A03.xlsx + 铜排载流量工程计算器-A00.xlsx', migration: '选型与规格反算均已网页化', publish: false },
+  { category: '铜排', current: '铜排载流量-A03.xlsx + 铜排载流量工程计算器-A00.xlsx + 铜排载流量.xlsx', migration: '选型、规格反算与温度/放置查表均已网页化', publish: false },
   { category: '智能母线', current: '智能母线配置与选型.xlsx', migration: '已网页化', publish: false },
   { category: '电能质量', current: 'APF容量配置.xlsx', migration: '已网页化', publish: false },
   { category: '编码', current: '配电柜申请编码生成模板-持续更新.xlsx', migration: '待下一阶段网页化', publish: false },

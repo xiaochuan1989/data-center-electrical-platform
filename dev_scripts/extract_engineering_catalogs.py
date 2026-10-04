@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from openpyxl import load_workbook
@@ -54,6 +55,52 @@ def extract_busbars() -> list[dict]:
     return result
 
 
+def merged_value(sheet, row: int, column: int):
+    """读取合并单元格时返回左上角值。"""
+    cell = sheet.cell(row=row, column=column)
+    if cell.value is not None:
+        return clean(cell.value)
+    for merged_range in sheet.merged_cells.ranges:
+        if cell.coordinate in merged_range:
+            return clean(sheet.cell(merged_range.min_row, merged_range.min_col).value)
+    return None
+
+
+def extract_busbar_ampacity_table() -> list[dict]:
+    """提取根目录《铜排载流量.xlsx》的温度、放置方式查表数据。"""
+    workbook = load_workbook(ROOT / "铜排载流量.xlsx", data_only=True, read_only=False)
+    sheet = workbook["Sheet1"]
+    result = []
+    for row in list(range(5, 42)) + list(range(47, 85)):
+        raw_spec = clean(sheet.cell(row=row, column=1).value)
+        if not raw_spec:
+            continue
+        match = re.fullmatch(r"(?:(\d+)\()?\s*(\d+)\s*[*×x]\s*(\d+)\)?", str(raw_spec))
+        if not match:
+            raise RuntimeError(f"无法解析铜排规格：{raw_spec}（第 {row} 行）")
+        conductor_count = int(match.group(1) or 1)
+        width_mm = int(match.group(2))
+        thickness_mm = int(match.group(3))
+        current_values = [merged_value(sheet, row, column) for column in range(2, 8)]
+        result.append({
+            "spec": f"{width_mm} x {thickness_mm}",
+            "displaySpec": f"{conductor_count} × ({width_mm} x {thickness_mm})" if conductor_count > 1 else f"{width_mm} x {thickness_mm}",
+            "configuration": "多根" if conductor_count > 1 else "单片",
+            "conductorCount": conductor_count,
+            "widthMm": width_mm,
+            "thicknessMm": thickness_mm,
+            "totalAreaMm2": conductor_count * width_mm * thickness_mm,
+            "currents": {
+                "25": {"flat": current_values[0], "vertical": current_values[1]},
+                "35": {"flat": current_values[2], "vertical": current_values[3]},
+                "40": {"flat": current_values[4], "vertical": current_values[5]},
+            },
+            "sourceRow": row,
+        })
+    workbook.close()
+    return result
+
+
 def extract_cables() -> tuple[list[dict], list[dict]]:
     """以 B-电缆选型-A00 为唯一来源提取电缆和中美线规数据。"""
     workbook = load_workbook(find_one("B-电缆选型-A00.xlsx"), data_only=True, read_only=True)
@@ -91,8 +138,10 @@ def extract_cables() -> tuple[list[dict], list[dict]]:
 
 def main() -> int:
     busbars = extract_busbars()
+    busbar_ampacity_table = extract_busbar_ampacity_table()
     cables, awg = extract_cables()
     write_json("busbar-catalog.json", busbars)
+    write_json("busbar-ampacity-table.json", busbar_ampacity_table)
     write_json("cable-catalog.json", cables)
     write_json("awg-catalog.json", awg)
     return 0

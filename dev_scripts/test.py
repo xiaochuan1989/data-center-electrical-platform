@@ -122,7 +122,7 @@ def check_html_structure():
     checks = [
         ("DOCTYPE", "<!DOCTYPE html>" in content),
         ("UTF-8 编码", 'charset="UTF-8"' in content),
-        ("SheetJS", "xlsx-js-style" in content or "sheetjs.com" in content),
+        ("SheetJS本机资源", './vendor/xlsx/reader.min.js' in content and './vendor/xlsx/style-writer.min.js' in content),
         ("mammoth.js", "mammoth" in content),
         ("产品数据", "PRODUCTS" in content),
         ("系统提示词", "DEFAULT_SYSTEM_PROMPT" in content),

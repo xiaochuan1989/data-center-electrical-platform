@@ -1,7 +1,7 @@
 # UPS与配电选型助手——工程开发手册
 
-> 当前版本：v2.10.0
-> 更新日期：2026-09-28
+> 当前版本：v2.12.0
+> 更新日期：2026-10-04（用户要求冻结新增、先发布试用版，再新对话只读审核；部署实际状态见发布记录）
 > 文档职责：说明开发环境、目录职责、修改流程、测试、浏览器回归和发布。
 
 ## 1. 开发原则
@@ -103,7 +103,7 @@ npm run dev -- --port 4173
 5. 建立正常、空值、零值、边界、超限和下拉组合测试。
 6. 原工作簿不复制到 `src/` 或 `dist/`。
 
-电缆当前核对源为 `工具模板/B-电缆选型-A00.xlsx`：`F4` 并联根数允许 1～4，`G4` 并列根数允许 1～6。铜排有两个互不覆盖的核对源：`工具模板/铜排载流量-A03.xlsx` 用于按电流选规格，`工具模板/铜排载流量工程计算器-A00.xlsx` 用于单片规格热平衡反算；对应纯函数为 `calculateBusbarSelection()` 和 `calculateBusbarAmpacity()`。规格反算测试必须覆盖原表默认值、DIN 同规格对照、交直流修正、温度关系和参数上下界。锂电池当前核对源为 `工具模板/锂电池-选型模板-A00.xlsx`，纯函数为 `calculateLithiumBatteryA00()`；测试必须覆盖 100kVA 逆变器效率边界、1/3/4/6C 平台电压边界、负载功率空值回退及原表 3C～4C 未定义区间。
+电缆当前核对源为 `工具模板/B-电缆选型-A00.xlsx`：`F4` 并联根数允许 1～4，`G4` 并列根数允许 1～6。铜排有三个互不覆盖的核对源：`工具模板/铜排载流量-A03.xlsx` 用于按电流选规格，`工具模板/铜排载流量工程计算器-A00.xlsx` 用于单片规格热平衡反算，根目录 `铜排载流量.xlsx` 用于 25/35/40℃及平放/竖放离散查表；对应纯函数为 `calculateBusbarSelection()`、`calculateBusbarAmpacity()` 和 `calculateBusbarTableLookup()`。规格反算测试必须覆盖原表默认值、DIN 同规格对照、交直流修正、温度关系和参数上下界；离散查表测试必须覆盖合并单元格、单片/多根筛选、放置方式和无满足规格边界。锂电池当前核对源为 `工具模板/锂电池-选型模板-A00.xlsx`，纯函数为 `calculateLithiumBatteryA00()`；测试必须覆盖 100kVA 逆变器效率边界、1/3/4/6C 平台电压边界、负载功率空值回退及原表 3C～4C 未定义区间。
 
 智能母线有三个互补核对源：`数据中心母线电流计算-A00.xlsx` 负责电流公式和档位，`智能母线配置与选型.xlsx` 负责数量与附件规则，`XGM-智能母线-商务成本-A11.xlsm` 只用于提取确认型号，任何价格不得写入 `src/data/smart-busway-catalog.json`。Excel 输出的是推荐依据，`runSelections` 与持久化 `plugBoxGroups` 中的人工采用值才是最终方案值。主要接口为 `createSmartBuswayDesign()`、`calculateSmartBuswayDesign()`、`recommendSmartBuswayGroups()`、`validateSmartBuswayGroups()` 和兼容包装 `calculateSmartBusway()`；测试必须覆盖逐柜支路、每排每路工况、人工降档、分组持久化、单相相序、不同回路能力、160/630/800A边界、801A BOM 阻断及 schema v2 迁移。
 
@@ -138,6 +138,7 @@ npm run dev -- --port 4173
 铜排：
 
 - “按电流选铜排”与“按规格算载流量”可独立切换，前者结果不因新增功能改变。
+- “温度/放置查表”按原表 25/35/40℃与平放/竖放列离散选择，不对空白工况插值；原表合并单元格值必须同时映射到两个放置方向。
 - 默认采用“DIN同规格30K反校”模型；没有DIN完全同规格数据时自动回退到自然对流 Nu/Ra 关联式，不得对全部规格固定套用 `h=5`。
 - `40 × 6mm` 在DIN参考表面条件、35℃环境、30K温升下应反校得到 `528A`；项目默认新亮镀锡、视角系数0.8、有效散热温差55K时热平衡值约 `699A`、80%建议值约 `559A`。
 - 温度链路显示并校验 `Tmax = 外部环境 + 工程控制温升`、`Tamb = 外部环境 + 柜内空气温升` 和 `ΔT = Tmax - Tamb`；默认对应 `35 + 70 = 105℃`、`35 + 15 = 50℃`、有效散热温差 `55K`。
@@ -175,7 +176,7 @@ npm run dev -- --port 4173
 
 ## 10. 自动测试说明
 
-`npm test` 验证项目格式、标准档位、工程纯函数、97 条铜排、224 条电缆、50 条线规、智能母线无价格目录、按排×路径计算、柔性插接箱分组、人工采用风险、典型铜排/电缆/智能母线样例、schema v2 迁移，以及当前版本和入口标识。
+`npm test` 验证项目格式、标准档位、工程纯函数、97 条 DIN 铜排、75 条温度/放置铜排、224 条电缆、50 条线规、智能母线无价格目录、按排×路径计算、柔性插接箱分组、人工采用风险、典型铜排/电缆/智能母线样例、schema v2 迁移，以及当前版本和入口标识。
 
 `python dev_scripts/test.py --all` 继续覆盖成熟 UPS、电池、产品编码、HTML/JavaScript 结构和公开数据库行为。
 
@@ -231,3 +232,29 @@ npm run dev -- --port 4173
 - [ ] Git 已提交并推送，GitHub Pages 已核对。
 
 v1.8.39 Git 标签是平台化升级前的回退基线；更细历史以 Git 提交记录为准。
+
+## 15. 分阶段开发与跨对话接续
+
+当前总接续入口为[非标配电售前方案包实施计划](docs/nonstandard-presales-roadmap.md)，已确认用于配电柜、PDU、智能母线售前交流和报价。N0/N1完成：[字段与数据契约v1](docs/nonstandard-presales-contract.md)定稿；N2已按[入口设计](docs/nonstandard-requirement-ui.md)接入需求复核基础版，`nonstandard-requirements.js`、`nonstandard-file-reader.js`及视图负责规则/本机解析/复核。N3按[方案—清单设计](docs/nonstandard-scheme-ui.md)新增`nonstandard-scheme-view.js`、`nonstandard-deliverable.js`和`presales-xlsx.js`，共用原独立包，旧存储键及schema不变。`test_nonstandard_deliverable.mjs`验证用途数量一致性、型号约束、恢复和HTML/XLSX安全，纳入六组`npm test`。不套UPS整机SKU表、不重建工作台；下一步是品类规则/真实案例校准与N4完整方案包，而非重复搭建已实现界面。
+
+配电柜助手见[设计与验收](docs/cabinet-assistant.md)：`cabinet-assistant.js`解析四列回路表并生成新草稿，`cabinet-rules.js`校验骨架元数据、确认条件和实时说明；核心只增v1可选来源元数据，不改旧schema/存储。`test_cabinet_assistant.mjs`纳入第七组npm回归，覆盖证据、错配、未知、合计与安全整数、兼容/输出。浏览器脚本`verify_cabinet_assistant_browser.mjs`是CLI函数，用独立会话、合成资料及忽略目录`output/playwright/cabinet-assistant/`，验证取消不丢编辑、旧方案不覆盖、草稿保存与型号阻断。仍需独立真实配电柜资料和业务反馈；资料解析依赖本机化及真实文件导入已按[本机化验收](docs/local-file-reading.md)完成，不能据此把业务采用标为完成。
+
+PDU助手见[设计与验收](docs/pdu-assistant.md)：`pdu-rules.js`负责有限语法候选/元数据/动态说明，`pdu-assistant.js`负责本设备条款选取、错配阻断与新草稿。`test_pdu_assistant.mjs`纳入第八组npm回归，浏览器CLI函数为`verify_pdu_assistant_browser.mjs`，独立导出检查为`check_pdu_exports.py`。无新默认额定值、品牌型号、输入数或保护分路；主备区域按独立设备量管理。真实微模块候选产物仅在忽略目录，未替业务人员确认，不升级或发布。
+
+智能母线区域助手见[设计与验收](docs/busway-assistant.md)：`busway-rules.js`注册表/五列表/有限文本提示/元数据/说明、`busway-assistant.js`证据和人工表纯生成，纳入第九组`test_busway_assistant.mjs`回归。`verify_busway_assistant_browser.mjs`为CLI函数，`check_busway_exports.py`独立核对三个下载XLSX、HTML与JSON。字段controllerCount/endpointCount和用途controller/endpoint为v1可选兼容扩展；区域口径显式数量1，误改设备数量不重乘。旧计算器/手工方案不受此口径约束，未知保护/附件/型号不补造。
+
+原N3浏览器脚本初始母线阻断用例要求隔离会话中无已生成布局；原地复跑可能遗留上轮合成布局，优先新建隔离会话。工具包重置不重置旧工具状态。最后验收只认本次新生成且passed=true的结果时间戳；CLI中途返回、旧文件或没有更新不能当通过。
+
+N3浏览器验收使用独立会话`nonstandard-n3`及`verify_nonstandard_scheme_browser.mjs`（CLI函数，不直接node执行）。本机Vite地址为127.0.0.1:5193，仅QA会话设置前端sessionStorage登录；脚本通过公开接口重置该会话独立合成包，旧工具数据不回写。已缓存CLI可用`npx --offline --no-install --package @playwright/cli playwright-cli -s=nonstandard-n3 run-code --filename dev_scripts/verify_nonstandard_scheme_browser.mjs`，等待最终新生成的browser-result.json，不以中途modal回显当作完成。产物在忽略的`output/playwright/nonstandard-n3/`。用捆绑Python执行`dev_scripts/check_nonstandard_exports.py`只读核对五份下载XLSX及JSON/HTML；Artifact工具可只读导入/渲染。新导出不依赖SheetJS，保留静态数值/字符串，不含公式/宏/外链；不能在Excel编辑后回写应用。这是N3阶段历史记录，当时未重跑完整N2。后续2026-10-01已完成解析依赖本机化、完整N2复跑及5份真实文件三环境导入，见[当前读取设计与验收](docs/local-file-reading.md)；完整发布/业务验收仍未完成。
+
+N2浏览器脚本是Playwright CLI函数，不直接用`node`执行。先启动本地Vite，再创建独立CLI浏览器会话`nonstandard-n2`打开本地URL；仅在该测试会话设置`ups_auth=ok`的sessionStorage并重载，清空该会话的独立需求工作稿键，不操作用户浏览器。测试PDF由既有`create_ups_evidence_fixtures.py`生成，库需正常加载。运行`npx --no-install --package @playwright/cli playwright-cli -s=nonstandard-n2 run-code --filename dev_scripts/verify_nonstandard_requirements_browser.mjs`；确认忽略目录`output/playwright/nonstandard-n2/browser-result.json`为本次生成且passed=true后，关闭自己创建的会话/服务。脚本使用合成材料，浏览器下载保存在忽略目录；真客户文件只在私有只读测试中使用，不进入仓库或公开构建。当前解析依赖已取消CDN并同源发出，新入口不调用AI/OCR接口；负例增加dev_scripts/create_local_reader_fixtures.py与dev_scripts/verify_local_reader_browser.mjs，真实私有验收仍放忽略output，详见docs/local-file-reading.md。
+
+条款分页与会话草稿见[定稿和实际验收](docs/requirement-pagination.md)。纯模块`requirement-review-state.js`负责交集筛选/稳定排序/分页/基线草稿，第11组`test_requirement_review.mjs`纳入npm回归。`verify_requirement_review_browser.mjs`是CLI函数：仅隔离QA会话清空存储，使用已有忽略的5来源1196条备份；dev与子目录各跑，默认端口5193/5194。不能直接node执行或在用户当前工作稿跑。`check_requirement_review_exports.py`用openpyxl独立核对两个环境完整要求/证据/修订及草稿不混入导出。产物在忽略`output/playwright/requirement-review/`；只认本次最终passed时间戳，中途modal不是结束。先切回1366宽度再运行，防止上轮900宽度隐藏侧栏影响测试前置。
+
+UPS需求证据与人工修订升级保留[子计划及接续记录](docs/ups-evidence-roadmap.md)。开始时读取两份计划、检查Git状态，从首个未完成阶段继续；结束时记录变更文件、实际验证、遗留问题及下一步。
+
+真实业务试用准备见[执行方案与结果](docs/nonstandard-business-trial.md)。`node dev_scripts/prepare_business_trial.mjs`只读旧私有统一包、生成`output/business-trial/2026-10-04/`副本及同源输出；不确认要求/方案，修改/错误区域口径探针仅纯内存，原包哈希不变。已有反馈任何改动即拒绝重建，保护模块/负例回归为`business_trial_feedback.mjs`及`test_business_trial_feedback.mjs`。真实资料不作为npm固定测试输入，也不进入Git/公开构建。使用新隔离CLI会话、本机服务和`verify_business_trial_browser.mjs`验证恢复/四方案导出后，按顺序运行`check_business_trial_browser.mjs`及捆绑Python的`check_business_trial_exports.py`独立核对；只认本次最终报告，不能把中途modal、旧文件或软件通过当业务采用。本人反馈未收集时停止于待业务复核，不反复重建或擅自采用。
+
+S1～S3已本地实现并通过软件回归；2026-10-01真实样例已复现，发现设备归属/表达提取及条款覆盖缺口，S4业务验收未通过，业务人员试用尚未完成。当前未提升版本、提交或发布。`src/modules/ups-evidence.js`只负责提取、来源范围验证、修订、确认约束和导出行，不参与产品满足性判断。`normalizeUpsRequirement()`保留可选`evidenceVersion=1`，历史与JSON容器继续`version=1`，项目schema不变。旧记录无证据时明确显示缺失，不能自动补造来源。
+
+`npm test`包含证据纯逻辑回归；页面验收先运行`python dev_scripts/create_ups_evidence_fixtures.py`（需reportlab），再运行`node dev_scripts/verify_ups_evidence_browser.mjs`（需本机Chrome及Playwright，可用`UPS_QA_PLAYWRIGHT_PATH`指定已安装模块位置，`UPS_QA_URL`指定本地服务地址）。脚本使用隔离浏览器存储及合成材料，不调用外部AI；输出至Git忽略的`output/playwright/ups-evidence/`。主流程覆盖修订/冲突阻断、新旧备份、PDF页序、替换及追加资料、存储失败和导出。发布前仍须执行本手册完整门禁，真实业务、OCR和系统打印未测试的部分不得标为已完成。

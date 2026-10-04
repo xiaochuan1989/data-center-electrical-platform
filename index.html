@@ -6,7 +6,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232d6a9f'/%3E%3Cpath d='M36 4 14 36h16l-2 24 22-34H34z' fill='%23fff'/%3E%3C/svg%3E">
 <title>UPS与配电选型助手</title>
 <script>
-const APP_VERSION = "v2.10.0";
+const APP_VERSION = "v2.12.0";
 const DEBUG_MODE = false;
 const CLIENT_SIDE_ACCESS_CODE = '173205';
 const PRICE_VIEW_CODE = '314159';
@@ -187,6 +187,15 @@ document.addEventListener("DOMContentLoaded", function() {
   .ups-criteria-grid input,.ups-criteria-grid select { min-width:0;width:100%;padding:8px;border:1px solid #bfcfe2;border-radius:6px;background:white;font:inherit; }
   .ups-criteria-confirm { display:flex;align-items:center;gap:8px;margin-top:13px;font-size:12px;color:#294c6f; }
   .ups-criteria-note { margin:8px 0 0;font-size:12px;color:#8a5a14;white-space:pre-wrap; }
+  .ups-evidence { margin-top:12px;font-size:12px; }
+  .ups-evidence summary { cursor:pointer;color:#24568c;font-weight:600; }
+  .ups-evidence-scroll { overflow:auto;max-height:360px;margin-top:8px; }
+  .ups-evidence table { width:100%;border-collapse:collapse;min-width:640px;background:#fff; }
+  .ups-evidence th,.ups-evidence td { border:1px solid #d5e0ed;padding:7px;text-align:left;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere; }
+  .ups-evidence th { background:#eef4fb; }
+  .ups-evidence select { max-width:100%;padding:4px; }
+  .ups-revision-item { display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid #d5e0ed; }
+  .ups-revision-item input { flex:1;min-width:180px;padding:7px;border:1px solid #bfcfe2;border-radius:5px; }
   .ups-audit-badge { display:inline-block;padding:2px 7px;margin-top:4px;border-radius:99px;font-size:11px;font-weight:600; }
   .ups-audit-badge.pass { background:#e9f7ee;color:#187444; }.ups-audit-badge.unknown { background:#fff4df;color:#955d00; }
   .ups-audit-badge.fail { background:#fce9e9;color:#b42318; }
@@ -434,38 +443,40 @@ document.addEventListener("DOMContentLoaded", function() {
   .analyze-btn { justify-content:center; }
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="./vendor/xlsx/reader.min.js"></script>
+<script>var XLSXReader = window.XLSX;</script>
+<script src="./vendor/xlsx/style-writer.min.js"></script>
+<script src="./vendor/mammoth/mammoth.browser.min.js"></script>
 <script>
-/* 第三方库容灾：主源（jsdelivr / cdnjs）被客户内网拦截或超时时自动切换备用源，
-   避免 Excel 导入导出、Word/PDF 解析静默失效。备用源已逐个实测可用：
-   xlsx-js-style 仅 jsdelivr 与 unpkg 收录，cdnjs 无该包。 */
+/* 解析依赖同源；缺文件明确失败，不退回外网。旧Excel样式写出保留，读取用CE。 */
 var LIB_SOURCES = [
-  { global: 'XLSX',      label: 'Excel 组件（xlsx-js-style）', url: 'https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js' },
-  { global: 'mammoth',   label: 'Word 解析组件（mammoth）',    url: 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js' },
-  { global: 'pdfjsLib',  label: 'PDF 解析组件（pdf.js）',      url: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
-    worker: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js' }
+  { global:'XLSX',label:'Excel本机组件' },
+  { global:'mammoth',label:'Word本机解析组件' },
+  { global:'pdfjsLib',label:'PDF本机解析组件' }
 ];
 var libLoadState = {};
-
-function setPdfWorkerSrc(url) {
-  if (typeof pdfjsLib !== 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc = url;
+if (typeof XLSXReader !== 'undefined' && typeof XLSX !== 'undefined') {
+  ['read','readFile','readFileSync'].forEach(function(key) { XLSX[key] = XLSXReader[key]; });
 }
-setPdfWorkerSrc('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js');
-
 LIB_SOURCES.forEach(function(lib) {
-  if (typeof window[lib.global] !== 'undefined') { libLoadState[lib.global] = 'ready'; return; }
-  libLoadState[lib.global] = 'loading';
-  var s = document.createElement('script');
-  s.src = lib.url;
-  s.onload = function() {
-    libLoadState[lib.global] = typeof window[lib.global] !== 'undefined' ? 'ready' : 'failed';
-    if (lib.worker && libLoadState[lib.global] === 'ready') setPdfWorkerSrc(lib.worker);
-  };
-  s.onerror = function() { libLoadState[lib.global] = 'failed'; };
-  document.head.appendChild(s);
+  libLoadState[lib.global] = typeof window[lib.global] !== 'undefined' ? 'ready' : 'failed';
 });
+if (typeof XLSXReader === 'undefined') { libLoadState.XLSX = 'failed'; }
+var localParserReady = {};
+libLoadState.pdfjsLib = 'loading';
+localParserReady.pdfjsLib = import(/* @vite-ignore */ new URL('vendor/pdfjs/pdf.mjs', document.baseURI).href).then(function(lib) {
+  if (lib.version !== '6.3.289') throw new Error('PDF解析库版本不匹配');
+  lib.GlobalWorkerOptions.workerSrc = new URL('vendor/pdfjs/pdf.worker.mjs', document.baseURI).href;
+  window.pdfjsLib = lib; libLoadState.pdfjsLib = 'ready'; return lib;
+}).catch(function(error) { libLoadState.pdfjsLib = 'failed'; throw error; });
+// 保留拒绝供读取入口处理，同时避免首屏未读取PDF时产生未处理的拒绝。
+localParserReady.pdfjsLib.catch(function() {});
+function localPdfDocumentOptions() {
+  var root = new URL('vendor/pdfjs/', document.baseURI);
+  return { cMapUrl:new URL('cmaps/',root).href,cMapPacked:true,
+    standardFontDataUrl:new URL('standard_fonts/',root).href,wasmUrl:new URL('wasm/',root).href,
+    isEvalSupported:false,enableScripting:false,enableXfa:false,useSystemFonts:false };
+}
 
 // 库缺失提示出口：showToast 就绪时用非阻塞消息条，未就绪则退回原生 alert
 function notifyLibIssue(message, type) {
@@ -475,16 +486,16 @@ function notifyLibIssue(message, type) {
 
 // 依赖第三方库的入口统一先调用本函数，缺库时给出可操作的提示而不是抛未捕获异常
 function ensureLib(globalName) {
-  if (typeof window[globalName] !== 'undefined') return true;
+  if (typeof window[globalName] !== 'undefined' && libLoadState[globalName] === 'ready') return true;
   var lib = null;
   for (var i = 0; i < LIB_SOURCES.length; i++) {
     if (LIB_SOURCES[i].global === globalName) { lib = LIB_SOURCES[i]; break; }
   }
   var name = lib ? lib.label : globalName;
   if (libLoadState[globalName] === 'loading') {
-    notifyLibIssue(name + '正在从备用源加载，请等待几秒后重试。', 'warn');
+    notifyLibIssue(name + '正在从本机资源加载，请稍后重试。', 'warn');
   } else {
-    notifyLibIssue(name + '加载失败，该功能暂时不可用。\n\n常见原因：当前网络（客户内网、防火墙）无法访问 CDN。\n请更换网络后刷新页面重试。', 'error');
+    notifyLibIssue(name + '加载失败，该功能暂时不可用。\n请刷新页面或检查完整静态资源；不会改用外部解析服务。', 'error');
   }
   return false;
 }
@@ -984,28 +995,28 @@ function checkAuth(){
     <!-- 锂电池面板 -->
     <div id="batt-lithium-panel" style="display:none">
       <div class="lithium-a00-intro">
-        <strong>计算口径：锂电池-选型模板-A00.xlsx</strong>
-        <span>网页字段、自动取值和容量公式逐项对应“锂电池选型”工作表第 2 行。</span>
+        <strong>锂电池容量估算</strong>
+        <span>根据负载功率、后备时间、电池组数与效率估算单组容量；自动计算项可在下方核对。</span>
       </div>
       <div class="lithium-a00-input-card">
         <div class="lithium-a00-input-grid">
           <div class="field">
-            <label for="li-load-kw">负载功率 A2（kW，选填）</label>
+            <label for="li-load-kw">负载功率（kW，选填）</label>
             <input type="number" id="li-load-kw" value="500" min="0" step="0.1" placeholder="留空时按UPS容量×功率因数">
             <small>填写后优先采用；留空才按 UPS 容量计算</small>
           </div>
           <div class="field">
-            <label for="li-ups-kva">UPS 功率 B2（kVA）</label>
+            <label for="li-ups-kva">UPS 额定容量（kVA）</label>
             <input type="number" id="li-ups-kva" value="600" min="0.1" step="0.1" oninput="syncLithiumBatteryPreview()">
             <small>同时决定逆变器效率：≤100kVA 取 0.93，&gt;100kVA 取 0.95</small>
           </div>
           <div class="field">
-            <label for="li-nominal-voltage">标称电压 L2（V）</label>
+            <label for="li-nominal-voltage">电池组标称电压（V）</label>
             <input type="number" id="li-nominal-voltage" value="512" min="0.1" step="0.1" oninput="syncLithiumBatteryPreview()">
-            <small>电芯串联数 C2 = 标称电压 ÷ 3.2V</small>
+            <small>电芯串联数 = 标称电压 ÷ 3.2V</small>
           </div>
           <div class="field">
-            <label for="li-group-num">电池组数量 D2</label>
+            <label for="li-group-num">并联电池组数</label>
             <select id="li-group-num">
               <option value="">请选择</option>
               <option value="1">1 组</option>
@@ -1015,51 +1026,51 @@ function checkAuth(){
             </select>
           </div>
           <div class="field">
-            <label for="li-pf">功率因数 E2（0.8～1）</label>
+            <label for="li-pf">UPS 输出功率因数（0.8～1）</label>
             <input type="number" id="li-pf" value="0.8" min="0.8" max="1" step="0.01">
           </div>
           <div class="field">
-            <label for="li-time">放电时间 H2（h）</label>
+            <label for="li-time">目标后备时间（h）</label>
             <input type="number" id="li-time" value="0.25" min="0.01" step="0.01" oninput="syncLithiumBatteryPreview()">
-            <small>电芯放电倍率 I2 = 1 ÷ 放电时间</small>
+            <small>电芯放电倍率 = 1 ÷ 放电时间</small>
           </div>
           <div class="field">
-            <label for="li-batt-eff">电池输出效率 G2（0.9～1）</label>
+            <label for="li-batt-eff">电池输出效率（0.9～1）</label>
             <input type="number" id="li-batt-eff" value="0.95" min="0.9" max="1" step="0.01">
           </div>
           <div class="field">
-            <label for="li-eff">逆变器效率 F2（自动）</label>
+            <label for="li-eff">逆变器效率（自动）</label>
             <input type="number" id="li-eff" value="0.95" step="0.01" readonly aria-readonly="true">
-            <small>严格按 IF(B2&gt;100, 0.95, 0.93) 自动取值</small>
+            <small>UPS 容量 ≤100kVA 取 0.93，&gt;100kVA 取 0.95</small>
           </div>
         </div>
-        <div class="lithium-a00-derived" aria-label="Excel 自动计算字段">
-          <div><span>3.2V 电芯串联数 C2</span><strong id="li-preview-cell-num">160</strong></div>
-          <div><span>逆变器效率 F2</span><strong id="li-preview-eff">0.95</strong></div>
-          <div><span>电芯放电倍率 I2</span><strong id="li-preview-rate">4.00 C</strong></div>
-          <div><span>电芯平台电压 J2</span><strong id="li-preview-platform">3.05 V</strong></div>
+        <div class="lithium-a00-derived" aria-label="自动计算参数">
+          <div><span>3.2V 电芯串联数</span><strong id="li-preview-cell-num">160</strong></div>
+          <div><span>逆变器效率</span><strong id="li-preview-eff">0.95</strong></div>
+          <div><span>电芯放电倍率</span><strong id="li-preview-rate">4.00 C</strong></div>
+          <div><span>电芯平台电压</span><strong id="li-preview-platform">3.05 V</strong></div>
         </div>
-        <button class="save-btn lithium-a00-calc-button" onclick="calcLithiumBattery()">按 Excel A00 计算</button>
+        <button class="save-btn lithium-a00-calc-button" onclick="calcLithiumBattery()">计算所需电池容量</button>
       </div>
 
-      <details class="lithium-a00-method" open>
-        <summary>计算方法说明与 Excel 单元格对应关系</summary>
+      <details class="lithium-a00-method">
+        <summary>计算方法与适用边界</summary>
         <div class="lithium-a00-method-body">
-          <p><strong>功率取值：</strong>A2（负载功率）不为空时采用 A2；A2 为空时采用 B2 × E2（UPS 功率 × 功率因数）。</p>
-          <p><strong>自动参数：</strong>C2 = L2 ÷ 3.2；F2 = IF(B2&gt;100, 0.95, 0.93)；I2 = 1 ÷ H2。</p>
-          <p><strong>平台电压 J2：</strong>≤1C 取 3.15V；&gt;1C 且 ≤3C 取 3.12V；≥4C 且 ≤6C 取 3.05V；&gt;6C 取 3.02V。</p>
-          <p><strong>容量 K2：</strong>功率(kW) × 1000 × H2 ÷ (F2 × C2 × D2 × G2 × J2)。结果为每组所需计算容量，Excel 单元格显示为整数 Ah。</p>
-          <div class="lithium-a00-warning">原表 J2 的 IFS 公式未定义 3C～4C 区间；网页遇到该区间会明确提示，不会擅自补值。</div>
+          <p><strong>功率取值：</strong>优先采用填写的负载功率；未填写时按 UPS 额定容量 × 输出功率因数估算。</p>
+          <p><strong>自动参数：</strong>电芯串联数 = 电池组标称电压 ÷ 3.2V；放电倍率 = 1 ÷ 后备时间；逆变器效率按 UPS 容量自动取值。</p>
+          <p><strong>平台电压：</strong>≤1C 取 3.15V；&gt;1C 且 ≤3C 取 3.12V；≥4C 且 ≤6C 取 3.05V；&gt;6C 取 3.02V。</p>
+          <p><strong>单组容量：</strong>负载功率(kW) × 1000 × 后备时间(h) ÷（逆变器效率 × 电芯串联数 × 并联电池组数 × 电池输出效率 × 电芯平台电压）。整数值仅用于显示；实际选型应不低于未取整计算值，并核对产品放电能力。</p>
+          <div class="lithium-a00-warning">3C～4C 区间缺少平台电压取值依据；计算遇到该区间会提示确认，不自动补值。实际选型还须核对电芯规格、放电曲线和温度条件。</div>
         </div>
       </details>
 
       <!-- 计算结果 -->
       <div id="li-result" style="display:none;margin-top:16px">
         <div class="lithium-a00-result-card">
-          <div class="lithium-a00-result-title">Excel A00 对照结果</div>
+          <div class="lithium-a00-result-title">容量计算结果</div>
           <div class="lithium-a00-result-grid">
             <div class="lithium-a00-result-primary">
-              <span>单组计算容量 K2（Excel 显示值）</span>
+              <span>单组计算容量（整数显示）</span>
               <strong><span id="li-capacity">-</span> Ah</strong>
               <small>未取整计算值：<span id="li-capacity-precise">-</span> Ah</small>
             </div>
@@ -1069,7 +1080,7 @@ function checkAuth(){
               <small id="li-power-source">-</small>
             </div>
             <div>
-              <span>3.2V 电芯串联数 C2</span>
+              <span>3.2V 电芯串联数</span>
               <strong><span id="li-cell-series">-</span></strong>
               <small><span id="li-nominal-volts">-</span> V ÷ 3.2V</small>
             </div>
@@ -1428,20 +1439,23 @@ function checkAuth(){
       </div>
       <label class="ups-criteria-confirm"><input id="ups-criteria-confirmed" type="checkbox"> 我已核对上述技术条件；空白项保持“资料不足”，不由 AI 猜测</label>
       <p id="ups-criteria-note" class="ups-criteria-note">先从原文提取，再核对和修改字段。未核对的条件不会作为已确认条件。</p>
+      <details class="ups-evidence" id="ups-evidence-panel"><summary>查看原文证据与人工修订</summary><div id="ups-evidence-content"></div></details>
     </div>
     <div class="req-bottom">
       <div style="display:flex;flex-direction:column;gap:6px">
         <span class="req-hint">💡 粘贴需求后可提取常见参数；未识别内容请手工补充并确认</span>
         <div style="display:flex;align-items:center;gap:10px">
-          <label class="doc-upload-label" title="支持 TXT / DOCX 文件，AI 自动提取需求">
+          <label class="doc-upload-label" title="在本机读取 TXT / MD / DOCX / PDF 文字，再核对技术条件">
             📎 上传文档
-            <input type="file" id="doc-upload" accept=".txt,.md,.docx,.doc,.pdf" style="display:none" onchange="handleDocUpload(this)">
+            <input type="file" id="doc-upload" accept=".txt,.md,.docx,.pdf" style="display:none" onchange="handleDocUpload(this)">
           </label>
           <span id="doc-upload-status">✓ <span id="doc-file-name"></span> 已加载</span>
+          <label style="font-size:12px"><input type="checkbox" id="ups-upload-append"> 追加到当前需求（保留多份资料）</label>
         </div>
       </div>
       <!-- 图片粘贴区域 -->
       <div id="image-preview-container" class="image-preview-container">
+        <span style="font-size:12px;color:#7b4a08">点击识别会将这些图片发送至设置中的 AI 服务商，识别结果须人工核对。</span>
         <div class="image-preview-label">📷 已粘贴的图片（点击×删除）：</div>
         <div id="image-preview-list" class="image-preview-list"></div>
         <button id="ocr-btn" onclick="extractTextFromImages()" style="margin-top:8px;background:#e67e22;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;">📷 识别图片文字</button>
@@ -2100,22 +2114,105 @@ const UPS_CRITERIA_FIELDS = {
   batteryType: 'ups-crit-battery', installation: 'ups-crit-install'
 };
 
-function extractUpsCriteria() {
-  const source = document.getElementById('requirement').value;
-  const parsed = window.upsSelection?.parseUpsRequirement(source);
-  if (!parsed) { showToast('选型校核模块尚未加载'); return; }
-  Object.entries(UPS_CRITERIA_FIELDS).forEach(([field, id]) => {
-    document.getElementById(id).value = parsed[field] ?? '';
-  });
-  document.getElementById('ups-crit-snmp').checked = parsed.needsSnmp;
+let upsEvidenceDraft = null;
+let upsEvidenceSources = [];
+let upsEvidenceSourceText = '';
+let upsSourceGeneration = 0;
+
+function upsCriteriaValues() {
+  const values = { needsSnmp: document.getElementById('ups-crit-snmp').checked };
+  Object.entries(UPS_CRITERIA_FIELDS).forEach(([field, id]) => { values[field] = document.getElementById(id).value; });
+  return window.upsSelection.normalizeUpsRequirement(values);
+}
+
+function invalidateUpsConfirmation(message, sourceChanged = false) {
+  upsSourceGeneration++;
   document.getElementById('ups-criteria-confirmed').checked = false;
-  document.getElementById('ups-criteria-note').textContent = '已提取可识别条件。请逐项核对；未识别的条件请手工补充，完成后勾选确认。';
+  if (upsEvidenceDraft) upsEvidenceDraft.confirmedAt = null;
+  if (upsEvidenceDraft?.fieldEvidence) for (const e of Object.values(upsEvidenceDraft.fieldEvidence)) {
+    e.reviewStatus = sourceChanged || e.reviewStatus === 'stale' ? 'stale' : 'pending';
+  }
+  if (message) document.getElementById('ups-criteria-note').textContent = message;
+}
+
+function setUpsRequirementSource(text, sources, append = false) {
+  const textarea = document.getElementById('requirement');
+  upsSourceGeneration++;
+  textarea.value = text;
+  upsEvidenceSources = sources;
+  upsEvidenceSourceText = text;
+  if (upsEvidenceDraft) upsEvidenceDraft.sourceText = text;
+  invalidateUpsConfirmation(append ? '已加入新的资料，请重新提取并核对技术条件。' : '资料已替换，请重新提取并核对技术条件。', true);
+  renderUpsEvidence();
+}
+
+function evidenceHtml(requirement) {
+  const tables = window.upsEvidence.evidenceExportRows(requirement);
+  const table = rows => `<div class="ups-evidence-scroll"><table><thead><tr>${rows[0].map(value => `<th>${escapeHtml(value)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(row => `<tr>${row.map(value => `<td>${escapeHtml(value)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return `<p>${escapeHtml(window.upsEvidence.evidenceSummary(requirement))}</p>${table(tables.evidence)}<p>人工修订记录</p>${table(tables.revisions)}`;
+}
+
+function renderUpsEvidence() {
+  const container = document.getElementById('ups-evidence-content');
+  if (!container || !window.upsEvidence) return;
+  if (!upsEvidenceDraft) { container.textContent = '请先从需求文字提取技术条件；历史记录未保存证据时，不推测来源。'; return; }
+  let html = evidenceHtml(upsEvidenceDraft);
+  for (const [field, e] of Object.entries(upsEvidenceDraft.fieldEvidence || {})) {
+    if (!e.conflict) continue;
+    const options = [...new Set(e.candidates.map(c => JSON.stringify(c.value)))];
+    html += `<p>${escapeHtml(window.upsEvidence.FIELD_LABELS[field])}存在多个值：<select aria-label="选择${escapeHtml(window.upsEvidence.FIELD_LABELS[field])}证据" data-evidence-field="${field}"><option value="">请选择，或在上方手工填写</option>${options.map((value, i) => `<option value="${i}">${escapeHtml(JSON.parse(value))}</option>`).join('')}</select></p>`;
+  }
+  html += (upsEvidenceDraft.revisions || []).map(r => `<label class="ups-revision-item"><span>${escapeHtml(window.upsEvidence.FIELD_LABELS[r.field])}：${escapeHtml(r.from ?? '未明确')} → ${escapeHtml(r.to ?? '未明确')}</span><input aria-label="修改原因" data-revision-id="${escapeHtml(r.id)}" placeholder="填写这次修改/补录的原因" value="${escapeHtml(r.reason)}"></label>`).join('');
+  container.innerHTML = html;
+}
+
+function trackUpsFieldChange(field) {
+  if (!upsEvidenceDraft) extractUpsCriteria(false);
+  if (!upsEvidenceDraft) return;
+  const current = upsCriteriaValues();
+  upsEvidenceDraft = window.upsEvidence.recordRequirementRevision(upsEvidenceDraft, field, upsEvidenceDraft[field], current[field]);
+  invalidateUpsConfirmation('技术条件已修改，请填写修改原因并重新确认。');
+  renderUpsEvidence();
+  if (upsEvidenceDraft.revisions.some(r => !r.reason)) document.getElementById('ups-evidence-panel').open = true;
+}
+
+document.getElementById('ups-evidence-content').addEventListener('input', event => {
+  const id = event.target.dataset.revisionId;
+  const revision = upsEvidenceDraft?.revisions.find(r => r.id === id);
+  if (revision) { revision.reason = event.target.value; invalidateUpsConfirmation(); }
+});
+document.getElementById('ups-evidence-content').addEventListener('change', event => {
+  const field = event.target.dataset.evidenceField;
+  if (!field || event.target.value === '') return;
+  const options = [...new Set(upsEvidenceDraft.fieldEvidence[field].candidates.map(c => JSON.stringify(c.value)))];
+  const value = JSON.parse(options[Number(event.target.value)]);
+  document.getElementById(UPS_CRITERIA_FIELDS[field]).value = value;
+  trackUpsFieldChange(field);
+});
+
+function extractUpsCriteria(overwrite = true) {
+  const source = document.getElementById('requirement').value;
+  const parsed = window.upsEvidence?.extractRequirementEvidence(source, source === upsEvidenceSourceText ? upsEvidenceSources : [], upsEvidenceDraft);
+  if (!parsed) { showToast('选型校核模块尚未加载'); return; }
+  const before = upsEvidenceDraft;
+  upsEvidenceDraft = parsed;
+  if (overwrite) {
+    // 保留重新提取造成的已修改值变化，避免清空/撤销没有记录。
+    if (before) for (const field of Object.keys(window.upsEvidence.FIELD_LABELS)) {
+      if (JSON.stringify(before[field]) !== JSON.stringify(parsed[field])) upsEvidenceDraft = window.upsEvidence.recordRequirementRevision(upsEvidenceDraft, field, before[field], parsed[field], '根据当前原文重新提取');
+    }
+    Object.entries(UPS_CRITERIA_FIELDS).forEach(([field, id]) => { document.getElementById(id).value = parsed[field] ?? ''; });
+    document.getElementById('ups-crit-snmp').checked = parsed.needsSnmp;
+  }
+  invalidateUpsConfirmation('已提取原文证据。请逐项核对；冲突值需选择并说明原因，未识别条件可手工补录。');
+  renderUpsEvidence();
+  if (Object.values(parsed.fieldEvidence).some(e => e.conflict)) document.getElementById('ups-evidence-panel').open = true;
 }
 
 function readUpsCriteria() {
-  const input = { sourceText: document.getElementById('requirement').value,
+  const input = { ...(upsEvidenceDraft || {}), sourceText: document.getElementById('requirement').value,
     needsSnmp: document.getElementById('ups-crit-snmp').checked,
-    confirmedAt: document.getElementById('ups-criteria-confirmed').checked ? new Date().toISOString() : null };
+    confirmedAt: document.getElementById('ups-criteria-confirmed').checked ? upsEvidenceDraft?.confirmedAt || new Date().toISOString() : null };
   Object.entries(UPS_CRITERIA_FIELDS).forEach(([field, id]) => { input[field] = document.getElementById(id).value; });
   return window.upsSelection.normalizeUpsRequirement(input);
 }
@@ -2128,15 +2225,45 @@ function fillUpsCriteria(requirement) {
   });
   document.getElementById('ups-crit-snmp').checked = normalized.needsSnmp;
   document.getElementById('ups-criteria-confirmed').checked = Boolean(normalized.confirmedAt);
+  upsEvidenceDraft = normalized.evidenceVersion ? normalized : null;
+  upsEvidenceSources = normalized.sources || [];
+  upsEvidenceSourceText = normalized.evidenceText || '';
+  upsSourceGeneration++;
+  renderUpsEvidence();
 }
 
 document.querySelectorAll('#ups-criteria input, #ups-criteria select').forEach(control => {
   if (control.id !== 'ups-criteria-confirmed') control.addEventListener('input', () => {
-    document.getElementById('ups-criteria-confirmed').checked = false;
+    invalidateUpsConfirmation();
   });
 });
+Object.entries({ ...UPS_CRITERIA_FIELDS, needsSnmp: 'ups-crit-snmp' }).forEach(([field, id]) => {
+  document.getElementById(id).addEventListener('change', () => trackUpsFieldChange(field));
+});
+document.getElementById('ups-criteria-confirmed').addEventListener('change', event => {
+  if (!event.target.checked) return;
+  if (!upsEvidenceDraft) extractUpsCriteria(false);
+  // 同时捕获尚未失焦的手工填写值。
+  const values = upsCriteriaValues();
+  for (const field of Object.keys(window.upsEvidence.FIELD_LABELS)) {
+    if (JSON.stringify(upsEvidenceDraft[field]) !== JSON.stringify(values[field])) upsEvidenceDraft = window.upsEvidence.recordRequirementRevision(upsEvidenceDraft, field, upsEvidenceDraft[field], values[field]);
+  }
+  try {
+    upsEvidenceDraft.sourceText = document.getElementById('requirement').value;
+    upsEvidenceDraft = window.upsEvidence.confirmRequirementEvidence(upsEvidenceDraft);
+    event.target.checked = true;
+    document.getElementById('ups-criteria-note').textContent = '技术条件和证据已人工确认，可开始选型。';
+  } catch (error) {
+    invalidateUpsConfirmation(error.message);
+    document.getElementById('ups-evidence-panel').open = true;
+  }
+  renderUpsEvidence();
+});
 document.getElementById('requirement').addEventListener('input', () => {
-  document.getElementById('ups-criteria-confirmed').checked = false;
+  upsSourceGeneration++;
+  if (upsEvidenceDraft) upsEvidenceDraft.sourceText = document.getElementById('requirement').value;
+  invalidateUpsConfirmation('需求原文已修改，请重新提取并核对技术条件。', true);
+  renderUpsEvidence();
 });
 
 function getUpsCatalogEntries() {
@@ -2224,6 +2351,9 @@ async function analyze() {
     return;
   }
   const confirmed = readUpsCriteria();
+  const problems = window.upsEvidence.confirmationProblems(confirmed);
+  if (problems.length) { invalidateUpsConfirmation(problems.join('；')); return; }
+  const generation = upsSourceGeneration;
   if (!confirmed.capacityKva && !confirmed.loadKw && !confirmed.loadKva) {
     document.getElementById('ups-criteria-note').textContent = '至少需要填写 UPS 容量下限、负荷 kW 或负荷 kVA 之一。';
     return;
@@ -2241,8 +2371,10 @@ async function analyze() {
       try {
         const productSummary = buildProductSummary();
         const validModels = PRODUCTS.map(p => p['型号']);
+        // 来源文件名、证据元数据和人工修订留在本机；AI只接收现有需求文字和确认标量。
+        const aiCriteria = Object.fromEntries([...Object.keys(UPS_CRITERIA_FIELDS), 'needsSnmp'].map(field => [field, confirmed[field]]));
         const systemPrompt = getCustomPrompt()
-          + `\n\n【工程师已确认的技术条件，优先于原文】\n${JSON.stringify(confirmed)}\n\n【产品数据库】\n${productSummary}\n\n【合法型号清单】\n${validModels.join('\n')}`
+          + `\n\n【工程师已确认的技术条件，优先于原文】\n${JSON.stringify(aiCriteria)}\n\n【产品数据库】\n${productSummary}\n\n【合法型号清单】\n${validModels.join('\n')}`
           + '\n\n仅辅助解释需求与候选差异，不作最终合格判定。严格输出 JSON：{"analysis":"说明","recommended":[{"model":"合法型号","reason":"理由"}],"also_consider":[]}';
         const aiResp = await callAI(req, systemPrompt);
         try {
@@ -2255,13 +2387,19 @@ async function analyze() {
     }
     const { result, audit } = auditedUpsResult(confirmed, aiResult);
 
+    if (generation !== upsSourceGeneration || !document.getElementById('ups-criteria-confirmed').checked ||
+      JSON.stringify(readUpsCriteria().fieldEvidence) !== JSON.stringify(confirmed.fieldEvidence)) {
+      showToast('等待期间需求或确认条件已修改，请重新确认并开始选型');
+      return;
+    }
+    saveSelectionHistory(result, req, window.projectSummary, confirmed, audit);
+
     chatHistory = [
       { role: "user",      content: "客户需求：" + req },
       { role: "assistant", content: JSON.stringify(result) }
     ];
     lastAdoptedModel = ''; lastAdoptionReason = '';
     lastResult = result; lastRequirement = req; lastConfirmedRequirement = confirmed; lastSelectionAudit = audit;
-    saveSelectionHistory(result, req, window.projectSummary, confirmed, audit);
     renderResult(result);
     document.getElementById("followup-card").style.display = apiKey ? "block" : "none";
     document.getElementById("chat-history").innerHTML = "";
@@ -2927,13 +3065,14 @@ body{font-family:-apple-system,"Microsoft YaHei",sans-serif;max-width:950px;marg
 h1{color:#163a60}h2{color:#2563eb;border-bottom:2px solid #dce8f6;padding-bottom:7px;margin-top:28px}
 .meta{font-size:12px;color:#66788a}.note{padding:12px;background:#f7faff;border:1px solid #dbe7f5;white-space:pre-wrap;font-size:13px}
 .risk{background:#fff1ef;border-color:#f1aaa3;color:#9b251d}table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:8px;border:1px solid #d9e2ec;text-align:left;vertical-align:top}th{background:#eef4fb}
-@media print{body{max-width:none;margin:10px}.note,table{break-inside:avoid}}
+th,td{padding:8px;border:1px solid #d9e2ec;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#eef4fb}
+@media print{body{max-width:none;margin:10px}.note,tr{break-inside:avoid}table{break-inside:auto}thead{display:table-header-group}h2,h3{break-after:avoid}}
 </style></head><body>
 <h1>UPS 选型技术说明</h1><div class="meta">UPS与配电选型助手 · ${escapeHtml(new Date().toLocaleString('zh-CN'))} · 规则 ${escapeHtml(window.upsSelection.UPS_SELECTION_RULE_VERSION)} · 目录 ${escapeHtml(meta.source)} / ${escapeHtml(meta.catalogVersion)}</div>
 <h2>一、客户原始需求</h2><div class="note">${escapeHtml(lastRequirement || '未提供原文')}</div>
 <h2>二、工程师确认的技术条件</h2><table><tbody>${criteria.map(([label, value, unit]) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value)} ${unit}</td></tr>`).join('')}</tbody></table>
 <p class="meta">确认时间：${escapeHtml(requirement.confirmedAt || '未记录')}。空白项不得按满足处理。</p>
+<h3>技术条件原文证据与人工修订</h3>${evidenceHtml(requirement)}
 <h2>三、程序校核与候选</h2><p>满足 ${audit?.counts.qualified || 0} 款；资料不足 ${audit?.counts.pending || 0} 款；不满足 ${audit?.counts.rejected || 0} 款。</p>
 <table><thead><tr><th>型号</th><th>容量</th><th>有功容量</th><th>结论</th><th>待确认或风险</th></tr></thead><tbody>${candidateRows || '<tr><td colspan="5">无合格候选</td></tr>'}</tbody></table>
 <h2>四、最终采用</h2><div class="note${adopted?.overall !== 'pass' ? ' risk' : ''}">${lastAdoptedModel
@@ -2973,8 +3112,11 @@ function exportUpsSelectionExcel() {
     ['采用理由/风险', lastAdoptionReason || ''], ['满足数量', lastSelectionAudit?.counts.qualified || 0],
     ['资料不足数量', lastSelectionAudit?.counts.pending || 0], ['不满足数量', lastSelectionAudit?.counts.rejected || 0]
   ];
-  for (const [key, value] of Object.entries(requirement)) if (!['sourceText', 'confirmedAt'].includes(key)) overview.push([key, value ?? '']);
+  for (const key of Object.keys(window.upsEvidence.FIELD_LABELS)) overview.push([window.upsEvidence.FIELD_LABELS[key], requirement[key] ?? '']);
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(overview), '技术条件');
+  const evidenceRows = window.upsEvidence.evidenceExportRows(requirement);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(evidenceRows.evidence), '原文证据');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(evidenceRows.revisions), '人工修订');
   const rows = [['型号', '类别', '校核', '容量(kVA)', '有功容量(kW)', '目录来源', '目录版本', '核对日期', '在售状态', '风险或待确认项']];
   for (const item of [...(lastResult.recommended || []), ...(lastResult.also_consider || [])]) {
     const product = findProduct(item.model);
@@ -3192,7 +3334,9 @@ async function extractTextFromImages() {
   if (btn) { btn.disabled = true; btn.textContent = '🔄 AI识别中...'; }
 
   try {
-    const existingText = document.getElementById('requirement').value.trim();
+    const existingText = document.getElementById('requirement').value;
+    const generation = upsSourceGeneration;
+    const imageCount = pastedImages.length;
 
     const systemPrompt = `你是一个专业的OCR文字识别助手，擅长从技术文档图片中准确提取文字。
 请仔细识别图片中的所有文字内容，只输出识别到的文字，不要做任何分析或选型建议。
@@ -3209,13 +3353,19 @@ async function extractTextFromImages() {
 
     // 清理结果
     let cleanResult = result.trim();
-    cleanResult = cleanResult.replace(/```[\s\S]*?```/g, '').trim();
+    cleanResult = cleanResult.replace(/^```[^\n]*\n|\n```$/g, '').trim();
 
-    if (cleanResult && cleanResult.length > 5) {
+    if (generation !== upsSourceGeneration) { showToast('识别期间需求已变更，识别结果未覆盖当前需求，请重新识别'); return; }
+    const meaningfulText = cleanResult.replace(/---图片\d+---|未识别到文字|[。\s]/g, '');
+    if (meaningfulText.length > 5) {
       const finalText = existingText
         ? existingText + '\n\n--- AI图片识别内容 ---\n' + cleanResult
         : cleanResult;
-      document.getElementById('requirement').value = finalText;
+      const sources = existingText === upsEvidenceSourceText ? [...upsEvidenceSources] : existingText
+        ? [window.upsEvidence.createEvidenceSource('text', '粘贴/手工需求', [{ start: 0, end: existingText.length }])] : [];
+      const start = finalText.length - cleanResult.length;
+      sources.push(window.upsEvidence.createEvidenceSource('image', `${imageCount}张图片的AI识别文字（需核对）`, [{ start, end: finalText.length }]));
+      setUpsRequirementSource(finalText, sources, true);
       pastedImages = [];
       updateImagePreviews();
       showToast('图片识别完成！文字已填入需求框，请检查确认。');
@@ -30427,7 +30577,7 @@ function getLithiumPlatformVoltage(rate) {
   if (rate > 1 && rate <= 3) return { voltage: 3.12, rule: '>1C 且 ≤3C' };
   if (rate >= 4 && rate <= 6) return { voltage: 3.05, rule: '≥4C 且 ≤6C' };
   if (rate > 6) return { voltage: 3.02, rule: '>6C' };
-  return { voltage: null, rule: '3C～4C：Excel 未定义' };
+  return { voltage: null, rule: '3C～4C：待确认平台电压' };
 }
 
 function syncLithiumBatteryPreview() {
@@ -30486,7 +30636,7 @@ function calcLithiumBattery() {
   document.getElementById('li-cell-series').textContent = format(result.cellSeriesCount, 2);
   document.getElementById('li-nominal-volts').textContent = format(result.nominalVoltageV, 2);
   document.getElementById('li-rate').textContent = format(result.dischargeRateC, 2) + ' C / ' + result.cellPlatformVoltageV.toFixed(2) + ' V';
-  document.getElementById('li-platform-rule').textContent = 'J2 条件：' + result.platformVoltageRule;
+  document.getElementById('li-platform-rule').textContent = '平台电压取值区间：' + result.platformVoltageRule;
   document.getElementById('li-eff').value = result.inverterEfficiency.toFixed(2);
 
   const powerExpression = result.hasLoadPower
@@ -30497,9 +30647,9 @@ function calcLithiumBattery() {
     <div class="lithium-a00-substitution">
       <div class="lithium-a00-substitution-title">本次代入过程</div>
       <div><span>功率：</span><code>${powerExpression}</code><strong>= ${format(result.designPowerKw * 1000, 2)} W</strong></div>
-      <div><span>C2：</span><code>${format(result.nominalVoltageV, 2)} ÷ 3.2</code><strong>= ${format(result.cellSeriesCount, 2)}</strong></div>
-      <div><span>I2：</span><code>1 ÷ ${format(result.dischargeTimeH, 3)}</code><strong>= ${format(result.dischargeRateC, 2)} C</strong></div>
-      <div><span>K2：</span><code>${capacityExpression}</code><strong>= ${format(result.calculatedCapacityAh, 2)} Ah（显示 ${format(result.excelDisplayCapacityAh, 0)} Ah）</strong></div>
+      <div><span>电芯串联数：</span><code>${format(result.nominalVoltageV, 2)} ÷ 3.2</code><strong>= ${format(result.cellSeriesCount, 2)}</strong></div>
+      <div><span>放电倍率：</span><code>1 ÷ ${format(result.dischargeTimeH, 3)}</code><strong>= ${format(result.dischargeRateC, 2)} C</strong></div>
+      <div><span>单组容量：</span><code>${capacityExpression}</code><strong>= ${format(result.calculatedCapacityAh, 2)} Ah（取整 ${format(result.excelDisplayCapacityAh, 0)} Ah）</strong></div>
     </div>`;
 
   syncLithiumBatteryPreview();
@@ -31501,8 +31651,8 @@ function saveSelectionHistory(result, requirement, projectSummary, confirmedRequ
     timestamp: new Date().toLocaleString('zh-CN', { hour12: false }),
     requirement: requirement,
     analysis: result.analysis || "",
-    recommended: result.recommended || [],
-    also_consider: result.also_consider || [],
+    recommended: JSON.parse(JSON.stringify(result.recommended || [])),
+    also_consider: JSON.parse(JSON.stringify(result.also_consider || [])),
     confirmedRequirement: confirmedRequirement ? JSON.parse(JSON.stringify(confirmedRequirement)) : null,
     auditCounts: audit?.counts || null,
     catalog: (() => { const meta = loadUpsCatalogMetadata(); return { source: meta.source, version: meta.catalogVersion, importedAt: meta.importedAt }; })(),
@@ -31585,7 +31735,7 @@ function restoreHistory(record, event) {
   };
   lastRequirement = record.requirement;
   lastHistoryRecordId = record.id;
-  lastConfirmedRequirement = record.confirmedRequirement || null;
+  lastConfirmedRequirement = record.confirmedRequirement ? window.upsSelection.normalizeUpsRequirement(record.confirmedRequirement) : null;
   if (record.confirmedRequirement && window.upsSelection) {
     fillUpsCriteria(record.confirmedRequirement);
     const audited = auditedUpsResult(record.confirmedRequirement);
@@ -31595,6 +31745,11 @@ function restoreHistory(record, event) {
     document.getElementById('requirement').value = record.requirement || '';
     document.getElementById('ups-criteria-confirmed').checked = false;
     lastSelectionAudit = null;
+    upsEvidenceDraft = null;
+    upsEvidenceSources = [];
+    upsEvidenceSourceText = '';
+    upsSourceGeneration++;
+    renderUpsEvidence();
   }
   lastAdoptedModel = record.manualAdoption?.model || '';
   lastAdoptionReason = record.manualAdoption?.reason || '';
@@ -31654,6 +31809,7 @@ function renderHistoryList(records) {
         </div>
         <div class="history-item-models">★ ${escapeHtml(recModels || '无')}${alsoModels ? ' | ○ ' + escapeHtml(alsoModels) : ''}${record.manualAdoption ? ' | 最终采用 ' + escapeHtml(record.manualAdoption.model) : ''}</div>
         <div class="history-item-requirement" title="${escapeHtml(record.requirement)}">需求：${escapeHtml(record.requirement)}</div>
+        <div style="font-size:12px;color:#4b6077">${escapeHtml(window.upsEvidence.evidenceSummary(record.confirmedRequirement))}</div>
         <div class="history-item-detail">${escapeHtml(record.analysis || '无分析内容')}</div>
       </div>
     `;
@@ -31743,6 +31899,15 @@ function exportHistory() {
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '选型历史');
+  const allEvidence = [['记录ID', '技术条件', '提取候选值', '确认值', '来源', '位置', '原文片段', '提取方式', '复核状态']];
+  const allRevisions = [['记录ID', '技术条件', '修改前', '修改后', '修改原因', '时间']];
+  for (const record of records) {
+    const data = window.upsEvidence.evidenceExportRows(record.confirmedRequirement || {});
+    allEvidence.push(...data.evidence.slice(data.evidence.length > 1 ? 1 : 0).map(row => [record.id, ...row]));
+    allRevisions.push(...data.revisions.slice(data.revisions.length > 1 ? 1 : 0).map(row => [record.id, ...row]));
+  }
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allEvidence), '原文证据');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allRevisions), '人工修订');
   XLSX.writeFile(wb, `选型历史_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
@@ -31755,6 +31920,7 @@ function downloadUpsJson(value, filename) {
 
 function sanitizeUpsHistoryRecord(record) {
   return { ...record,
+    confirmedRequirement: record.confirmedRequirement ? window.upsSelection.normalizeUpsRequirement(record.confirmedRequirement) : null,
     productSnapshots: (record.productSnapshots || []).map(upsProductSnapshot),
     projectSummary: {}, savedUpsConfigurations: [] };
 }
@@ -31820,7 +31986,8 @@ function compareUpsHistory() {
     return { name: `方案 ${index + 1}`, model, capacity: normalized.capacityKva, outputKw: normalized.outputKw,
       marginKw, backup: requirement.backupMinutes, status: audit?.overall || 'unknown',
       reason: record.manualAdoption?.reason || '', source: record.catalog?.source || '历史目录未记录',
-      rule: record.ruleVersion || '历史规则未记录' };
+      rule: record.ruleVersion || '历史规则未记录', evidence: window.upsEvidence.evidenceSummary(record.confirmedRequirement),
+      requirement };
   });
   const row = (label, values) => `<tr><th style="text-align:left;padding:9px;border:1px solid #dbe3ed;background:#f5f8fc">${label}</th>${values.map(value =>
     `<td style="padding:9px;border:1px solid #dbe3ed">${escapeHtml(value ?? '待确认')}</td>`).join('')}</tr>`;
@@ -31832,7 +31999,8 @@ function compareUpsHistory() {
     row('后备时间目标', cells.map(item => item.backup ? `${item.backup} 分钟` : null)) +
     row('当前校核', cells.map(item => ({ pass: '满足', unknown: '资料不足', fail: '不满足' })[item.status])) +
     row('人工偏离说明', cells.map(item => item.reason || '无')) + row('目录来源', cells.map(item => item.source)) +
-    row('规则版本', cells.map(item => item.rule)) + '</table>';
+    row('规则版本', cells.map(item => item.rule)) + row('证据与修订', cells.map(item => item.evidence)) + '</table>' +
+    cells.map(item => `<details class="ups-evidence"><summary>${escapeHtml(item.name)}的技术条件证据与修订</summary>${evidenceHtml(item.requirement)}</details>`).join('');
   document.getElementById('compare-modal').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
@@ -31859,51 +32027,65 @@ async function handleDocUpload(input) {
   const textarea = document.getElementById('requirement');
   const status   = document.getElementById('doc-upload-status');
   const nameEl   = document.getElementById('doc-file-name');
-
-  const showOk = () => {
-    nameEl.textContent = file.name;
-    status.style.display = 'inline';
-    setTimeout(() => { status.style.display = 'none'; }, 4000);
-  };
-
-  if (ext === 'txt' || ext === 'md' || ext === 'csv') {
-    const text = await file.text();
-    textarea.value = text;
+  const generation = upsSourceGeneration;
+  const append = document.getElementById('ups-upload-append').checked;
+  try {
+    let text = '', segments = [], emptyPages = [], sourceType = 'text';
+    if (['txt', 'md', 'csv'].includes(ext)) {
+      text = await file.text();
+      segments = [{ start: 0, end: text.length }];
+    } else if (ext === 'docx') {
+      if (!ensureLib('mammoth')) return;
+      const buf = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer: buf }, { externalFileAccess:false });
+      text = result.value;
+      sourceType = 'docx';
+      segments = [{ start: 0, end: text.length }];
+    } else if (ext === 'pdf') {
+      if (localParserReady.pdfjsLib) await localParserReady.pdfjsLib;
+      if (!ensureLib('pdfjsLib')) return;
+      sourceType = 'pdf';
+      const buf = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: buf, ...localPdfDocumentOptions() });
+      try {
+        const pdf = await loadingTask.promise;
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items.map(item => item.str + (item.hasEOL ? '\n' : ' ')).join('');
+          const start = text.length;
+          text += pageText;
+          segments.push({ start, end: text.length, page: i });
+          text += '\n\n';
+          if (!pageText.trim()) emptyPages.push(i);
+          page.cleanup();
+        }
+      } finally { await loadingTask.destroy(); }
+    } else {
+      throw new Error(ext === 'doc' ? '旧版 DOC 请先另存为 DOCX 或 PDF' : '支持 TXT / MD / DOCX / PDF');
+    }
+    if (generation !== upsSourceGeneration) { showToast('读取期间需求已变更，文件内容未覆盖当前需求，请重新上传'); return; }
+    if (!text.trim()) throw new Error('未读取到有效文字；扫描件请使用图片识别或人工填写。当前需求保持原样。');
+    const existing = append ? textarea.value : '';
+    const separator = existing ? '\n\n' : '';
+    const offset = existing.length + separator.length;
+    const sources = existing === upsEvidenceSourceText ? [...upsEvidenceSources] : existing
+      ? [window.upsEvidence.createEvidenceSource('text', '粘贴/手工需求', [{ start: 0, end: existing.length }])] : [];
+    sources.push(window.upsEvidence.createEvidenceSource(sourceType, file.name,
+      segments.map(segment => ({ ...segment, start: segment.start + offset, end: segment.end + offset }))));
+    setUpsRequirementSource(existing + separator + text, sources, append);
     textarea.focus();
-    showOk();
-  } else if (ext === 'docx' || ext === 'doc') {
-    if (!ensureLib('mammoth')) { input.value = ''; return; }
-    try {
-      const buf = await file.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer: buf });
-      textarea.value = result.value;
-      textarea.focus();
-      showOk();
-    } catch(err) {
-      showToast('DOCX 解析失败：' + err.message);
+    nameEl.textContent = file.name + (emptyPages.length ? `（第${emptyPages.join('、')}页未读取到文字，请另行核对）` : '');
+    status.style.display = 'inline';
+    if (emptyPages.length) {
+      document.getElementById('ups-criteria-note').textContent += `\nPDF第${emptyPages.join('、')}页未读取到文字，请使用图片识别或人工补录；已读取页面不代表整份资料完整。`;
+      showToast('部分PDF页面无文字，已保留真实页序；请补充核对扫描页');
     }
-  } else if (ext === 'pdf') {
-    if (!ensureLib('pdfjsLib')) { input.value = ''; return; }
-    try {
-      const buf = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      let fullText = '';
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
-        fullText += pageText + '\n';
-      }
-      textarea.value = fullText.trim();
-      textarea.focus();
-      showOk();
-    } catch(err) {
-      showToast('PDF 解析失败：' + err.message);
-    }
-  } else {
-    showToast('暂不支持该格式。\n支持：TXT / MD / DOCX / PDF');
+  } catch (error) {
+    showToast('文档读取失败：' + error.message);
+  } finally {
+    input.value = '';
   }
-  input.value = '';
 }
 </script>
 <script type="module" src="./src/main.js"></script>

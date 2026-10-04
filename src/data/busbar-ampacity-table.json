@@ -1,0 +1,1802 @@
+[
+  {
+    "spec": "10 x 3",
+    "displaySpec": "10 x 3",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 10,
+    "thicknessMm": 3,
+    "totalAreaMm2": 30,
+    "currents": {
+      "25": {
+        "flat": null,
+        "vertical": null
+      },
+      "35": {
+        "flat": null,
+        "vertical": null
+      },
+      "40": {
+        "flat": 100,
+        "vertical": 100
+      }
+    },
+    "sourceRow": 5
+  },
+  {
+    "spec": "15 x 3",
+    "displaySpec": "15 x 3",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 15,
+    "thicknessMm": 3,
+    "totalAreaMm2": 45,
+    "currents": {
+      "25": {
+        "flat": 200,
+        "vertical": 210
+      },
+      "35": {
+        "flat": 176,
+        "vertical": 185
+      },
+      "40": {
+        "flat": 162,
+        "vertical": 171
+      }
+    },
+    "sourceRow": 6
+  },
+  {
+    "spec": "20 x 3",
+    "displaySpec": "20 x 3",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 20,
+    "thicknessMm": 3,
+    "totalAreaMm2": 60,
+    "currents": {
+      "25": {
+        "flat": 261,
+        "vertical": 275
+      },
+      "35": {
+        "flat": 233,
+        "vertical": 245
+      },
+      "40": {
+        "flat": 214,
+        "vertical": 225
+      }
+    },
+    "sourceRow": 7
+  },
+  {
+    "spec": "20 x 4",
+    "displaySpec": "20 x 4",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 20,
+    "thicknessMm": 4,
+    "totalAreaMm2": 80,
+    "currents": {
+      "25": {
+        "flat": 347,
+        "vertical": 365
+      },
+      "35": {
+        "flat": 305,
+        "vertical": 320
+      },
+      "40": {
+        "flat": 281,
+        "vertical": 295
+      }
+    },
+    "sourceRow": 8
+  },
+  {
+    "spec": "25 x 3",
+    "displaySpec": "25 x 3",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 25,
+    "thicknessMm": 3,
+    "totalAreaMm2": 75,
+    "currents": {
+      "25": {
+        "flat": 323,
+        "vertical": 340
+      },
+      "35": {
+        "flat": 285,
+        "vertical": 299
+      },
+      "40": {
+        "flat": 262,
+        "vertical": 275
+      }
+    },
+    "sourceRow": 9
+  },
+  {
+    "spec": "25 x 4",
+    "displaySpec": "25 x 4",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 25,
+    "thicknessMm": 4,
+    "totalAreaMm2": 100,
+    "currents": {
+      "25": {
+        "flat": 430,
+        "vertical": 450
+      },
+      "35": {
+        "flat": 376,
+        "vertical": 385
+      },
+      "40": {
+        "flat": 347,
+        "vertical": 364
+      }
+    },
+    "sourceRow": 10
+  },
+  {
+    "spec": "25 x 5",
+    "displaySpec": "25 x 5",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 25,
+    "thicknessMm": 5,
+    "totalAreaMm2": 125,
+    "currents": {
+      "25": {
+        "flat": 535,
+        "vertical": 560
+      },
+      "35": {
+        "flat": 471,
+        "vertical": 492
+      },
+      "40": {
+        "flat": 433,
+        "vertical": 453
+      }
+    },
+    "sourceRow": 11
+  },
+  {
+    "spec": "25 x 6",
+    "displaySpec": "25 x 6",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 25,
+    "thicknessMm": 6,
+    "totalAreaMm2": 150,
+    "currents": {
+      "25": {
+        "flat": 640,
+        "vertical": 672
+      },
+      "35": {
+        "flat": 560,
+        "vertical": 590
+      },
+      "40": {
+        "flat": 515,
+        "vertical": 540
+      }
+    },
+    "sourceRow": 12
+  },
+  {
+    "spec": "25 x 10",
+    "displaySpec": "25 x 10",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 25,
+    "thicknessMm": 10,
+    "totalAreaMm2": 250,
+    "currents": {
+      "25": {
+        "flat": 750,
+        "vertical": 785
+      },
+      "35": {
+        "flat": 660,
+        "vertical": 690
+      },
+      "40": {
+        "flat": 607,
+        "vertical": 635
+      }
+    },
+    "sourceRow": 13
+  },
+  {
+    "spec": "30 x 3",
+    "displaySpec": "30 x 3",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 30,
+    "thicknessMm": 3,
+    "totalAreaMm2": 90,
+    "currents": {
+      "25": {
+        "flat": 380,
+        "vertical": 400
+      },
+      "35": {
+        "flat": 335,
+        "vertical": 352
+      },
+      "40": {
+        "flat": 308,
+        "vertical": 324
+      }
+    },
+    "sourceRow": 14
+  },
+  {
+    "spec": "30 x 4",
+    "displaySpec": "30 x 4",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 30,
+    "thicknessMm": 4,
+    "totalAreaMm2": 120,
+    "currents": {
+      "25": {
+        "flat": 451,
+        "vertical": 475
+      },
+      "35": {
+        "flat": 395,
+        "vertical": 415
+      },
+      "40": {
+        "flat": 366,
+        "vertical": 385
+      }
+    },
+    "sourceRow": 15
+  },
+  {
+    "spec": "30 x 5",
+    "displaySpec": "30 x 5",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 30,
+    "thicknessMm": 5,
+    "totalAreaMm2": 150,
+    "currents": {
+      "25": {
+        "flat": 561,
+        "vertical": 590
+      },
+      "35": {
+        "flat": 494,
+        "vertical": 519
+      },
+      "40": {
+        "flat": 455,
+        "vertical": 477
+      }
+    },
+    "sourceRow": 16
+  },
+  {
+    "spec": "30 x 6",
+    "displaySpec": "30 x 6",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 30,
+    "thicknessMm": 6,
+    "totalAreaMm2": 180,
+    "currents": {
+      "25": {
+        "flat": 666,
+        "vertical": 700
+      },
+      "35": {
+        "flat": 586,
+        "vertical": 616
+      },
+      "40": {
+        "flat": 540,
+        "vertical": 567
+      }
+    },
+    "sourceRow": 17
+  },
+  {
+    "spec": "30 x 10",
+    "displaySpec": "30 x 10",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 30,
+    "thicknessMm": 10,
+    "totalAreaMm2": 300,
+    "currents": {
+      "25": {
+        "flat": 880,
+        "vertical": 925
+      },
+      "35": {
+        "flat": 713,
+        "vertical": 814
+      },
+      "40": {
+        "flat": 656,
+        "vertical": 750
+      }
+    },
+    "sourceRow": 18
+  },
+  {
+    "spec": "40 x 4",
+    "displaySpec": "40 x 4",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 40,
+    "thicknessMm": 4,
+    "totalAreaMm2": 160,
+    "currents": {
+      "25": {
+        "flat": 593,
+        "vertical": 625
+      },
+      "35": {
+        "flat": 522,
+        "vertical": 550
+      },
+      "40": {
+        "flat": 484,
+        "vertical": 510
+      }
+    },
+    "sourceRow": 19
+  },
+  {
+    "spec": "40 x 5",
+    "displaySpec": "40 x 5",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 40,
+    "thicknessMm": 5,
+    "totalAreaMm2": 200,
+    "currents": {
+      "25": {
+        "flat": 665,
+        "vertical": 700
+      },
+      "35": {
+        "flat": 587,
+        "vertical": 616
+      },
+      "40": {
+        "flat": 540,
+        "vertical": 567
+      }
+    },
+    "sourceRow": 20
+  },
+  {
+    "spec": "40 x 6",
+    "displaySpec": "40 x 6",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 40,
+    "thicknessMm": 6,
+    "totalAreaMm2": 240,
+    "currents": {
+      "25": {
+        "flat": null,
+        "vertical": null
+      },
+      "35": {
+        "flat": null,
+        "vertical": null
+      },
+      "40": {
+        "flat": 630,
+        "vertical": 630
+      }
+    },
+    "sourceRow": 21
+  },
+  {
+    "spec": "40 x 8",
+    "displaySpec": "40 x 8",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 40,
+    "thicknessMm": 8,
+    "totalAreaMm2": 320,
+    "currents": {
+      "25": {
+        "flat": 940,
+        "vertical": 987
+      },
+      "35": {
+        "flat": 827,
+        "vertical": 868
+      },
+      "40": {
+        "flat": 761,
+        "vertical": 800
+      }
+    },
+    "sourceRow": 22
+  },
+  {
+    "spec": "40 x 10",
+    "displaySpec": "40 x 10",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 40,
+    "thicknessMm": 10,
+    "totalAreaMm2": 400,
+    "currents": {
+      "25": {
+        "flat": 1175,
+        "vertical": 1235
+      },
+      "35": {
+        "flat": 1035,
+        "vertical": 1086
+      },
+      "40": {
+        "flat": 952,
+        "vertical": 1000
+      }
+    },
+    "sourceRow": 23
+  },
+  {
+    "spec": "50 x 5",
+    "displaySpec": "50 x 5",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 50,
+    "thicknessMm": 5,
+    "totalAreaMm2": 250,
+    "currents": {
+      "25": {
+        "flat": 816,
+        "vertical": 860
+      },
+      "35": {
+        "flat": 721,
+        "vertical": 756
+      },
+      "40": {
+        "flat": 669,
+        "vertical": 696
+      }
+    },
+    "sourceRow": 24
+  },
+  {
+    "spec": "50 x 6",
+    "displaySpec": "50 x 6",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 50,
+    "thicknessMm": 6,
+    "totalAreaMm2": 300,
+    "currents": {
+      "25": {
+        "flat": 906,
+        "vertical": 955
+      },
+      "35": {
+        "flat": 800,
+        "vertical": 840
+      },
+      "40": {
+        "flat": 735,
+        "vertical": 775
+      }
+    },
+    "sourceRow": 25
+  },
+  {
+    "spec": "50 x 8",
+    "displaySpec": "50 x 8",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 50,
+    "thicknessMm": 8,
+    "totalAreaMm2": 400,
+    "currents": {
+      "25": {
+        "flat": 1210,
+        "vertical": 1270
+      },
+      "35": {
+        "flat": 1066,
+        "vertical": 1118
+      },
+      "40": {
+        "flat": 980,
+        "vertical": 1030
+      }
+    },
+    "sourceRow": 26
+  },
+  {
+    "spec": "50 x 10",
+    "displaySpec": "50 x 10",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 50,
+    "thicknessMm": 10,
+    "totalAreaMm2": 500,
+    "currents": {
+      "25": {
+        "flat": 1293,
+        "vertical": 1358
+      },
+      "35": {
+        "flat": 1138,
+        "vertical": 1195
+      },
+      "40": {
+        "flat": 1047,
+        "vertical": 1100
+      }
+    },
+    "sourceRow": 27
+  },
+  {
+    "spec": "60 x 6",
+    "displaySpec": "60 x 6",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 60,
+    "thicknessMm": 6,
+    "totalAreaMm2": 360,
+    "currents": {
+      "25": {
+        "flat": 1069,
+        "vertical": 1125
+      },
+      "35": {
+        "flat": 940,
+        "vertical": 990
+      },
+      "40": {
+        "flat": 873,
+        "vertical": 920
+      }
+    },
+    "sourceRow": 28
+  },
+  {
+    "spec": "60 x 8",
+    "displaySpec": "60 x 8",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 60,
+    "thicknessMm": 8,
+    "totalAreaMm2": 480,
+    "currents": {
+      "25": {
+        "flat": 1258,
+        "vertical": 1320
+      },
+      "35": {
+        "flat": 1105,
+        "vertical": 1160
+      },
+      "40": {
+        "flat": 1019,
+        "vertical": 1070
+      }
+    },
+    "sourceRow": 29
+  },
+  {
+    "spec": "60 x 10",
+    "displaySpec": "60 x 10",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 60,
+    "thicknessMm": 10,
+    "totalAreaMm2": 600,
+    "currents": {
+      "25": {
+        "flat": 1405,
+        "vertical": 1475
+      },
+      "35": {
+        "flat": 1236,
+        "vertical": 1298
+      },
+      "40": {
+        "flat": 1138,
+        "vertical": 1195
+      }
+    },
+    "sourceRow": 30
+  },
+  {
+    "spec": "80 x 6",
+    "displaySpec": "80 x 6",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 80,
+    "thicknessMm": 6,
+    "totalAreaMm2": 480,
+    "currents": {
+      "25": {
+        "flat": 1249,
+        "vertical": 1358
+      },
+      "35": {
+        "flat": 1099,
+        "vertical": 1195
+      },
+      "40": {
+        "flat": 1012,
+        "vertical": 1100
+      }
+    },
+    "sourceRow": 31
+  },
+  {
+    "spec": "80 x 8",
+    "displaySpec": "80 x 8",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 80,
+    "thicknessMm": 8,
+    "totalAreaMm2": 640,
+    "currents": {
+      "25": {
+        "flat": 1553,
+        "vertical": 1690
+      },
+      "35": {
+        "flat": 1361,
+        "vertical": 1480
+      },
+      "40": {
+        "flat": 1260,
+        "vertical": 1370
+      }
+    },
+    "sourceRow": 32
+  },
+  {
+    "spec": "80 x 10",
+    "displaySpec": "80 x 10",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 80,
+    "thicknessMm": 10,
+    "totalAreaMm2": 800,
+    "currents": {
+      "25": {
+        "flat": 1747,
+        "vertical": 1900
+      },
+      "35": {
+        "flat": 1531,
+        "vertical": 1670
+      },
+      "40": {
+        "flat": 1417,
+        "vertical": 1540
+      }
+    },
+    "sourceRow": 33
+  },
+  {
+    "spec": "80 x 12",
+    "displaySpec": "80 x 12",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 80,
+    "thicknessMm": 12,
+    "totalAreaMm2": 960,
+    "currents": {
+      "25": {
+        "flat": 2071,
+        "vertical": 2251
+      },
+      "35": {
+        "flat": 1823,
+        "vertical": 1981
+      },
+      "40": {
+        "flat": 1678,
+        "vertical": 1824
+      }
+    },
+    "sourceRow": 34
+  },
+  {
+    "spec": "100 x 6",
+    "displaySpec": "100 x 6",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 100,
+    "thicknessMm": 6,
+    "totalAreaMm2": 600,
+    "currents": {
+      "25": {
+        "flat": 1665,
+        "vertical": 1810
+      },
+      "35": {
+        "flat": 1469,
+        "vertical": 1592
+      },
+      "40": {
+        "flat": 1356,
+        "vertical": 1470
+      }
+    },
+    "sourceRow": 35
+  },
+  {
+    "spec": "100 x 8",
+    "displaySpec": "100 x 8",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 100,
+    "thicknessMm": 8,
+    "totalAreaMm2": 800,
+    "currents": {
+      "25": {
+        "flat": 1911,
+        "vertical": 2080
+      },
+      "35": {
+        "flat": 1684,
+        "vertical": 1820
+      },
+      "40": {
+        "flat": 1546,
+        "vertical": 1685
+      }
+    },
+    "sourceRow": 36
+  },
+  {
+    "spec": "100 x 10",
+    "displaySpec": "100 x 10",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 100,
+    "thicknessMm": 10,
+    "totalAreaMm2": 1000,
+    "currents": {
+      "25": {
+        "flat": 2121,
+        "vertical": 2310
+      },
+      "35": {
+        "flat": 1865,
+        "vertical": 2025
+      },
+      "40": {
+        "flat": 1720,
+        "vertical": 1870
+      }
+    },
+    "sourceRow": 37
+  },
+  {
+    "spec": "100 x 12",
+    "displaySpec": "100 x 12",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 100,
+    "thicknessMm": 12,
+    "totalAreaMm2": 1200,
+    "currents": {
+      "25": {
+        "flat": 2385,
+        "vertical": 2600
+      },
+      "35": {
+        "flat": 2105,
+        "vertical": 2289
+      },
+      "40": {
+        "flat": 1932,
+        "vertical": 2106
+      }
+    },
+    "sourceRow": 38
+  },
+  {
+    "spec": "120 x 8",
+    "displaySpec": "120 x 8",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 120,
+    "thicknessMm": 8,
+    "totalAreaMm2": 960,
+    "currents": {
+      "25": {
+        "flat": 2210,
+        "vertical": 2400
+      },
+      "35": {
+        "flat": 1950,
+        "vertical": 2110
+      },
+      "40": {
+        "flat": 1800,
+        "vertical": 1955
+      }
+    },
+    "sourceRow": 39
+  },
+  {
+    "spec": "120 x 10",
+    "displaySpec": "120 x 10",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 120,
+    "thicknessMm": 10,
+    "totalAreaMm2": 1200,
+    "currents": {
+      "25": {
+        "flat": 2457,
+        "vertical": 2679
+      },
+      "35": {
+        "flat": 2162,
+        "vertical": 2357
+      },
+      "40": {
+        "flat": 1900,
+        "vertical": 2170
+      }
+    },
+    "sourceRow": 40
+  },
+  {
+    "spec": "125 x 8",
+    "displaySpec": "125 x 8",
+    "configuration": "单片",
+    "conductorCount": 1,
+    "widthMm": 125,
+    "thicknessMm": 8,
+    "totalAreaMm2": 1000,
+    "currents": {
+      "25": {
+        "flat": 2267,
+        "vertical": 2469
+      },
+      "35": {
+        "flat": 1995,
+        "vertical": 2172
+      },
+      "40": {
+        "flat": 1836,
+        "vertical": 2000
+      }
+    },
+    "sourceRow": 41
+  },
+  {
+    "spec": "60 x 6",
+    "displaySpec": "2 × (60 x 6)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 60,
+    "thicknessMm": 6,
+    "totalAreaMm2": 720,
+    "currents": {
+      "25": {
+        "flat": 1730,
+        "vertical": 1817
+      },
+      "35": {
+        "flat": 1532,
+        "vertical": 1600
+      },
+      "40": {
+        "flat": 1401,
+        "vertical": 1472
+      }
+    },
+    "sourceRow": 47
+  },
+  {
+    "spec": "60 x 8",
+    "displaySpec": "2 × (60 x 8)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 60,
+    "thicknessMm": 8,
+    "totalAreaMm2": 960,
+    "currents": {
+      "25": {
+        "flat": 2144,
+        "vertical": 2251
+      },
+      "35": {
+        "flat": 1887,
+        "vertical": 1981
+      },
+      "40": {
+        "flat": 1737,
+        "vertical": 1824
+      }
+    },
+    "sourceRow": 48
+  },
+  {
+    "spec": "60 x 10",
+    "displaySpec": "2 × (60 x 10)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 60,
+    "thicknessMm": 10,
+    "totalAreaMm2": 1200,
+    "currents": {
+      "25": {
+        "flat": 2595,
+        "vertical": 2724
+      },
+      "35": {
+        "flat": 2283,
+        "vertical": 2398
+      },
+      "40": {
+        "flat": 2102,
+        "vertical": 2207
+      }
+    },
+    "sourceRow": 49
+  },
+  {
+    "spec": "80 x 6",
+    "displaySpec": "2 × (80 x 6)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 80,
+    "thicknessMm": 6,
+    "totalAreaMm2": 960,
+    "currents": {
+      "25": {
+        "flat": 2257,
+        "vertical": 2370
+      },
+      "35": {
+        "flat": 1986,
+        "vertical": 2086
+      },
+      "40": {
+        "flat": 1828,
+        "vertical": 1920
+      }
+    },
+    "sourceRow": 50
+  },
+  {
+    "spec": "80 x 8",
+    "displaySpec": "2 × (80 x 8)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 80,
+    "thicknessMm": 8,
+    "totalAreaMm2": 1280,
+    "currents": {
+      "25": {
+        "flat": 2738,
+        "vertical": 2875
+      },
+      "35": {
+        "flat": 2410,
+        "vertical": 2530
+      },
+      "40": {
+        "flat": 2218,
+        "vertical": 2329
+      }
+    },
+    "sourceRow": 51
+  },
+  {
+    "spec": "80 x 10",
+    "displaySpec": "2 × (80 x 10)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 80,
+    "thicknessMm": 10,
+    "totalAreaMm2": 1600,
+    "currents": {
+      "25": {
+        "flat": 3078,
+        "vertical": 3232
+      },
+      "35": {
+        "flat": 2709,
+        "vertical": 2844
+      },
+      "40": {
+        "flat": 2493,
+        "vertical": 2618
+      }
+    },
+    "sourceRow": 52
+  },
+  {
+    "spec": "100 x 6",
+    "displaySpec": "2 × (100 x 6)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 100,
+    "thicknessMm": 6,
+    "totalAreaMm2": 1200,
+    "currents": {
+      "25": {
+        "flat": 2681,
+        "vertical": 2815
+      },
+      "35": {
+        "flat": 2359,
+        "vertical": 2477
+      },
+      "40": {
+        "flat": 2171,
+        "vertical": 2280
+      }
+    },
+    "sourceRow": 53
+  },
+  {
+    "spec": "100 x 8",
+    "displaySpec": "2 × (100 x 8)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 100,
+    "thicknessMm": 8,
+    "totalAreaMm2": 1600,
+    "currents": {
+      "25": {
+        "flat": 3170,
+        "vertical": 3328
+      },
+      "35": {
+        "flat": 2789,
+        "vertical": 2928
+      },
+      "40": {
+        "flat": 2567,
+        "vertical": 2696
+      }
+    },
+    "sourceRow": 54
+  },
+  {
+    "spec": "100 x 10",
+    "displaySpec": "2 × (100 x 10)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 100,
+    "thicknessMm": 10,
+    "totalAreaMm2": 2000,
+    "currents": {
+      "25": {
+        "flat": 3655,
+        "vertical": 3838
+      },
+      "35": {
+        "flat": 3217,
+        "vertical": 3378
+      },
+      "40": {
+        "flat": 2959,
+        "vertical": 3109
+      }
+    },
+    "sourceRow": 55
+  },
+  {
+    "spec": "120 x 8",
+    "displaySpec": "2 × (120 x 8)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 120,
+    "thicknessMm": 8,
+    "totalAreaMm2": 1920,
+    "currents": {
+      "25": {
+        "flat": 3612,
+        "vertical": 3792
+      },
+      "35": {
+        "flat": 3178,
+        "vertical": 3337
+      },
+      "40": {
+        "flat": 2926,
+        "vertical": 3072
+      }
+    },
+    "sourceRow": 56
+  },
+  {
+    "spec": "120 x 10",
+    "displaySpec": "2 × (120 x 10)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 120,
+    "thicknessMm": 10,
+    "totalAreaMm2": 2400,
+    "currents": {
+      "25": {
+        "flat": 4091,
+        "vertical": 4296
+      },
+      "35": {
+        "flat": 3600,
+        "vertical": 3780
+      },
+      "40": {
+        "flat": 3314,
+        "vertical": 3480
+      }
+    },
+    "sourceRow": 57
+  },
+  {
+    "spec": "125 x 10",
+    "displaySpec": "2 × (125 x 10)",
+    "configuration": "多根",
+    "conductorCount": 2,
+    "widthMm": 125,
+    "thicknessMm": 10,
+    "totalAreaMm2": 2500,
+    "currents": {
+      "25": {
+        "flat": 4262,
+        "vertical": 4475
+      },
+      "35": {
+        "flat": 3750,
+        "vertical": 3938
+      },
+      "40": {
+        "flat": 3452,
+        "vertical": 3620
+      }
+    },
+    "sourceRow": 58
+  },
+  {
+    "spec": "60 x 6",
+    "displaySpec": "3 × (60 x 6)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 60,
+    "thicknessMm": 6,
+    "totalAreaMm2": 1080,
+    "currents": {
+      "25": {
+        "flat": 2270,
+        "vertical": 2383
+      },
+      "35": {
+        "flat": 1998,
+        "vertical": 2098
+      },
+      "40": {
+        "flat": 1839,
+        "vertical": 1931
+      }
+    },
+    "sourceRow": 59
+  },
+  {
+    "spec": "60 x 8",
+    "displaySpec": "3 × (60 x 8)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 60,
+    "thicknessMm": 8,
+    "totalAreaMm2": 1440,
+    "currents": {
+      "25": {
+        "flat": 2751,
+        "vertical": 2889
+      },
+      "35": {
+        "flat": 2421,
+        "vertical": 2542
+      },
+      "40": {
+        "flat": 2228,
+        "vertical": 2340
+      }
+    },
+    "sourceRow": 60
+  },
+  {
+    "spec": "60 x 10",
+    "displaySpec": "3 × (60 x 10)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 60,
+    "thicknessMm": 10,
+    "totalAreaMm2": 1800,
+    "currents": {
+      "25": {
+        "flat": 3206,
+        "vertical": 3367
+      },
+      "35": {
+        "flat": 2821,
+        "vertical": 2962
+      },
+      "40": {
+        "flat": 2597,
+        "vertical": 2727
+      }
+    },
+    "sourceRow": 61
+  },
+  {
+    "spec": "80 x 6",
+    "displaySpec": "3 × (80 x 6)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 80,
+    "thicknessMm": 6,
+    "totalAreaMm2": 1440,
+    "currents": {
+      "25": {
+        "flat": 2729,
+        "vertical": 2967
+      },
+      "35": {
+        "flat": 2401,
+        "vertical": 2610
+      },
+      "40": {
+        "flat": 2210,
+        "vertical": 2403
+      }
+    },
+    "sourceRow": 62
+  },
+  {
+    "spec": "80 x 8",
+    "displaySpec": "3 × (80 x 8)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 80,
+    "thicknessMm": 8,
+    "totalAreaMm2": 1920,
+    "currents": {
+      "25": {
+        "flat": 3299,
+        "vertical": 3586
+      },
+      "35": {
+        "flat": 2903,
+        "vertical": 3156
+      },
+      "40": {
+        "flat": 2672,
+        "vertical": 2905
+      }
+    },
+    "sourceRow": 63
+  },
+  {
+    "spec": "80 x 10",
+    "displaySpec": "3 × (80 x 10)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 80,
+    "thicknessMm": 10,
+    "totalAreaMm2": 2400,
+    "currents": {
+      "25": {
+        "flat": 3843,
+        "vertical": 4178
+      },
+      "35": {
+        "flat": 3381,
+        "vertical": 3676
+      },
+      "40": {
+        "flat": 3113,
+        "vertical": 3384
+      }
+    },
+    "sourceRow": 64
+  },
+  {
+    "spec": "100 x 6",
+    "displaySpec": "3 × (100 x 6)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 100,
+    "thicknessMm": 6,
+    "totalAreaMm2": 1800,
+    "currents": {
+      "25": {
+        "flat": 3230,
+        "vertical": 3511
+      },
+      "35": {
+        "flat": 2842,
+        "vertical": 3090
+      },
+      "40": {
+        "flat": 2616,
+        "vertical": 2844
+      }
+    },
+    "sourceRow": 65
+  },
+  {
+    "spec": "100 x 8",
+    "displaySpec": "3 × (100 x 8)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 100,
+    "thicknessMm": 8,
+    "totalAreaMm2": 2400,
+    "currents": {
+      "25": {
+        "flat": 3898,
+        "vertical": 4238
+      },
+      "35": {
+        "flat": 3431,
+        "vertical": 3730
+      },
+      "40": {
+        "flat": 3158,
+        "vertical": 3433
+      }
+    },
+    "sourceRow": 66
+  },
+  {
+    "spec": "100 x 10",
+    "displaySpec": "3 × (100 x 10)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 100,
+    "thicknessMm": 10,
+    "totalAreaMm2": 3000,
+    "currents": {
+      "25": {
+        "flat": 4547,
+        "vertical": 4943
+      },
+      "35": {
+        "flat": 4002,
+        "vertical": 4350
+      },
+      "40": {
+        "flat": 3683,
+        "vertical": 4004
+      }
+    },
+    "sourceRow": 67
+  },
+  {
+    "spec": "120 x 8",
+    "displaySpec": "3 × (120 x 8)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 120,
+    "thicknessMm": 8,
+    "totalAreaMm2": 2880,
+    "currents": {
+      "25": {
+        "flat": 4245,
+        "vertical": 4615
+      },
+      "35": {
+        "flat": 3736,
+        "vertical": 4061
+      },
+      "40": {
+        "flat": 3438,
+        "vertical": 3738
+      }
+    },
+    "sourceRow": 68
+  },
+  {
+    "spec": "120 x 10",
+    "displaySpec": "3 × (120 x 10)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 120,
+    "thicknessMm": 10,
+    "totalAreaMm2": 3600,
+    "currents": {
+      "25": {
+        "flat": 4906,
+        "vertical": 5333
+      },
+      "35": {
+        "flat": 4317,
+        "vertical": 4693
+      },
+      "40": {
+        "flat": 3974,
+        "vertical": 4320
+      }
+    },
+    "sourceRow": 69
+  },
+  {
+    "spec": "125 x 10",
+    "displaySpec": "3 × (125 x 10)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 125,
+    "thicknessMm": 10,
+    "totalAreaMm2": 3750,
+    "currents": {
+      "25": {
+        "flat": 5213,
+        "vertical": 5667
+      },
+      "35": {
+        "flat": 4588,
+        "vertical": 4987
+      },
+      "40": {
+        "flat": 4222,
+        "vertical": 4590
+      }
+    },
+    "sourceRow": 70
+  },
+  {
+    "spec": "125 x 12",
+    "displaySpec": "3 × (125 x 12)",
+    "configuration": "多根",
+    "conductorCount": 3,
+    "widthMm": 125,
+    "thicknessMm": 12,
+    "totalAreaMm2": 4500,
+    "currents": {
+      "25": {
+        "flat": 5877,
+        "vertical": 6389
+      },
+      "35": {
+        "flat": 5172,
+        "vertical": 5622
+      },
+      "40": {
+        "flat": 4761,
+        "vertical": 5175
+      }
+    },
+    "sourceRow": 71
+  },
+  {
+    "spec": "60 x 6",
+    "displaySpec": "4 × (60 x 6)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 60,
+    "thicknessMm": 6,
+    "totalAreaMm2": 1440,
+    "currents": {
+      "25": {
+        "flat": 2941,
+        "vertical": 3197
+      },
+      "35": {
+        "flat": 2588,
+        "vertical": 2814
+      },
+      "40": {
+        "flat": 2382,
+        "vertical": 2590
+      }
+    },
+    "sourceRow": 72
+  },
+  {
+    "spec": "60 x 8",
+    "displaySpec": "4 × (60 x 8)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 60,
+    "thicknessMm": 8,
+    "totalAreaMm2": 1920,
+    "currents": {
+      "25": {
+        "flat": 3652,
+        "vertical": 3790
+      },
+      "35": {
+        "flat": 3068,
+        "vertical": 3335
+      },
+      "40": {
+        "flat": 2824,
+        "vertical": 3070
+      }
+    },
+    "sourceRow": 73
+  },
+  {
+    "spec": "60 x 10",
+    "displaySpec": "4 × (60 x 10)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 60,
+    "thicknessMm": 10,
+    "totalAreaMm2": 2400,
+    "currents": {
+      "25": {
+        "flat": 3952,
+        "vertical": 4296
+      },
+      "35": {
+        "flat": 3477,
+        "vertical": 3780
+      },
+      "40": {
+        "flat": 3201,
+        "vertical": 3480
+      }
+    },
+    "sourceRow": 74
+  },
+  {
+    "spec": "80 x 6",
+    "displaySpec": "4 × (80 x 6)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 80,
+    "thicknessMm": 6,
+    "totalAreaMm2": 1920,
+    "currents": {
+      "25": {
+        "flat": 3617,
+        "vertical": 3932
+      },
+      "35": {
+        "flat": 3183,
+        "vertical": 3460
+      },
+      "40": {
+        "flat": 2893,
+        "vertical": 3145
+      }
+    },
+    "sourceRow": 75
+  },
+  {
+    "spec": "80 x 8",
+    "displaySpec": "4 × (80 x 8)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 80,
+    "thicknessMm": 8,
+    "totalAreaMm2": 2560,
+    "currents": {
+      "25": {
+        "flat": 4360,
+        "vertical": 4740
+      },
+      "35": {
+        "flat": 3838,
+        "vertical": 4172
+      },
+      "40": {
+        "flat": 3532,
+        "vertical": 3840
+      }
+    },
+    "sourceRow": 76
+  },
+  {
+    "spec": "80 x 10",
+    "displaySpec": "4 × (80 x 10)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 80,
+    "thicknessMm": 10,
+    "totalAreaMm2": 3200,
+    "currents": {
+      "25": {
+        "flat": 4724,
+        "vertical": 5135
+      },
+      "35": {
+        "flat": 4158,
+        "vertical": 4520
+      },
+      "40": {
+        "flat": 3827,
+        "vertical": 4160
+      }
+    },
+    "sourceRow": 77
+  },
+  {
+    "spec": "100 x 8",
+    "displaySpec": "4 × (100 x 8)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 100,
+    "thicknessMm": 8,
+    "totalAreaMm2": 3200,
+    "currents": {
+      "25": {
+        "flat": 4827,
+        "vertical": 5247
+      },
+      "35": {
+        "flat": 4247,
+        "vertical": 4617
+      },
+      "40": {
+        "flat": 3910,
+        "vertical": 4250
+      }
+    },
+    "sourceRow": 78
+  },
+  {
+    "spec": "100 x 10",
+    "displaySpec": "4 × (100 x 10)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 100,
+    "thicknessMm": 10,
+    "totalAreaMm2": 4000,
+    "currents": {
+      "25": {
+        "flat": 4997,
+        "vertical": 5432
+      },
+      "35": {
+        "flat": 4397,
+        "vertical": 4780
+      },
+      "40": {
+        "flat": 4048,
+        "vertical": 4400
+      }
+    },
+    "sourceRow": 79
+  },
+  {
+    "spec": "120 x 10",
+    "displaySpec": "4 × (120 x 10)",
+    "configuration": "多根",
+    "conductorCount": 4,
+    "widthMm": 120,
+    "thicknessMm": 10,
+    "totalAreaMm2": 4800,
+    "currents": {
+      "25": {
+        "flat": 5997,
+        "vertical": 6518
+      },
+      "35": {
+        "flat": 5277,
+        "vertical": 5736
+      },
+      "40": {
+        "flat": 4857,
+        "vertical": 5280
+      }
+    },
+    "sourceRow": 80
+  },
+  {
+    "spec": "100 x 10",
+    "displaySpec": "6 × (100 x 10)",
+    "configuration": "多根",
+    "conductorCount": 6,
+    "widthMm": 100,
+    "thicknessMm": 10,
+    "totalAreaMm2": 6000,
+    "currents": {
+      "25": {
+        "flat": 7496,
+        "vertical": 8148
+      },
+      "35": {
+        "flat": 6596,
+        "vertical": 7170
+      },
+      "40": {
+        "flat": 6072,
+        "vertical": 6600
+      }
+    },
+    "sourceRow": 81
+  },
+  {
+    "spec": "60 x 10",
+    "displaySpec": "8 × (60 x 10)",
+    "configuration": "多根",
+    "conductorCount": 8,
+    "widthMm": 60,
+    "thicknessMm": 10,
+    "totalAreaMm2": 4800,
+    "currents": {
+      "25": {
+        "flat": 5696,
+        "vertical": 6192
+      },
+      "35": {
+        "flat": 5013,
+        "vertical": 5449
+      },
+      "40": {
+        "flat": 4614,
+        "vertical": 5016
+      }
+    },
+    "sourceRow": 82
+  },
+  {
+    "spec": "80 x 8",
+    "displaySpec": "8 × (80 x 8)",
+    "configuration": "多根",
+    "conductorCount": 8,
+    "widthMm": 80,
+    "thicknessMm": 8,
+    "totalAreaMm2": 5120,
+    "currents": {
+      "25": {
+        "flat": 6978,
+        "vertical": 7585
+      },
+      "35": {
+        "flat": 6141,
+        "vertical": 6675
+      },
+      "40": {
+        "flat": 5652,
+        "vertical": 6144
+      }
+    },
+    "sourceRow": 83
+  },
+  {
+    "spec": "80 x 10",
+    "displaySpec": "8 × (80 x 10)",
+    "configuration": "多根",
+    "conductorCount": 8,
+    "widthMm": 80,
+    "thicknessMm": 10,
+    "totalAreaMm2": 6400,
+    "currents": {
+      "25": {
+        "flat": 7995,
+        "vertical": 8691
+      },
+      "35": {
+        "flat": 7036,
+        "vertical": 7648
+      },
+      "40": {
+        "flat": 6476,
+        "vertical": 7040
+      }
+    },
+    "sourceRow": 84
+  }
+]
