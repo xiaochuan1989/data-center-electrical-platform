@@ -237,6 +237,8 @@ button.primary, .platform-primary-action { border-color: var(--platform-blue) !i
 .busbar-method-strip b { display: block; margin-bottom: 3px; color: #264e72; }
 .busbar-ampacity-hero > div:nth-child(3) { border-color: #c8d9ea; background: #f5f9fd; }
 .busbar-ampacity-process { margin-top: 12px; }
+.busbar-article-example { min-height: 40px; margin: 16px 0 0 8px; padding: 0 18px; border: 1px solid #b9ccde; border-radius: 7px; color: #315c82; background: #fff; cursor: pointer; font-weight: 600; }
+.busbar-article-example:hover { background: #eef5fc; }
 .busbar-din-comparison { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 0; margin-top: 12px; overflow: hidden; border: 1px solid #d9e5ef; border-radius: 9px; background: #f8fbfe; }
 .busbar-din-comparison > div { padding: 13px 15px; border-right: 1px solid #e0e8ef; }
 .busbar-din-comparison > div:last-of-type { border-right: 0; }

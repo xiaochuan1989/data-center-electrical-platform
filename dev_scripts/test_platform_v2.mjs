@@ -466,6 +466,7 @@ const reviewedTinBusbar = calculateBusbarAmpacity(busbarCatalog, {
   widthMm: 40,
   thicknessMm: 6,
   convectionModel: 'din-calibrated',
+  dinReferenceEmissivity: 0.12, // Explicit legacy calibration regression.
   emissivity: 0.05,
   radiationViewFactor: 0.8,
   resistivity20OhmM: 1.7241e-8,
@@ -487,6 +488,7 @@ const dinNormalizedBusbar = calculateBusbarAmpacity(busbarCatalog, {
   permittedTemperatureRiseK: 30,
   internalTemperatureRiseC: 0,
   convectionModel: 'din-calibrated',
+  dinReferenceEmissivity: 0.12,
   emissivity: 0.12,
   radiationViewFactor: 1,
   designFactor: 1
@@ -541,7 +543,8 @@ assert.ok(smartCatalog.plugBoxes.some(item => item.ratedCurrentA === 40 && item.
 assert.doesNotMatch(JSON.stringify(smartCatalog), /价格|price/i);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert.match(index, /const APP_VERSION = "v2\.12\.0"/);
+const packageVersion = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version;
+assert.equal(index.match(/const APP_VERSION = "(v\d+\.\d+\.\d+)"/)?.[1], `v${packageVersion}`);
 assert.match(index, /UPS与配电选型助手/);
 assert.match(index, /<script type="module" src="\.\/src\/main\.js"><\/script>/);
 assert.match(index, /计算所需电池容量/);
@@ -567,7 +570,7 @@ assert.match(appShell, /id="calculate-busbar-ampacity"/);
 assert.match(appShell, /新亮全镀锡（ε=0\.05，建议默认）/);
 assert.match(appShell, /历史参考参数（状态未注明，ε=0\.35）/);
 assert.match(appShell, /id="busbar-ampacity-rise-limit"/);
-assert.match(appShell, /DIN同规格反校（推荐）/);
+assert.match(appShell, /文章对流经验式（独立估算）/);
 assert.match(appShell, /自然对流关联式（独立估算）/);
 assert.match(appShell, /id="busbar-ampacity-view-factor"/);
 assert.match(appShell, /id="busbar-ampacity-surface-factor"/);

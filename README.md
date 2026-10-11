@@ -1,8 +1,10 @@
 # UPS与配电选型助手
 
+2026-10-11：v2.12.1 [铜排规格反算文章核对](docs/busbar-article-calibration.md)：默认文章对流经验项＋绝对温度辐射，新增综合Kt、特征长度、表面预设与100×10对照工况。明确原文温度/长度口径及裸排/涂层数据差异；保留原表选型。发布范围和验证见[发布记录](docs/release-2.12.1.md)。
+
 2026-10-04：[真实工作稿业务试用准备](docs/nonstandard-business-trial.md)已完成。四份PDU/母线讨论稿的证据、区域数量、恢复与同源导出通过软件预检；私有试用副本和反馈模板已准备，等待本人复核，不代确认；本轮冻结发布安排见下方。
 
-**版本**：v2.12.0 · **线上地址**：https://xiaochuan1989.github.io/data-center-electrical-platform/
+**版本**：v2.12.1 · **线上地址**：https://xiaochuan1989.github.io/data-center-electrical-platform/
 
 ## v2.12.0 非标售前试用版（功能冻结）
 
