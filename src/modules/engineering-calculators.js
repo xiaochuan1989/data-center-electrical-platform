@@ -896,6 +896,24 @@ export const BUSBAR_ARTICLE_REFERENCE = Object.freeze({
   reportedCurrentA: 1762, reportedTableCurrentA: 1810
 });
 
+// Reproduce the article's stated Kt and operating-temperature resistivity.
+// Do not substitute the engineering model's convection/radiation/material inputs.
+export function calculateBusbarArticleExample() {
+  const reference = BUSBAR_ARTICLE_REFERENCE;
+  const widthM = reference.widthMm / 1000;
+  const thicknessM = reference.thicknessMm / 1000;
+  const temperatureRiseK = reference.temperatureC - reference.ambientC;
+  const numerator = reference.combinedCoefficient * 2 * widthM * thicknessM
+    * (widthM + thicknessM) * temperatureRiseK;
+  const articleRoundedNumerator = 0.0649;
+  return {
+    ...reference, temperatureRiseK, widthM, thicknessM, numerator,
+    articleRoundedNumerator,
+    fullPrecisionCurrentA: Math.sqrt(numerator / reference.resistivityOhmM),
+    articleCalculationCurrentA: Math.sqrt(articleRoundedNumerator / reference.resistivityOhmM)
+  };
+}
+
 function airPropertiesAt(temperatureC) {
   const temperatureK = temperatureC + 273.15;
   const dynamicViscosity = 1.716e-5 * (temperatureK / 273.15) ** 1.5 * (273.15 + 111) / (temperatureK + 111);

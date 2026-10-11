@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import { calculateBusbarAmpacity, BUSBAR_ARTICLE_REFERENCE } from '../src/modules/engineering-calculators.js';
+import { calculateBusbarAmpacity, calculateBusbarArticleExample, BUSBAR_ARTICLE_REFERENCE } from '../src/modules/engineering-calculators.js';
 
 const catalog = JSON.parse(fs.readFileSync(new URL('../src/data/busbar-catalog.json', import.meta.url)));
 const input = {
@@ -14,6 +14,12 @@ const input = {
 const close = (actual, expected, tolerance = 1e-9) => assert.ok(Math.abs(actual - expected) < tolerance, `${actual} != ${expected}`);
 const calc = overrides => calculateBusbarAmpacity(catalog, { ...input, ...overrides });
 const base = calc({});
+const article = calculateBusbarArticleExample();
+close(article.numerator, 0.0649935);
+close(article.fullPrecisionCurrentA, 1763.4445957004896);
+close(article.articleCalculationCurrentA, 1762.1756887140218);
+assert.equal(Math.round(article.articleCalculationCurrentA), article.reportedCurrentA);
+assert.equal(article.resistivityOhmM, 2.09e-8);
 assert.equal(base.convectionModel, 'article-empirical');
 assert.equal(base.characteristicLengthMm, 100);
 close(base.thermalBalanceCurrentA, 1672.8768166579669);
@@ -81,20 +87,38 @@ for (const match of shell.matchAll(/<(input|select)\b([^>]*\bid="(busbar-ampacit
   elements.set(id, { value, disabled: /\bdisabled\b/.test(attributes), selectedOptions: [{ textContent: selected?.[2] || '' }] });
 }
 elements.set('busbar-ampacity-result', { innerHTML: '' });
+elements.set('busbar-article-reference-result', { innerHTML: '', hidden: true });
+elements.set('busbar-ampacity-temperature-note', { textContent: '' });
 const context = vm.createContext({
   document: { getElementById: id => elements.get(id) },
   state: { catalogs: { busbars: catalog }, project: { busbars: {} } },
-  calculateBusbarAmpacity
+  calculateBusbarAmpacity, calculateBusbarArticleExample
 });
 const functionSlice = (start, end) => shell.slice(shell.indexOf(`function ${start}`), shell.indexOf(`function ${end}`));
 vm.runInContext(functionSlice('htmlEscape', 'statusLabel') + shell.slice(shell.indexOf('function resultCards'), shell.indexOf('async function loadCatalogs'))
   + functionSlice('syncBusbarAmpacityControls', 'quickBuswayInput'), context);
-vm.runInContext('loadBusbarArticleExample()', context);
+const previousInputs = [...elements].map(([id, el]) => [id, el.value]);
+vm.runInContext('showBusbarArticleExample()', context);
+assert.equal(elements.get('busbar-article-reference-result').hidden, false);
+assert.match(elements.get('busbar-article-reference-result').innerHTML, /1,762\.18/);
+assert.match(elements.get('busbar-article-reference-result').innerHTML, /1,763\.44/);
+assert.deepEqual([...elements].map(([id, el]) => [id, el.value]), previousInputs);
+assert.equal(context.state.project.busbars.ampacityCalculation, undefined);
+vm.runInContext('loadBusbarEngineeringExample()', context);
 close(context.state.project.busbars.ampacityCalculation.thermalBalanceCurrentA, base.thermalBalanceCurrentA);
 assert.match(elements.get('busbar-ampacity-result').innerHTML, /综合散热系数 Kt/);
 assert.equal(elements.get('busbar-ampacity-maximum-temperature').value, '65');
 assert.equal(elements.get('busbar-ampacity-emissivity').value, '0.4');
 assert.equal(elements.get('busbar-ampacity-characteristic-length').disabled, false);
+assert.match(elements.get('busbar-ampacity-temperature-note').textContent, /35 \+ 30 = 65℃/);
+assert.match(elements.get('busbar-ampacity-result').innerHTML, /不作为误差比较/);
+assert.doesNotMatch(elements.get('busbar-ampacity-result').innerHTML, /同条件差异|高于DIN|低于DIN/);
+elements.get('busbar-ampacity-rise-limit').value = '65';
+elements.get('busbar-ampacity-internal-rise').value = '15';
+vm.runInContext('syncBusbarAmpacityControls()', context);
+assert.match(elements.get('busbar-ampacity-temperature-note').textContent, /35 \+ 65 = 100℃/);
+assert.match(elements.get('busbar-ampacity-temperature-note').textContent, /100 − 50 = 50K/);
+vm.runInContext('loadBusbarEngineeringExample()', context);
 elements.get('busbar-ampacity-convection-model').value = 'din-calibrated';
 vm.runInContext('syncBusbarAmpacityControls(); calculateBusbarAmpacityResult()', context);
 assert.equal(elements.get('busbar-ampacity-din-emissivity').disabled, false);

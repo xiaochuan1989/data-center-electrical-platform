@@ -5,6 +5,7 @@ import {
   calculateBranch,
   calculateBusbarAmpacity,
   BUSBAR_ARTICLE_REFERENCE,
+  calculateBusbarArticleExample,
   calculateBusbarSelection,
   calculateBusbarTableLookup,
   calculateCableSelection,
@@ -247,10 +248,10 @@ function busbarView() {
       <div id="busbar-result" class="busbar-result" aria-live="polite"></div>
     </div>
     <div class="busbar-pane" data-busbar-pane="ampacity" hidden>
-      <div class="busbar-source-note"><b>计算口径</b><span>依据宾工文章的热平衡思路，默认采用对流经验项 h=1.33(ΔT/L₀)<sup>0.25</sup>，辐射单独按绝对温度计算；综合 Kt=h+hrad，只用于汇总，不重复叠加辐射。可切换原表反校或自然对流关联式；结果用于工程估算，不替代成套温升验证。</span></div>
+      <div class="busbar-source-note"><b>计算口径</b><span>当前表单为工程分项热平衡模型：参考对流经验项 h=1.33(ΔT/L₀)<sup>0.25</sup>，辐射单独按绝对温度计算。它与文章原例采用的 Kt、ρ 参数不同。点击“复现文章原例”会单独按原文参数计算；两套结果不作为同参数误差比较。</span></div>
       <div class="busbar-ampacity-scope">
         <b>温升口径</b>
-        <span>70K 是铜排相对外部环境的工程控制温升：35 + 70 = 105℃。若柜内空气比房间再高 15K，则柜内空气为 50℃，铜排对柜内空气的有效散热温差为 105 − 50 = 55K；它与 DIN 表的 30K 查表条件不是同一个量。</span>
+        <span id="busbar-ampacity-temperature-note" aria-live="polite">温升说明随当前输入更新。</span>
       </div>
       <div class="busbar-ampacity-scope">
         <b>适用边界</b>
@@ -265,12 +266,12 @@ function busbarView() {
         <label>柜内空气温升 (K)<input id="busbar-ampacity-internal-rise" type="number" min="0" max="100" step="1" value="15"><small>历史模型采用 15K；开放空气可填 0K</small></label>
         <label>电流类型<select id="busbar-ampacity-current-type"><option value="dc">直流 / 忽略交流附加损耗</option><option value="ac">交流（使用修正系数）</option></select></label>
         <label>设计裕量系数<select id="busbar-ampacity-design-factor"><option value="0.7">70%</option><option value="0.8" selected>80%（建议默认）</option><option value="0.9">90%</option><option value="1">100%（热平衡极限，不推荐）</option></select></label>
-        <label>原表同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量（35℃ / 30K）</option><option value="coatedCurrentA">涂层载流量（工艺需核对）</option></select><small>对照统一温度条件；须核对表面和安装条件</small></label>
+        <label>原表同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量（35℃ / 30K）</option><option value="coatedCurrentA">涂层载流量（工艺需核对）</option></select><small>仅统一温度；表面和安装条件待核实</small></label>
       </div>
       <details class="busbar-advanced">
-        <summary>高级热工参数 <span>默认采用文章对流经验式，可调整表面、特征长度和模型</span></summary>
+        <summary>高级热工参数 <span>工程分项模型；参数不等同于文章原例</span></summary>
         <div class="platform-form-grid cols-3 compact">
-          <label>对流计算模型<select id="busbar-ampacity-convection-model"><option value="article-empirical" selected>文章对流经验式（独立估算）</option><option value="din-calibrated">原表同规格反校（依赖参考假设）</option><option value="natural-correlation">自然对流关联式（独立估算）</option><option value="custom">自定义对流换热系数</option></select><small>h 仅表示对流；综合散热系数为 Kt</small></label>
+          <label>对流计算模型<select id="busbar-ampacity-convection-model"><option value="article-empirical" selected>工程对流经验式（分项散热）</option><option value="din-calibrated">原表同规格反校（依赖参考假设）</option><option value="natural-correlation">自然对流关联式（独立估算）</option><option value="custom">自定义对流换热系数</option></select><small>h 仅表示对流；综合散热系数为 Kt</small></label>
           <label>安装方向<select id="busbar-ampacity-orientation"><option value="edgewise-horizontal" selected>铜排水平、宽面竖直</option><option value="vertical-run">铜排沿长度方向竖直</option><option value="flat-horizontal">铜排水平、宽面水平</option></select><small>文章经验式仅用于宽面竖直；其余方向自动使用Nu/Ra模型（沿长度竖直按1m估算）</small></label>
           <label>经验式特征长度 L₀ (mm)<input id="busbar-ampacity-characteristic-length" type="number" min="0.1" max="10000" step="0.1" placeholder="留空：采用铜排宽度 / 竖直高度"><small>长度须与散热方向一致；100×10宽面竖直默认100mm，原文示例使用10mm</small></label>
           <label>自定义对流 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5" disabled><small>W/(m²·K)；仅自定义模式使用，不含辐射</small></label>
@@ -287,18 +288,20 @@ function busbarView() {
       <div class="busbar-method-strip" aria-label="规格反算方法">
         <span><b>最高温度</b> 外部环境 + 工程控制温升</span>
         <span><b>柜内空气温度</b> 外部环境 + 柜内空气温升</span>
-        <span><b>对流散热</b> 1.33(ΔT/L₀)<sup>0.25</sup> × As × ΔT</span>
+        <span><b>对流散热</b> 当前所选模型的 h × As × ΔT</span>
         <span><b>辐射散热</b> ε × F × σ × As × (T⁴ − Tamb⁴)</span>
         <span><b>热平衡电流</b> √(总散热 ÷ 每米电阻)</span>
         <span><b>建议电流</b> 热平衡电流 × 设计裕量</span>
       </div>
       <button id="calculate-busbar-ampacity" class="platform-primary-action">按规格计算载流量</button>
-      <button id="busbar-ampacity-article-example" class="busbar-article-example">载入100×10文章对照工况</button>
-      <details class="busbar-calculation-details"><summary>文章原例与计算口径差异</summary><div class="busbar-calculation-flow">
+      <button id="busbar-ampacity-article-example" class="busbar-article-example">复现文章原例（1762A）</button>
+      <button id="busbar-ampacity-engineering-example" class="busbar-article-example">载入100×10工程校核工况</button>
+      <div id="busbar-article-reference-result" class="busbar-result" aria-live="polite" hidden></div>
+      <details class="busbar-calculation-details"><summary>两套模型的参数区别</summary><div class="busbar-calculation-flow">
         <p><a href="${BUSBAR_ARTICLE_REFERENCE.url}" target="_blank" rel="noopener noreferrer">${BUSBAR_ARTICLE_REFERENCE.title}</a> · 宾昭平 · 2026-09-30</p>
-        <p>原例：100×10mm、35℃环境、65℃铜排、L₀=10mm、ε=0.4、ρ₆₅=0.0209×10⁻⁶Ω·m、Kt≈9.8475，报告1762A。此处保留为原文记录。</p>
-        <p>宽面竖直时本工具默认L₀=宽度100mm；原文辐射经验项代入35℃的三次方，与文字说明的绝对温度口径不一致，本工具采用开尔文四次方差。材料电阻率由ρ₂₀和α计算，因此载入工况后不应预期得到1762A。</p>
-        <p>原文引用1810A作为查表对照；本地原表100×10裸排为1490A、涂层为1810A，表面状态不同，不可据此宣称裸排误差仅2%。</p>
+        <p>原例直接采用Kt=9.8475、ρ₆₅=0.0209×10⁻⁶Ω·m、100×10mm、35℃环境和65℃铜排。复现保留这些参数，不再重算Kt或替换材料电阻率。</p>
+        <p>工程模型单独计算对流和辐射，ρ由ρ₂₀与α计算。只统一规格和温度，仍不能称为同参数比较。原文载流量公式中的0.1m和0.01m分别为宽度和厚度，不能把这里的0.01m当作特征长度。</p>
+        <p>原文引用1810A；本地工作簿列名为裸排1490A、涂层1810A。两份来源的表面定义和版本条件未核实，不能据本地列名判定原文查表错误，也不据两者差值判断模型准确性。</p>
       </div></details>
       <div id="busbar-ampacity-result" class="busbar-result busbar-ampacity-result" aria-live="polite"></div>
     </div>
@@ -851,9 +854,41 @@ function syncBusbarAmpacityControls() {
   acFactor.disabled = !usesAcFactor;
   const derivedMaximum = Number(roomTemperature?.value) + Number(riseLimit?.value);
   if (maximumTemperature && Number.isFinite(derivedMaximum)) maximumTemperature.value = String(derivedMaximum);
+  const note = document.getElementById('busbar-ampacity-temperature-note');
+  const internalRise = document.getElementById('busbar-ampacity-internal-rise');
+  if (note) {
+    const fields = [roomTemperature, riseLimit, internalRise];
+    if (fields.some(field => !field || field.value === '' || !Number.isFinite(Number(field.value)))) {
+      note.textContent = '请填写外部环境温度、工程控制温升和柜内空气温升。';
+    } else {
+      const room = Number(roomTemperature.value), rise = Number(riseLimit.value), insideRise = Number(internalRise.value);
+      const inside = room + insideRise, effectiveRise = rise - insideRise;
+      note.textContent = `当前工程控制温升 ${format(rise, 1)}K：铜排最高温度 ${format(room, 1)} + ${format(rise, 1)} = ${format(derivedMaximum, 1)}℃；柜内空气温度 ${format(room, 1)} + ${format(insideRise, 1)} = ${format(inside, 1)}℃；实际散热温差 ${format(derivedMaximum, 1)} − ${format(inside, 1)} = ${format(effectiveRise, 1)}K。${effectiveRise > 0 ? '温升与最高温度是不同的量；原文示例最高65℃、温升30K。' : '最高温度必须高于柜内空气温度，当前工况无法计算。'}`;
+    }
+  }
 }
 
-function loadBusbarArticleExample() {
+function showBusbarArticleExample() {
+  const example = calculateBusbarArticleExample();
+  const target = document.getElementById('busbar-article-reference-result');
+  target.hidden = false;
+  target.innerHTML = `
+    <div class="busbar-source-note"><b>文章原例复现</b><span>采用原文给定Kt和ρ，独立于上方工程表单。</span></div>
+    <div class="busbar-result-hero">
+      <div><span>按原文中间近似值复现</span><strong>${format(example.articleCalculationCurrentA, 2)} A</strong><small>分子采用原文0.0649；报告约1762A</small></div>
+      <div><span>保留完整计算精度</span><strong>${format(example.fullPrecisionCurrentA, 2)} A</strong><small>分子0.0649935；仅中间近似不同</small></div>
+      <div><span>原文综合散热系数 Kt</span><strong>9.8475 W/(m²·K)</strong><small>已经包含散热综合效果</small></div>
+      <div><span>原文65℃电阻率</span><strong>2.09×10⁻⁸ Ω·m</strong><small>直接采用原文值</small></div>
+    </div>
+    <div class="busbar-calculation-flow">
+      <p>原文边界：100×10mm、竖放、环境35℃、最高65℃、温升30K；直接热平衡计算，未另乘80%设计系数。</p>
+      <p>I=√[9.8475 × 2 × 0.1 × 0.01 × (0.1+0.01) × 30 ÷ (0.0209×10⁻⁶)] = ${format(example.fullPrecisionCurrentA, 2)}A。</p>
+      <p>原文将分子写为0.0649后，I=√[0.0649 ÷ (0.0209×10⁻⁶)] = ${format(example.articleCalculationCurrentA, 2)}A。0.1m为宽度，0.01m为厚度。</p>
+      <p>这里的复现说明原文给定参数的代入结果，不将它外推到其他规格、温度或安装边界。</p>
+    </div>`;
+}
+
+function loadBusbarEngineeringExample() {
   const values = {
     'width': '100', 'thickness': '10', 'room-temperature': '35', 'rise-limit': '30',
     'internal-rise': '0', 'current-type': 'dc', 'design-factor': '1',
@@ -899,7 +934,7 @@ function calculateBusbarAmpacityResult() {
 
   const surfaceLabel = surfaceModeElement.selectedOptions[0]?.textContent || '自定义发射率';
   const convectionModelLabels = {
-    'article-empirical': '文章对流经验式＋绝对温度辐射',
+    'article-empirical': '工程对流经验式＋绝对温度辐射',
     'din-calibrated': 'DIN同规格30K反校',
     'natural-correlation': '自然对流Nu/Ra关联式',
     custom: '自定义对流换热系数'
@@ -916,21 +951,29 @@ function calculateBusbarAmpacityResult() {
     ampacityCalculation: { ...result, surfaceMode: surfaceModeElement.value, surfaceLabel }
   };
   const dinLabel = result.dinReferenceField === 'coatedCurrentA' ? '涂层' : '裸排';
-  const differenceClass = result.dinDifferencePercent === null
-    ? 'neutral'
-    : Math.abs(result.dinDifferencePercent) > 0.15 ? 'warning' : 'safe';
-  const differenceText = result.dinDifferencePercent === null
-    ? 'DIN数据表中没有完全相同的单片规格'
-    : `${result.dinNormalizedThermalCurrentA >= result.dinCurrentA ? '高于' : '低于'}DIN ${dinLabel}数据 ${format(Math.abs(result.dinDifferencePercent) * 100, 1)}%`;
   const dinComparison = result.dinMatch
-    ? `<div class="busbar-din-comparison ${differenceClass}">
-        <div><span>DIN同规格</span><strong>${htmlEscape(result.dinMatch.spec)} · 单片</strong></div>
-        <div><span>DIN ${dinLabel}载流量</span><strong>${format(result.dinCurrentA, 0)} A</strong></div>
-        <div><span>模型归一到35℃ / 30K</span><strong>${format(result.dinNormalizedThermalCurrentA, 0)} A</strong></div>
-        <div><span>同条件差异</span><strong>${htmlEscape(differenceText)}</strong></div>
-        <p>仅统一35℃环境和30K温升；表面、安装及交流损耗仍需核对。${result.convectionModel === 'din-calibrated' ? '该模型由原表反校，吻合原表不构成独立验证。' : '这是与本地原表的交叉对照。'}${result.dinReferenceField === 'coatedCurrentA' ? '涂层列材料及工艺未注明。' : ''}</p>
+    ? `<div class="busbar-din-comparison neutral">
+        <div><span>本地工作簿规格</span><strong>${htmlEscape(result.dinMatch.spec)} · 单片</strong></div>
+        <div><span>本地工作簿 ${dinLabel}列</span><strong>${format(result.dinCurrentA, 0)} A</strong></div>
+        <div><span>工程模型仅温度归一至35℃ / 30K</span><strong>${format(result.dinNormalizedThermalCurrentA, 0)} A</strong></div>
+        <div><span>条件匹配状态</span><strong>表面及安装条件待核实</strong></div>
+        <p>以上为来源值并列展示，不计算“同条件误差”。仅温度归一不能证明材料、表面、安装或交流损耗一致。${result.convectionModel === 'din-calibrated' ? '该模型由原表反校，吻合原表不构成独立验证。' : ''}${result.dinReferenceField === 'coatedCurrentA' ? '涂层列材料及工艺未注明。' : ''}</p>
       </div>`
-    : `<div class="busbar-din-comparison neutral"><p>${htmlEscape(differenceText)}；仍可使用热平衡结果，但无法完成DIN同规格对照。</p></div>`;
+    : `<div class="busbar-din-comparison neutral"><p>本地工作簿没有完全相同的单片规格；当前只显示工程模型估算。</p></div>`;
+  const articleParameters = [
+    ['规格', '100×10mm', `${result.normalizedSpec}mm`],
+    ['环境 / 内部空气温度', '35℃ / 35℃', `${format(result.roomTemperatureC, 1)}℃ / ${format(result.internalAmbientTemperatureC, 1)}℃`],
+    ['最高温度 / 有效散热温差', '65℃ / 30K', `${format(result.maximumTemperatureC, 1)}℃ / ${format(result.effectiveTemperatureRiseK, 1)}K`],
+    ['综合散热系数 Kt', '9.8475（直接采用）', `${format(result.combinedHeatTransferCoefficient, 5)}（分项计算）`],
+    ['对流特征长度 L₀', '原文Kt计算步骤使用10mm', result.characteristicLengthMm === null ? '当前模型不单独使用' : `${format(result.characteristicLengthMm, 1)}mm`],
+    ['辐射处理', '包含于原文给定Kt', 'ε × F × σ × As × 绝对温度四次方差'],
+    ['工作温度电阻率 ρ (Ω·m)', '2.09×10⁻⁸（直接采用）', `${format(result.resistivityAtMaximumOhmM * 1e8, 6)}×10⁻⁸（按材料参数计算）`],
+    ['散热 / 安装', '原文竖放、综合Kt', `${orientationLabels[result.orientation]}；ε=${format(result.emissivity, 2)}、F=${format(result.radiationViewFactor, 2)}、面积系数=${format(result.exposedSurfaceFactor, 2)}`],
+    ['设计电流折减', '原文未另行折减', `${format(result.designFactor * 100, 0)}%工程设计系数`]
+  ];
+  const articleComparison = `<details class="busbar-calculation-details"><summary>原文与本次工程计算的参数区别（不作为误差比较）</summary>
+    <div class="data-entry-table"><table><thead><tr><th>参数</th><th>文章原例</th><th>本次工程计算</th></tr></thead>
+    <tbody>${articleParameters.map(row => `<tr>${row.map(value => `<td>${htmlEscape(value)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`;
 
   target.innerHTML = `
     <div class="busbar-result-hero busbar-ampacity-hero">
@@ -955,6 +998,7 @@ function calculateBusbarAmpacityResult() {
       ['DIN 30K归一化值', format(result.dinNormalizedThermalCurrentA, 0), 'A']
     ])}</div>
     ${dinComparison}
+    ${articleComparison}
     <details class="busbar-calculation-details">
       <summary>查看完整计算方法</summary>
       <div class="busbar-calculation-flow">
@@ -978,7 +1022,7 @@ function calculateBusbarAmpacityResult() {
     <div class="busbar-notices">
       <p class="${result.convectionFallback ? 'warning' : 'safe'}">${result.convectionFallback ? (result.convectionFallbackReason === 'orientation' ? '当前安装方向不适用文章宽面竖直经验式，已自动切换自然对流Nu/Ra关联式。' : '当前规格无法完成原表反校，已自动回退到自然对流关联式；请复核安装方向和参考发射率。') : `当前采用${htmlEscape(convectionModelLabel)}。`}</p>
       ${result.characteristicLengthOverridden ? '<p class="warning">特征长度已手工覆盖，未采用铜排宽度；较小L₀会提高估算载流量，须核对实际散热方向与依据。</p>' : ''}
-      <p class="neutral">70K 为本项目采用的工程控制口径，并非所有母线场景的统一限值；实际最高温度还应受端子、绝缘、连接件、相邻元件和验证条件中的最低限值约束。</p>
+      <p class="neutral">当前工程控制温升为 ${format(result.permittedTemperatureRiseK, 1)}K；实际最高温度还应受端子、绝缘、连接件、相邻元件和验证条件中的最低限值约束。</p>
       <p class="${surfaceModeElement.value === 'excel' ? 'warning' : 'neutral'}">当前表面：${htmlEscape(surfaceLabel)}，ε=${format(result.emissivity, 2)}。${surfaceModeElement.value === 'excel' ? '历史参考状态与依据未注明，不能代表镀锡。' : surfaceModeElement.value === 'painted' ? '喷涂高发射率假设须核对涂层热阻及工艺，不能用于热缩绝缘。' : '表面预设仅供初算，应与实际材料状态及验证值一致。'}</p>
       <p class="${isThermalLimit ? 'warning' : 'neutral'}">${isThermalLimit ? '当前选择100%：结果是达到最高温度时的理论热平衡极限，没有连续运行设计裕量。' : `当前已采用 ${format(result.designFactor * 100, 0)}% 设计系数；该系数是工程裕量，不是标准统一规定。`}</p>
       <p class="warning">柜内空气温升、安装方向、有效散热面积、辐射视角系数和设计裕量都会影响结果；并排互热及接头损耗仍需专项校核。</p>
@@ -1668,7 +1712,8 @@ function bindEvents() {
   document.getElementById('awg-catalog-search').addEventListener('input', renderAwgCatalog);
   document.getElementById('calculate-busbar').addEventListener('click', calculateBusbar);
   document.getElementById('calculate-busbar-ampacity').addEventListener('click', calculateBusbarAmpacityResult);
-  document.getElementById('busbar-ampacity-article-example').addEventListener('click', loadBusbarArticleExample);
+  document.getElementById('busbar-ampacity-article-example').addEventListener('click', showBusbarArticleExample);
+  document.getElementById('busbar-ampacity-engineering-example').addEventListener('click', loadBusbarEngineeringExample);
   document.getElementById('calculate-busbar-table').addEventListener('click', calculateBusbarTableResult);
   document.getElementById('busbar-ampacity-surface-mode').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-convection-model').addEventListener('change', syncBusbarAmpacityControls);
@@ -1676,6 +1721,7 @@ function bindEvents() {
   document.getElementById('busbar-ampacity-current-type').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-room-temperature').addEventListener('input', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-rise-limit').addEventListener('input', syncBusbarAmpacityControls);
+  document.getElementById('busbar-ampacity-internal-rise').addEventListener('input', syncBusbarAmpacityControls);
   document.getElementById('busbar-catalog-configuration').addEventListener('change', renderBusbarCatalog);
   document.getElementById('busbar-catalog-search').addEventListener('input', renderBusbarCatalog);
   ['busbar-table-ambient', 'busbar-table-orientation', 'busbar-table-configuration']
