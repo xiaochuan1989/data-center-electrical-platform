@@ -887,6 +887,33 @@ const DIN_REFERENCE_RISE_K = 30;
 // calibration assumption, not a verified surface specification of the A03 table.
 const DIN_REFERENCE_BARE_EMISSIVITY = 0.4;
 
+export const BUSBAR_GUIDE_REFERENCE = Object.freeze({
+  title: 'Copper for Busbars — Guidance for Design and Installation',
+  url: 'https://kupfer.de/wp-content/uploads/2019/11/Copper-for-Busbars.pdf',
+  edition: '2014', convectionPages: '16–17', radiationPages: '18–19'
+});
+
+// Guide §2.2.1.1, W/m²; L is in mm (not m). Figure 5 separates the faces.
+function guideConvectionAt({ widthMm, thicknessMm, verticalLengthMm, temperatureRiseK, orientation, exposedSurfaceFactor }) {
+  const vertical = orientation === 'vertical-run';
+  const edgewise = orientation === 'edgewise-horizontal';
+  const faceDefinitions = vertical
+    ? [['宽面（竖直）', 2 * widthMm / 1000, verticalLengthMm, 7.66], ['窄面（竖直）', 2 * thicknessMm / 1000, verticalLengthMm, 7.66]]
+    : edgewise
+      ? [['宽面（竖直）', 2 * widthMm / 1000, widthMm, 7.66], ['窄面（水平）', 2 * thicknessMm / 1000, thicknessMm, 5.92]]
+      : [['宽面（水平）', 2 * widthMm / 1000, widthMm, 5.92], ['窄面（竖直）', 2 * thicknessMm / 1000, thicknessMm, 7.66]];
+  const faces = faceDefinitions.map(([label, grossAreaM2PerM, lengthMm, constant]) => {
+    const areaM2PerM = grossAreaM2PerM * exposedSurfaceFactor;
+    const coefficient = constant * (Math.abs(temperatureRiseK) / lengthMm) ** 0.25;
+    return { label, areaM2PerM, lengthMm, constant, coefficient, lossWPerM: coefficient * areaM2PerM * temperatureRiseK };
+  });
+  const area = faces.reduce((sum, face) => sum + face.areaM2PerM, 0);
+  return {
+    coefficient: faces.reduce((sum, face) => sum + face.coefficient * face.areaM2PerM, 0) / area,
+    faces, characteristicLengthM: null, rayleighNumber: null, nusseltNumber: null
+  };
+}
+
 export const BUSBAR_ARTICLE_REFERENCE = Object.freeze({
   title: '【宾工专栏】如何通过理论计算确定铜排的载流量？',
   url: 'https://bang.schneider-electric.cn/prm/web/mobile/article/detail?ecId=786077029349982210&id=2102038944095281152',
@@ -943,8 +970,8 @@ function horizontalPlateNusselt(rayleigh, upward) {
   return rayleigh < 1e7 ? 0.54 * rayleigh ** 0.25 : 0.15 * rayleigh ** (1 / 3);
 }
 
-function naturalConvectionAt({ widthMm, temperatureC, ambientTemperatureC, orientation }) {
-  const temperatureRiseK = temperatureC - ambientTemperatureC;
+function naturalConvectionAt({ widthMm, temperatureC, ambientTemperatureC, orientation, verticalLengthMm = 1000 }) {
+  const temperatureRiseK = Math.abs(temperatureC - ambientTemperatureC);
   if (temperatureRiseK <= 0) {
     return { coefficient: 0, characteristicLengthM: 0, rayleighNumber: 0, nusseltNumber: 0 };
   }
@@ -952,7 +979,7 @@ function naturalConvectionAt({ widthMm, temperatureC, ambientTemperatureC, orien
   const filmTemperatureC = (temperatureC + ambientTemperatureC) / 2;
   const air = airPropertiesAt(filmTemperatureC);
   const characteristicLengthM = orientation === 'vertical-run'
-    ? 1
+    ? verticalLengthMm / 1000
     : orientation === 'flat-horizontal'
       ? Math.max(widthM / 2, 0.005)
       : Math.max(widthM, 0.005);
@@ -978,7 +1005,7 @@ function radiationLoss({ emissivity, viewFactor, surfaceAreaM2PerM, surfaceTempe
  * 按铜排规格反算载流量。
  *
  * 保留 I²R=Pconv+Prad 的稳态热平衡骨架，但不再把 h=5 当成所有规格的通用常数。
- * 默认采用文章的对流经验项 h=1.33(ΔT/L0)^0.25，宽面竖直时 L0 为竖直高度。
+ * 默认采用2014铜排指南的竖直/水平表面分项自然对流；旧模型可显式选择。
  * 辐射独立使用绝对温度的 Stefan–Boltzmann 公式，不重复叠加综合 Kt。
  * 原表反校和 Nu/Ra 模型继续可选；设计裕量独立于热极限值。
  */
@@ -991,9 +1018,9 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
     : number(input.maximumTemperatureC, NaN) - roomTemperatureC;
   const maximumTemperatureC = roomTemperatureC + permittedTemperatureRiseK;
   const internalTemperatureRiseC = number(input.internalTemperatureRiseC, NaN);
-  const requestedConvectionModel = ['article-empirical', 'din-calibrated', 'natural-correlation', 'custom'].includes(input.convectionModel)
+  const requestedConvectionModel = ['guide-natural', 'article-empirical', 'din-calibrated', 'natural-correlation', 'custom'].includes(input.convectionModel)
     ? input.convectionModel
-    : 'article-empirical';
+    : 'guide-natural';
   const orientation = ['edgewise-horizontal', 'vertical-run', 'flat-horizontal'].includes(input.orientation)
     ? input.orientation
     : 'edgewise-horizontal';
@@ -1003,6 +1030,8 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
   const dinReferenceBareEmissivity = number(input.dinReferenceEmissivity, DIN_REFERENCE_BARE_EMISSIVITY);
   const emissivity = number(input.emissivity, NaN);
   const radiationViewFactor = number(input.radiationViewFactor, 0.8);
+  const surroundingsEmissivity = number(input.surroundingsEmissivity, 1);
+  const verticalLengthMm = number(input.verticalLengthMm, 1000);
   const exposedSurfaceFactor = number(input.exposedSurfaceFactor, 1);
   const resistivity20OhmM = number(input.resistivity20OhmM, NaN);
   const temperatureCoefficient = number(input.temperatureCoefficient, NaN);
@@ -1023,6 +1052,8 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
   if (!Number.isFinite(dinReferenceBareEmissivity) || dinReferenceBareEmissivity < 0 || dinReferenceBareEmissivity > 1) return { error: '原表反校参考发射率必须在 0～1 之间' };
   if (!Number.isFinite(emissivity) || emissivity < 0 || emissivity > 1) return { error: '表面发射率必须在 0～1 之间' };
   if (!Number.isFinite(radiationViewFactor) || radiationViewFactor <= 0 || radiationViewFactor > 1) return { error: '辐射视角系数必须大于 0 且不超过 1' };
+  if (!Number.isFinite(surroundingsEmissivity) || surroundingsEmissivity <= 0 || surroundingsEmissivity > 1) return { error: '周围表面发射率必须大于 0 且不超过 1' };
+  if (orientation === 'vertical-run' && (!Number.isFinite(verticalLengthMm) || verticalLengthMm <= 0 || verticalLengthMm > 10000)) return { error: '竖直散热长度必须大于 0mm 且不超过 10000mm' };
   if (!Number.isFinite(exposedSurfaceFactor) || exposedSurfaceFactor <= 0 || exposedSurfaceFactor > 1) return { error: '有效散热面积系数必须大于 0 且不超过 1' };
   if (!Number.isFinite(resistivity20OhmM) || resistivity20OhmM <= 0 || resistivity20OhmM > 1e-6) return { error: '20℃电阻率必须大于 0 且不超过 1×10⁻⁶Ω·m' };
   if (!Number.isFinite(temperatureCoefficient) || temperatureCoefficient < 0 || temperatureCoefficient > 0.02) return { error: '电阻温度系数必须在 0～0.02/℃ 之间' };
@@ -1030,6 +1061,14 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
   if (!Number.isFinite(acResistanceFactor) || acResistanceFactor < 1 || acResistanceFactor > 5) return { error: '交流电阻修正系数必须在 1～5 之间' };
 
   const internalAmbientTemperatureC = roomTemperatureC + internalTemperatureRiseC;
+  const radiationEnvironmentTemperatureC = input.radiationEnvironmentTemperatureC === undefined
+    || input.radiationEnvironmentTemperatureC === null || input.radiationEnvironmentTemperatureC === ''
+    ? internalAmbientTemperatureC : number(input.radiationEnvironmentTemperatureC, NaN);
+  if (!Number.isFinite(radiationEnvironmentTemperatureC) || radiationEnvironmentTemperatureC < -50 || radiationEnvironmentTemperatureC > 250) return { error: '辐射环境温度必须在 -50～250℃ 之间' };
+  // Guide §2.2.1.3 two-surface approximation; F separately represents visibility.
+  const relativeEmissivity = emissivity === 0 ? 0
+    : emissivity * surroundingsEmissivity / (emissivity + surroundingsEmissivity - emissivity * surroundingsEmissivity);
+  const radiationEnvironmentOffsetK = radiationEnvironmentTemperatureC - internalAmbientTemperatureC;
   if (maximumTemperatureC <= internalAmbientTemperatureC) {
     return { error: '铜排允许最高温度必须高于房间温度与内部温升之和' };
   }
@@ -1076,7 +1115,11 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
     ? 'natural-correlation'
     : requestedConvectionModel;
   const convectionAt = (temperatureC, ambientTemperatureC) => {
-    const temperatureRiseK = Math.max(temperatureC - ambientTemperatureC, 0);
+    const temperatureRiseK = Math.abs(temperatureC - ambientTemperatureC);
+    if (convectionModel === 'guide-natural') {
+      return guideConvectionAt({ widthMm, thicknessMm, verticalLengthMm,
+        temperatureRiseK: temperatureC - ambientTemperatureC, orientation, exposedSurfaceFactor });
+    }
     if (convectionModel === 'article-empirical') {
       return {
         coefficient: 1.33 * (temperatureRiseK / (characteristicLengthMm / 1000)) ** 0.25,
@@ -1101,18 +1144,18 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
         nusseltNumber: null
       };
     }
-    return naturalConvectionAt({ widthMm, temperatureC, ambientTemperatureC, orientation });
+    return naturalConvectionAt({ widthMm, temperatureC, ambientTemperatureC, orientation, verticalLengthMm });
   };
   const thermalStateAt = (temperatureC, ambientTemperatureC, resistanceFactor = acResistanceFactor) => {
     const temperatureRiseK = temperatureC - ambientTemperatureC;
     const convection = convectionAt(temperatureC, ambientTemperatureC);
     const convectionLoss = convection.coefficient * surfaceAreaM2PerM * temperatureRiseK;
     const radiativeLoss = radiationLoss({
-      emissivity,
+      emissivity: relativeEmissivity,
       viewFactor: radiationViewFactor,
       surfaceAreaM2PerM,
       surfaceTemperatureC: temperatureC,
-      surroundingsTemperatureC: ambientTemperatureC
+      surroundingsTemperatureC: ambientTemperatureC + radiationEnvironmentOffsetK
     });
     return {
       ...resistanceAt(temperatureC, resistanceFactor),
@@ -1133,6 +1176,9 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
   const convectionLossWPerM = maximumState.convectionLoss;
   const radiationLossWPerM = maximumState.radiationLoss;
   const totalDissipationWPerM = convectionLossWPerM + radiationLossWPerM;
+  if (!Number.isFinite(totalDissipationWPerM) || totalDissipationWPerM <= 0) {
+    return { error: '最高温度下净散热能力不大于零，请复核辐射环境温度和散热条件' };
+  }
   const thermalBalanceCurrentA = Math.sqrt(totalDissipationWPerM / usedResistanceOhmPerM);
   const recommendedCurrentA = thermalBalanceCurrentA * designFactor;
   const currentDensityAmm2 = recommendedCurrentA / areaMm2;
@@ -1143,7 +1189,7 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
     const generated = recommendedCurrentA ** 2 * state.usedResistance;
     return state.totalDissipation - generated;
   };
-  let lowerTemperatureC = internalAmbientTemperatureC;
+  let lowerTemperatureC = Math.min(internalAmbientTemperatureC, radiationEnvironmentTemperatureC);
   let upperTemperatureC = maximumTemperatureC;
   for (let iteration = 0; iteration < 60; iteration += 1) {
     const midpointC = (lowerTemperatureC + upperTemperatureC) / 2;
@@ -1158,8 +1204,9 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
     DIN_REFERENCE_AMBIENT_C + DIN_REFERENCE_RISE_K,
     DIN_REFERENCE_AMBIENT_C
   );
-  const dinNormalizedThermalCurrentA = Math.sqrt(dinNormalizedState.totalDissipation / dinNormalizedState.usedResistance);
-  const dinDifferencePercent = dinCurrentA > 0 ? dinNormalizedThermalCurrentA / dinCurrentA - 1 : null;
+  const dinNormalizedThermalCurrentA = dinNormalizedState.totalDissipation > 0
+    ? Math.sqrt(dinNormalizedState.totalDissipation / dinNormalizedState.usedResistance) : null;
+  const dinDifferencePercent = dinCurrentA > 0 && dinNormalizedThermalCurrentA !== null ? dinNormalizedThermalCurrentA / dinCurrentA - 1 : null;
 
   return {
     widthMm,
@@ -1177,6 +1224,8 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
     convectionFallbackReason: convectionModel === requestedConvectionModel ? null
       : requestedConvectionModel === 'article-empirical' ? 'orientation' : 'catalog',
     orientation,
+    verticalLengthMm,
+    convectionFaces: maximumState.faces || [],
     convectionCoefficient: effectiveConvectionCoefficient,
     dinReferenceConvectionCoefficient,
     dinReferenceBareEmissivity,
@@ -1187,6 +1236,10 @@ export function calculateBusbarAmpacity(catalog, input = {}) {
     rayleighNumber: maximumState.rayleighNumber,
     nusseltNumber: maximumState.nusseltNumber,
     emissivity,
+    surroundingsEmissivity,
+    relativeEmissivity,
+    radiationEnvironmentTemperatureC,
+    radiationEnvironmentOffsetK,
     radiationViewFactor,
     exposedSurfaceFactor,
     resistivity20OhmM,

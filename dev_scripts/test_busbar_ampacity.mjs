@@ -7,6 +7,7 @@ const catalog = JSON.parse(fs.readFileSync(new URL('../src/data/busbar-catalog.j
 const input = {
   widthMm: 100, thicknessMm: 10, roomTemperatureC: 35,
   permittedTemperatureRiseK: 30, internalTemperatureRiseC: 0,
+  convectionModel: 'article-empirical',
   emissivity: 0.4, radiationViewFactor: 1, exposedSurfaceFactor: 1,
   resistivity20OhmM: 1.7241e-8, temperatureCoefficient: 0.00393,
   currentType: 'dc', designFactor: 1
@@ -74,12 +75,65 @@ assert.equal(project.effectiveTemperatureRiseK, 55);
 close(project.dinNormalizedThermalCurrentA, base.thermalBalanceCurrentA);
 console.log('Busbar ampacity: article model, heat balance, source distinctions, fallback and boundary checks passed.');
 
+// Independent guide §2.2.1.1 example: two 100mm vertical faces and two 10mm
+// horizontal faces, per metre. This verifies the guide's mm unit convention.
+const guide = calc({ convectionModel: 'guide-natural', emissivity: 0.3 });
+const guideConvection = 0.2 * 7.66 * 30 ** 1.25 / 100 ** 0.25
+  + 0.02 * 5.92 * 30 ** 1.25 / 10 ** 0.25;
+close(guide.convectionLossWPerM, guideConvection);
+close(guide.radiationLossWPerM, radiation * 0.3 / 0.4);
+close(guide.thermalBalanceCurrentA ** 2 * rho / area, guideConvection + radiation * 0.3 / 0.4);
+assert.equal(guide.convectionFaces.length, 2);
+assert.deepEqual(guide.convectionFaces.map(face => face.lengthMm), [100, 10]);
+const flatGuide = calc({ convectionModel: 'guide-natural', orientation: 'flat-horizontal' });
+close(flatGuide.convectionLossWPerM, 0.2 * 5.92 * 30 ** 1.25 / 100 ** 0.25
+  + 0.02 * 7.66 * 30 ** 1.25 / 10 ** 0.25);
+assert.ok(flatGuide.convectionLossWPerM < guide.convectionLossWPerM);
+const verticalGuide = calc({ convectionModel: 'guide-natural', orientation: 'vertical-run', verticalLengthMm: 1000 });
+close(verticalGuide.convectionLossWPerM, 0.22 * 7.66 * 30 ** 1.25 / 1000 ** 0.25);
+assert.ok(calc({ convectionModel: 'guide-natural', orientation: 'vertical-run', verticalLengthMm: 2000 }).thermalBalanceCurrentA < verticalGuide.thermalBalanceCurrentA);
+close(calc({ convectionModel: undefined, emissivity: 0.3 }).thermalBalanceCurrentA, guide.thermalBalanceCurrentA);
+const reflectiveWall = calc({ convectionModel: 'guide-natural', emissivity: 0.3, surroundingsEmissivity: 0.1 });
+close(reflectiveWall.relativeEmissivity, 0.03 / 0.37);
+assert.ok(reflectiveWall.thermalBalanceCurrentA < guide.thermalBalanceCurrentA);
+const warmWall = calc({ convectionModel: 'guide-natural', emissivity: 0.3, radiationEnvironmentTemperatureC: 60, designFactor: 0.8 });
+assert.ok(warmWall.thermalBalanceCurrentA < guide.thermalBalanceCurrentA);
+assert.ok(warmWall.estimatedOperatingTemperatureC < 65);
+const wallAtCopperTemperature = calc({ convectionModel: 'guide-natural', radiationEnvironmentTemperatureC: 65 });
+close(wallAtCopperTemperature.radiationLossWPerM, 0);
+assert.ok(calc({ convectionModel: 'guide-natural', radiationEnvironmentTemperatureC: 70 }).radiationLossWPerM < 0);
+assert.match(calc({ convectionModel: 'guide-natural', radiationEnvironmentTemperatureC: 250 }).error, /净散热/);
+assert.match(calc({ surroundingsEmissivity: 0 }).error, /周围表面发射率/);
+assert.match(calc({ radiationEnvironmentTemperatureC: 'bad' }).error, /辐射环境/);
+assert.match(calc({ convectionModel: 'guide-natural', orientation: 'vertical-run', verticalLengthMm: 0 }).error, /竖直散热长度/);
+const coldWall = calc({ convectionModel: 'guide-natural', radiationEnvironmentTemperatureC: 10, designFactor: 0.8 });
+assert.ok(coldWall.estimatedOperatingTemperatureC > 10 && coldWall.estimatedOperatingTemperatureC < 65);
+const guideMargin = calc({ convectionModel: 'guide-natural', emissivity: 0.3, designFactor: 0.8 });
+close(guideMargin.recommendedCurrentA, guide.thermalBalanceCurrentA * 0.8);
+close(calc({ convectionModel: 'guide-natural', emissivity: 0.3, currentType: 'ac', acResistanceFactor: 4 }).thermalBalanceCurrentA, guide.thermalBalanceCurrentA / 2);
+for (const r of [guideMargin, warmWall, coldWall]) {
+  const t = r.estimatedOperatingTemperatureC;
+  const delta = t - r.internalAmbientTemperatureC;
+  const conv = (0.2 * 7.66 / 100 ** 0.25 + 0.02 * 5.92 / 10 ** 0.25)
+    * Math.sign(delta) * Math.abs(delta) ** 1.25;
+  const rad = r.relativeEmissivity * r.radiationViewFactor * 5.670374419e-8 * 0.22
+    * ((t + 273.15) ** 4 - (r.radiationEnvironmentTemperatureC + 273.15) ** 4);
+  const resistance = 1.7241e-8 * (1 + 0.00393 * (t - 20)) / 0.001;
+  close(conv + rad, r.recommendedCurrentA ** 2 * resistance, 1e-8);
+}
+const hotProject = calc({ convectionModel: 'guide-natural', permittedTemperatureRiseK: 70, radiationEnvironmentTemperatureC: 120 });
+assert.equal(hotProject.dinNormalizedThermalCurrentA, null);
+assert.equal(hotProject.dinDifferencePercent, null);
+console.log('Guide: face areas/orientation, mm units, wall radiation, length, heat balance and boundaries passed.');
+
 // Exercise the actual view functions with form defaults parsed from its markup.
 // This tests event logic/rendering without requiring a live browser connection.
 const shell = fs.readFileSync(new URL('../src/platform/app-shell.js', import.meta.url), 'utf8');
 const elements = new Map();
-for (const match of shell.matchAll(/<(input|select)\b([^>]*\bid="(busbar-ampacity-[^"]+)"[^>]*)>([\s\S]*?)(?:<\/select>|(?=<))/g)) {
-  const [, tag, attributes, id, content] = match;
+for (const match of shell.matchAll(/<(select)\b([^>]*\bid="(busbar-ampacity-[^"]+)"[^>]*)>([\s\S]*?)<\/select>|<(input)\b([^>]*\bid="(busbar-ampacity-[^"]+)"[^>]*)>/g)) {
+  const [, selectTag, selectAttributes, selectId, selectContent, inputTag, inputAttributes, inputId] = match;
+  const tag = selectTag || inputTag, attributes = selectAttributes || inputAttributes;
+  const id = selectId || inputId, content = selectContent || '';
   let value = attributes.match(/\bvalue="([^"]*)"/)?.[1] || '';
   const options = [...content.matchAll(/<option\b([^>]*)>([^<]*)<\/option>/g)];
   const selected = options.find(m => /\bselected\b/.test(m[1])) || options[0];
@@ -98,12 +152,27 @@ const functionSlice = (start, end) => shell.slice(shell.indexOf(`function ${star
 vm.runInContext(functionSlice('htmlEscape', 'statusLabel') + shell.slice(shell.indexOf('function resultCards'), shell.indexOf('async function loadCatalogs'))
   + functionSlice('syncBusbarAmpacityControls', 'quickBuswayInput'), context);
 const previousInputs = [...elements].map(([id, el]) => [id, el.value]);
+assert.equal(elements.get('busbar-ampacity-convection-model').value, 'guide-natural');
+assert.equal(elements.get('busbar-ampacity-surface-mode').value, 'guide-bright');
 vm.runInContext('showBusbarArticleExample()', context);
 assert.equal(elements.get('busbar-article-reference-result').hidden, false);
 assert.match(elements.get('busbar-article-reference-result').innerHTML, /1,762\.18/);
 assert.match(elements.get('busbar-article-reference-result').innerHTML, /1,763\.44/);
 assert.deepEqual([...elements].map(([id, el]) => [id, el.value]), previousInputs);
 assert.equal(context.state.project.busbars.ampacityCalculation, undefined);
+vm.runInContext('loadBusbarGuideExample()', context);
+close(context.state.project.busbars.ampacityCalculation.thermalBalanceCurrentA, guide.thermalBalanceCurrentA);
+assert.match(elements.get('busbar-ampacity-result').innerHTML, /指南各表面对流散热/);
+assert.equal(elements.get('busbar-ampacity-emissivity').value, '0.3');
+assert.equal(elements.get('busbar-ampacity-characteristic-length').disabled, true);
+elements.get('busbar-ampacity-orientation').value = 'vertical-run';
+vm.runInContext('syncBusbarAmpacityControls()', context);
+assert.equal(elements.get('busbar-ampacity-vertical-length').disabled, false);
+elements.get('busbar-ampacity-radiation-temperature').value = '65';
+elements.get('busbar-ampacity-surroundings-emissivity').value = '0.1';
+vm.runInContext('calculateBusbarAmpacityResult()', context);
+close(context.state.project.busbars.ampacityCalculation.radiationLossWPerM, 0);
+assert.match(elements.get('busbar-ampacity-result').innerHTML, /周围表面65℃/);
 vm.runInContext('loadBusbarEngineeringExample()', context);
 close(context.state.project.busbars.ampacityCalculation.thermalBalanceCurrentA, base.thermalBalanceCurrentA);
 assert.match(elements.get('busbar-ampacity-result').innerHTML, /综合散热系数 Kt/);

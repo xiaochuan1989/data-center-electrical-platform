@@ -5,6 +5,7 @@ import {
   calculateBranch,
   calculateBusbarAmpacity,
   BUSBAR_ARTICLE_REFERENCE,
+  BUSBAR_GUIDE_REFERENCE,
   calculateBusbarArticleExample,
   calculateBusbarSelection,
   calculateBusbarTableLookup,
@@ -248,14 +249,14 @@ function busbarView() {
       <div id="busbar-result" class="busbar-result" aria-live="polite"></div>
     </div>
     <div class="busbar-pane" data-busbar-pane="ampacity" hidden>
-      <div class="busbar-source-note"><b>计算口径</b><span>当前表单为工程分项热平衡模型：参考对流经验项 h=1.33(ΔT/L₀)<sup>0.25</sup>，辐射单独按绝对温度计算。它与文章原例采用的 Kt、ρ 参数不同。点击“复现文章原例”会单独按原文参数计算；两套结果不作为同参数误差比较。</span></div>
+      <div class="busbar-source-note"><b>计算口径</b><span>默认采用 <a href="${BUSBAR_GUIDE_REFERENCE.url}#page=16" target="_blank" rel="noopener noreferrer">Copper for Busbars 2014指南</a> 第16–19页：竖直面、水平面分别计算自然对流，辐射采用周围表面温度和相对发射率。旧经验式仍可选择；文章1762A独立复现，不作为不同模型的准确性基准。</span></div>
       <div class="busbar-ampacity-scope">
         <b>温升口径</b>
         <span id="busbar-ampacity-temperature-note" aria-live="polite">温升说明随当前输入更新。</span>
       </div>
       <div class="busbar-ampacity-scope">
         <b>适用边界</b>
-        <span>本模型只适用于单片、非并联、四个表面均可自然散热的初步估算。并排互热、柜壁遮挡、热缩绝缘、接头损耗、强迫风冷及实际交流附加损耗必须另行校核；柜内空气温升应优先采用项目实测或整柜温升计算结果。标准参考：GB/T 7251.1-2023、GB/T 24276-2025。</span>
+        <span>指南自然对流公式用于自由空气。本工具按单片、非并联铜排估算，柜内结果须核实空气流通、辐射壁面与遮挡条件；并排互热、热缩绝缘、涂层热阻、接头损耗和强迫风冷未建模。交流须提供经核实的电阻修正系数。标准参考：GB/T 7251.1-2023、GB/T 24276-2025。</span>
       </div>
       <div class="platform-form-grid cols-4 busbar-inputs busbar-ampacity-inputs">
         <label>铜排宽度 (mm)<input id="busbar-ampacity-width" type="number" min="1" max="500" step="1" value="120"></label>
@@ -267,16 +268,19 @@ function busbarView() {
         <label>电流类型<select id="busbar-ampacity-current-type"><option value="dc">直流 / 忽略交流附加损耗</option><option value="ac">交流（使用修正系数）</option></select></label>
         <label>设计裕量系数<select id="busbar-ampacity-design-factor"><option value="0.7">70%</option><option value="0.8" selected>80%（建议默认）</option><option value="0.9">90%</option><option value="1">100%（热平衡极限，不推荐）</option></select></label>
         <label>原表同规格对照<select id="busbar-ampacity-din-reference"><option value="bareCurrentA">裸排载流量（35℃ / 30K）</option><option value="coatedCurrentA">涂层载流量（工艺需核对）</option></select><small>仅统一温度；表面和安装条件待核实</small></label>
+        <label>散热计算模型<select id="busbar-ampacity-convection-model"><option value="guide-natural" selected>指南自然对流（各面分项）</option><option value="article-empirical">工程对流经验式（分项散热）</option><option value="din-calibrated">原表同规格反校（依赖参考假设）</option><option value="natural-correlation">自然对流关联式（独立估算）</option><option value="custom">自定义对流换热系数</option></select><small>指南式区分竖直/水平面；旧模型可选</small></label>
+        <label>铜排表面状态<select id="busbar-ampacity-surface-mode"><option value="guide-bright" selected>指南：明亮金属（ε=0.10）</option><option value="guide-partial">指南：部分氧化铜（ε=0.30）</option><option value="guide-heavy">指南：重度氧化铜（ε=0.70）</option><option value="painted">指南：非金属哑光漆（ε=0.90）</option><option value="bright-tin">镀锡旧假设（ε=0.05，需核实）</option><option value="conservative-tin">镀锡旧假设（ε=0.03，需核实）</option><option value="bare-oxidized">文章：部分氧化铜（ε=0.40）</option><option value="excel">历史参考参数（状态未注明，ε=0.35）</option><option value="custom">自定义发射率</option></select><small>指南典型值不等于实测值；明亮金属不特指镀锡</small></label>
       </div>
       <details class="busbar-advanced">
-        <summary>高级热工参数 <span>工程分项模型；参数不等同于文章原例</span></summary>
+        <summary>高级热工参数 <span>安装、辐射环境与材料假设</span></summary>
         <div class="platform-form-grid cols-3 compact">
-          <label>对流计算模型<select id="busbar-ampacity-convection-model"><option value="article-empirical" selected>工程对流经验式（分项散热）</option><option value="din-calibrated">原表同规格反校（依赖参考假设）</option><option value="natural-correlation">自然对流关联式（独立估算）</option><option value="custom">自定义对流换热系数</option></select><small>h 仅表示对流；综合散热系数为 Kt</small></label>
-          <label>安装方向<select id="busbar-ampacity-orientation"><option value="edgewise-horizontal" selected>铜排水平、宽面竖直</option><option value="vertical-run">铜排沿长度方向竖直</option><option value="flat-horizontal">铜排水平、宽面水平</option></select><small>文章经验式仅用于宽面竖直；其余方向自动使用Nu/Ra模型（沿长度竖直按1m估算）</small></label>
+          <label>安装方向<select id="busbar-ampacity-orientation"><option value="edgewise-horizontal" selected>铜排水平、宽面竖直</option><option value="vertical-run">铜排沿长度方向竖直</option><option value="flat-horizontal">铜排水平、宽面水平</option></select><small>指南按各面朝向与实际高度/宽度计算</small></label>
+          <label>竖直散热长度 (mm)<input id="busbar-ampacity-vertical-length" type="number" min="1" max="10000" step="1" value="1000" disabled><small>仅沿长度竖直时使用；应填写有效连续散热高度</small></label>
           <label>经验式特征长度 L₀ (mm)<input id="busbar-ampacity-characteristic-length" type="number" min="0.1" max="10000" step="0.1" placeholder="留空：采用铜排宽度 / 竖直高度"><small>长度须与散热方向一致；100×10宽面竖直默认100mm，原文示例使用10mm</small></label>
           <label>自定义对流 h<input id="busbar-ampacity-convection" type="number" min="0.1" max="100" step="0.1" value="5" disabled><small>W/(m²·K)；仅自定义模式使用，不含辐射</small></label>
-          <label>表面状态 / 发射率<select id="busbar-ampacity-surface-mode"><option value="bright-tin" selected>新亮全镀锡（ε=0.05，建议默认）</option><option value="conservative-tin">电镀铜保守校核（ε=0.03）</option><option value="bare-oxidized">裸铜部分氧化（文章假设，ε=0.40）</option><option value="painted">喷涂表面（文章假设，ε=0.90）</option><option value="excel">历史参考参数（状态未注明，ε=0.35）</option><option value="custom">自定义发射率</option></select><small>喷涂须复核涂层热阻；高发射率不能直接套用于热缩绝缘</small></label>
-          <label>计算采用的发射率 ε<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.05" disabled><small>这是辐射散热参数，不是铜排电阻发热系数</small></label>
+          <label>铜排发射率 ε₁<input id="busbar-ampacity-emissivity" type="number" min="0" max="1" step="0.01" value="0.1" disabled><small>随表面预设带入；自定义模式可编辑</small></label>
+          <label>周围表面发射率 ε₂<input id="busbar-ampacity-surroundings-emissivity" type="number" min="0.01" max="1" step="0.01" value="1"><small>1为黑体周围表面假设；金属柜壁应按实际状态核实</small></label>
+          <label>辐射环境温度 (℃)<input id="busbar-ampacity-radiation-temperature" type="number" min="-50" max="250" step="1" placeholder="留空：假设与柜内空气同温"><small>可见柜壁/周围表面的等效温度，区别于空气温度</small></label>
           <label>辐射视角系数 F<input id="busbar-ampacity-view-factor" type="number" min="0.05" max="1" step="0.05" value="0.8"><small>1为完全可见；柜壁、相邻铜排会降低视角系数</small></label>
           <label>有效散热面积系数<input id="busbar-ampacity-surface-factor" type="number" min="0.1" max="1" step="0.05" value="1"><small>四面无遮挡取1；支撑、遮挡或邻近结构应降低</small></label>
           <label>20℃铜电阻率 ρ₂₀<input id="busbar-ampacity-resistivity" type="number" min="0" max="0.000001" step="0.000000000001" value="0.000000017241"><small>Ω·m；按高导电退火铜，材料不明时应保守提高</small></label>
@@ -288,14 +292,15 @@ function busbarView() {
       <div class="busbar-method-strip" aria-label="规格反算方法">
         <span><b>最高温度</b> 外部环境 + 工程控制温升</span>
         <span><b>柜内空气温度</b> 外部环境 + 柜内空气温升</span>
-        <span><b>对流散热</b> 当前所选模型的 h × As × ΔT</span>
-        <span><b>辐射散热</b> ε × F × σ × As × (T⁴ − Tamb⁴)</span>
+        <span><b>对流散热</b> 各面散热之和；h为面积加权等效值</span>
+        <span><b>辐射散热</b> e × F × σ × As × (T⁴ − T周围⁴)</span>
         <span><b>热平衡电流</b> √(总散热 ÷ 每米电阻)</span>
         <span><b>建议电流</b> 热平衡电流 × 设计裕量</span>
       </div>
       <button id="calculate-busbar-ampacity" class="platform-primary-action">按规格计算载流量</button>
       <button id="busbar-ampacity-article-example" class="busbar-article-example">复现文章原例（1762A）</button>
       <button id="busbar-ampacity-engineering-example" class="busbar-article-example">载入100×10工程校核工况</button>
+      <button id="busbar-ampacity-guide-example" class="busbar-article-example">载入100×10指南校核工况</button>
       <div id="busbar-article-reference-result" class="busbar-result" aria-live="polite" hidden></div>
       <details class="busbar-calculation-details"><summary>两套模型的参数区别</summary><div class="busbar-calculation-flow">
         <p><a href="${BUSBAR_ARTICLE_REFERENCE.url}" target="_blank" rel="noopener noreferrer">${BUSBAR_ARTICLE_REFERENCE.title}</a> · 宾昭平 · 2026-09-30</p>
@@ -839,12 +844,14 @@ function syncBusbarAmpacityControls() {
   const riseLimit = document.getElementById('busbar-ampacity-rise-limit');
   const maximumTemperature = document.getElementById('busbar-ampacity-maximum-temperature');
   if (!surfaceMode || !emissivity || !currentType || !acFactor) return;
-  const surfacePresets = { excel: '0.35', 'bright-tin': '0.05', 'conservative-tin': '0.03', 'bare-oxidized': '0.4', painted: '0.9' };
+  const surfacePresets = { 'guide-bright': '0.1', 'guide-partial': '0.3', 'guide-heavy': '0.7', excel: '0.35', 'bright-tin': '0.05', 'conservative-tin': '0.03', 'bare-oxidized': '0.4', painted: '0.9' };
   const usesSurfacePreset = Object.hasOwn(surfacePresets, surfaceMode.value);
   if (usesSurfacePreset) emissivity.value = surfacePresets[surfaceMode.value];
   emissivity.disabled = usesSurfacePreset;
   if (convectionModel && convectionCoefficient) convectionCoefficient.disabled = convectionModel.value !== 'custom';
-  if (convectionModel && orientation) orientation.disabled = !['natural-correlation', 'article-empirical'].includes(convectionModel.value);
+  if (convectionModel && orientation) orientation.disabled = !['guide-natural', 'natural-correlation', 'article-empirical'].includes(convectionModel.value);
+  const verticalLength = document.getElementById('busbar-ampacity-vertical-length');
+  if (verticalLength) verticalLength.disabled = !['guide-natural', 'natural-correlation'].includes(convectionModel.value) || orientation.value !== 'vertical-run';
   const characteristicLength = document.getElementById('busbar-ampacity-characteristic-length');
   if (characteristicLength) characteristicLength.disabled = convectionModel.value !== 'article-empirical' || orientation.value !== 'edgewise-horizontal';
   const referenceEmissivity = document.getElementById('busbar-ampacity-din-emissivity');
@@ -894,10 +901,19 @@ function loadBusbarEngineeringExample() {
     'internal-rise': '0', 'current-type': 'dc', 'design-factor': '1',
     'convection-model': 'article-empirical', 'orientation': 'edgewise-horizontal',
     'characteristic-length': '', 'surface-mode': 'bare-oxidized', 'view-factor': '1',
+    'surroundings-emissivity': '1', 'radiation-temperature': '', 'vertical-length': '1000',
     'surface-factor': '1', 'resistivity': '0.000000017241',
     'temperature-coefficient': '0.00393', 'din-reference': 'bareCurrentA'
   };
   for (const [field, value] of Object.entries(values)) document.getElementById(`busbar-ampacity-${field}`).value = value;
+  syncBusbarAmpacityControls();
+  calculateBusbarAmpacityResult();
+}
+
+function loadBusbarGuideExample() {
+  loadBusbarEngineeringExample();
+  document.getElementById('busbar-ampacity-convection-model').value = 'guide-natural';
+  document.getElementById('busbar-ampacity-surface-mode').value = 'guide-partial';
   syncBusbarAmpacityControls();
   calculateBusbarAmpacityResult();
 }
@@ -916,11 +932,14 @@ function calculateBusbarAmpacityResult() {
     dinReferenceField: document.getElementById('busbar-ampacity-din-reference').value,
     convectionModel: document.getElementById('busbar-ampacity-convection-model').value,
     orientation: document.getElementById('busbar-ampacity-orientation').value,
+    verticalLengthMm: numberValue('busbar-ampacity-vertical-length'),
     convectionCoefficient: numberValue('busbar-ampacity-convection'),
     characteristicLengthMm: document.getElementById('busbar-ampacity-characteristic-length').value,
     dinReferenceEmissivity: numberValue('busbar-ampacity-din-emissivity'),
     emissivity: numberValue('busbar-ampacity-emissivity'),
     radiationViewFactor: numberValue('busbar-ampacity-view-factor'),
+    surroundingsEmissivity: numberValue('busbar-ampacity-surroundings-emissivity'),
+    radiationEnvironmentTemperatureC: document.getElementById('busbar-ampacity-radiation-temperature').value,
     exposedSurfaceFactor: numberValue('busbar-ampacity-surface-factor'),
     resistivity20OhmM: numberValue('busbar-ampacity-resistivity'),
     temperatureCoefficient: numberValue('busbar-ampacity-temperature-coefficient'),
@@ -934,6 +953,7 @@ function calculateBusbarAmpacityResult() {
 
   const surfaceLabel = surfaceModeElement.selectedOptions[0]?.textContent || '自定义发射率';
   const convectionModelLabels = {
+    'guide-natural': '指南自然对流分面计算＋环境辐射',
     'article-empirical': '工程对流经验式＋绝对温度辐射',
     'din-calibrated': 'DIN同规格30K反校',
     'natural-correlation': '自然对流Nu/Ra关联式',
@@ -951,13 +971,14 @@ function calculateBusbarAmpacityResult() {
     ampacityCalculation: { ...result, surfaceMode: surfaceModeElement.value, surfaceLabel }
   };
   const dinLabel = result.dinReferenceField === 'coatedCurrentA' ? '涂层' : '裸排';
+  const normalizedCurrentText = result.dinNormalizedThermalCurrentA === null ? '净散热≤0，无法归一' : `${format(result.dinNormalizedThermalCurrentA, 0)} A`;
   const dinComparison = result.dinMatch
     ? `<div class="busbar-din-comparison neutral">
         <div><span>本地工作簿规格</span><strong>${htmlEscape(result.dinMatch.spec)} · 单片</strong></div>
         <div><span>本地工作簿 ${dinLabel}列</span><strong>${format(result.dinCurrentA, 0)} A</strong></div>
-        <div><span>工程模型仅温度归一至35℃ / 30K</span><strong>${format(result.dinNormalizedThermalCurrentA, 0)} A</strong></div>
+        <div><span>工程模型仅温度归一至35℃ / 30K</span><strong>${normalizedCurrentText}</strong></div>
         <div><span>条件匹配状态</span><strong>表面及安装条件待核实</strong></div>
-        <p>以上为来源值并列展示，不计算“同条件误差”。仅温度归一不能证明材料、表面、安装或交流损耗一致。${result.convectionModel === 'din-calibrated' ? '该模型由原表反校，吻合原表不构成独立验证。' : ''}${result.dinReferenceField === 'coatedCurrentA' ? '涂层列材料及工艺未注明。' : ''}</p>
+        <p>以上为来源值并列展示，不计算“同条件误差”。仅温度归一不能证明材料、表面、安装或交流损耗一致；归一时保留辐射环境相对空气的温差。${result.convectionModel === 'din-calibrated' ? '该模型由原表反校，吻合原表不构成独立验证。' : ''}${result.dinReferenceField === 'coatedCurrentA' ? '涂层列材料及工艺未注明。' : ''}</p>
       </div>`
     : `<div class="busbar-din-comparison neutral"><p>本地工作簿没有完全相同的单片规格；当前只显示工程模型估算。</p></div>`;
   const articleParameters = [
@@ -966,9 +987,9 @@ function calculateBusbarAmpacityResult() {
     ['最高温度 / 有效散热温差', '65℃ / 30K', `${format(result.maximumTemperatureC, 1)}℃ / ${format(result.effectiveTemperatureRiseK, 1)}K`],
     ['综合散热系数 Kt', '9.8475（直接采用）', `${format(result.combinedHeatTransferCoefficient, 5)}（分项计算）`],
     ['对流特征长度 L₀', '原文Kt计算步骤使用10mm', result.characteristicLengthMm === null ? '当前模型不单独使用' : `${format(result.characteristicLengthMm, 1)}mm`],
-    ['辐射处理', '包含于原文给定Kt', 'ε × F × σ × As × 绝对温度四次方差'],
+    ['辐射处理', '包含于原文给定Kt', `相对发射率e=${format(result.relativeEmissivity, 4)}；周围表面${format(result.radiationEnvironmentTemperatureC, 1)}℃`],
     ['工作温度电阻率 ρ (Ω·m)', '2.09×10⁻⁸（直接采用）', `${format(result.resistivityAtMaximumOhmM * 1e8, 6)}×10⁻⁸（按材料参数计算）`],
-    ['散热 / 安装', '原文竖放、综合Kt', `${orientationLabels[result.orientation]}；ε=${format(result.emissivity, 2)}、F=${format(result.radiationViewFactor, 2)}、面积系数=${format(result.exposedSurfaceFactor, 2)}`],
+    ['散热 / 安装', '原文竖放、综合Kt', `${orientationLabels[result.orientation]}；ε₁=${format(result.emissivity, 2)}、ε₂=${format(result.surroundingsEmissivity, 2)}、F=${format(result.radiationViewFactor, 2)}、面积系数=${format(result.exposedSurfaceFactor, 2)}`],
     ['设计电流折减', '原文未另行折减', `${format(result.designFactor * 100, 0)}%工程设计系数`]
   ];
   const articleComparison = `<details class="busbar-calculation-details"><summary>原文与本次工程计算的参数区别（不作为误差比较）</summary>
@@ -985,7 +1006,10 @@ function calculateBusbarAmpacityResult() {
     <div class="result-grid busbar-result-grid busbar-ampacity-process">${resultCards([
       ['允许总温升', format(result.permittedTemperatureRiseK, 1), 'K'],
       ['对柜内空气散热温差', format(result.effectiveTemperatureRiseK, 1), 'K'],
-      ['对流换热系数 h', format(result.convectionCoefficient, 2), 'W/(m²·K)'],
+      ['面积加权对流系数 h', format(result.convectionCoefficient, 2), 'W/(m²·K)'],
+      ['铜排表面发射率 ε₁', format(result.emissivity, 2), ''],
+      ['相对发射率 e', format(result.relativeEmissivity, 4), ''],
+      ['辐射环境温度', format(result.radiationEnvironmentTemperatureC, 1), '℃'],
       ['综合散热系数 Kt', format(result.combinedHeatTransferCoefficient, 2), 'W/(m²·K)'],
       ...(result.characteristicLengthMm === null ? [] : [['特征长度 L₀', format(result.characteristicLengthMm, 1), 'mm']]),
       ['每米散热表面积', format(result.surfaceAreaM2PerM, 4), 'm²/m'],
@@ -995,26 +1019,30 @@ function calculateBusbarAmpacityResult() {
       ['辐射散热', format(result.radiationLossWPerM, 1), 'W/m'],
       ['总散热能力', format(result.totalDissipationWPerM, 1), 'W/m'],
       ['建议电流下损耗', format(result.designLossWPerM, 1), 'W/m'],
-      ['DIN 30K归一化值', format(result.dinNormalizedThermalCurrentA, 0), 'A']
+      ['仅温度归一至35℃ / 30K', normalizedCurrentText, '']
     ])}</div>
     ${dinComparison}
     ${articleComparison}
+    ${result.convectionFaces.length ? `<details class="busbar-calculation-details" open><summary>指南各表面对流散热（第16–17页，L按mm）</summary>
+      <div class="data-entry-table"><table><thead><tr><th>表面组（各含两个面）</th><th>有效面积 m²/m</th><th>高度/宽度 L mm</th><th>系数 C</th><th>h W/(m²·K)</th><th>散热 W/m</th></tr></thead>
+      <tbody>${result.convectionFaces.map(face => `<tr><td>${htmlEscape(face.label)}</td><td>${format(face.areaM2PerM, 4)}</td><td>${format(face.lengthMm, 1)}</td><td>${format(face.constant, 2)}</td><td>${format(face.coefficient, 3)}</td><td>${format(face.lossWPerM, 3)}</td></tr>`).join('')}</tbody></table></div>
+      <p>单面热流密度 q=C×ΔT<sup>1.25</sup>/L<sup>0.25</sup>，竖直面C=7.66、水平面C=5.92；各面热流乘面积后相加。不是把同一个h用于四个面。</p></details>` : ''}
     <details class="busbar-calculation-details">
       <summary>查看完整计算方法</summary>
       <div class="busbar-calculation-flow">
-        <p><b>对流模型：</b>${htmlEscape(convectionModelLabel)}${['natural-correlation', 'article-empirical'].includes(result.convectionModel) ? `；安装方向：${htmlEscape(orientationLabels[result.orientation] || result.orientation)}` : ''}</p>
+        <p><b>对流模型：</b>${htmlEscape(convectionModelLabel)}${['guide-natural', 'natural-correlation', 'article-empirical'].includes(result.convectionModel) ? `；安装方向：${htmlEscape(orientationLabels[result.orientation] || result.orientation)}` : ''}${result.orientation === 'vertical-run' ? `；竖直散热长度${format(result.verticalLengthMm, 1)}mm` : ''}</p>
         ${result.convectionModel === 'article-empirical' ? `<p><b>文章对流项：</b>h=1.33 × (${format(result.effectiveTemperatureRiseK, 2)} ÷ ${format(result.characteristicLengthMm / 1000, 4)})<sup>0.25</sup> = ${format(result.convectionCoefficient, 3)}W/(m²·K)；L₀按米代入。</p>` : ''}
         ${result.convectionModel === 'din-calibrated' ? `<p><b>原表反校：</b>同规格裸排在35℃ / 30K条件下，以参考ε=${format(result.dinReferenceBareEmissivity, 2)}反求 h=${format(result.dinReferenceConvectionCoefficient, 3)}W/(m²·K)，项目温差按 h∝ΔT<sup>0.25</sup>修正；参考ε为假设。</p>` : ''}
-        <p><b>表面参数：</b>${htmlEscape(surfaceLabel)}；计算采用 ε=${format(result.emissivity, 2)}</p>
+        <p><b>表面参数：</b>${htmlEscape(surfaceLabel)}；ε₁=${format(result.emissivity, 2)}、周围表面ε₂=${format(result.surroundingsEmissivity, 2)}；e=ε₁ε₂/(ε₁+ε₂−ε₁ε₂)=${format(result.relativeEmissivity, 4)}（指南第18页的两表面近似）。</p>
         <p><b>截面积：</b>${format(result.widthMm, 1)} × ${format(result.thicknessMm, 1)} = ${format(result.areaMm2, 1)}mm²</p>
         <p><b>铜排最高温度：</b>外部环境 ${format(result.roomTemperatureC, 1)}℃ + 工程控制温升 ${format(result.permittedTemperatureRiseK, 1)}K = ${format(result.maximumTemperatureC, 1)}℃</p>
         <p><b>柜内空气温度：</b>外部环境 ${format(result.roomTemperatureC, 1)}℃ + 柜内空气温升 ${format(result.internalTemperatureRiseC, 1)}K = ${format(result.internalAmbientTemperatureC, 1)}℃</p>
         <p><b>有效散热温差：</b>${format(result.maximumTemperatureC, 1)} − ${format(result.internalAmbientTemperatureC, 1)} = ${format(result.effectiveTemperatureRiseK, 1)}K</p>
         <p><b>有效散热面积：</b>四面总面积 ${format(result.grossSurfaceAreaM2PerM, 4)} × ${format(result.exposedSurfaceFactor, 2)} = ${format(result.surfaceAreaM2PerM, 4)}m²/m</p>
-        <p><b>对流散热：</b>h(规格、温差、方向) × As × ΔT = ${format(result.convectionLossWPerM, 2)}W/m</p>
-        <p><b>辐射散热：</b>ε × F(${format(result.radiationViewFactor, 2)}) × σ × As × (Tmax⁴ − Tamb⁴) = ${format(result.radiationLossWPerM, 2)}W/m</p>
+        <p><b>对流散热：</b>${result.convectionFaces.length ? '竖直/水平各面的q×A之和' : 'h(规格、温差、方向) × As × ΔT'} = ${format(result.convectionLossWPerM, 2)}W/m</p>
+        <p><b>辐射散热：</b>e × F(${format(result.radiationViewFactor, 2)}) × σ × As × (Tmax⁴ − T周围⁴) = ${format(result.radiationLossWPerM, 2)}W/m；周围表面${format(result.radiationEnvironmentTemperatureC, 1)}℃${document.getElementById('busbar-ampacity-radiation-temperature').value === '' ? '（假设与柜内空气同温）' : '（采用输入值）'}。</p>
         <p><b>温度相关电阻：</b>ρ(T)=ρ₂₀[1+α(T−20)] = ${format(result.resistivityAtMaximumOhmM * 1e8, 4)}×10⁻⁸Ω·m；R=ρ(T)/S × ${format(result.acResistanceFactor, 2)}。</p>
-        <p><b>综合系数：</b>Kt=h+Prad/(As×ΔT) = ${format(result.combinedHeatTransferCoefficient, 3)}W/(m²·K)；I=√(Kt×As×ΔT/R)，与分项热平衡等价。辐射绝对温度为 ${format(result.maximumTemperatureC + 273.15, 2)}K / ${format(result.internalAmbientTemperatureC + 273.15, 2)}K。</p>
+        <p><b>综合系数：</b>Kt=h+Prad/(As×ΔT) = ${format(result.combinedHeatTransferCoefficient, 3)}W/(m²·K)；I=√(Kt×As×ΔT/R)，与分项热平衡等价。辐射绝对温度为 ${format(result.maximumTemperatureC + 273.15, 2)}K / ${format(result.radiationEnvironmentTemperatureC + 273.15, 2)}K。</p>
         <p><b>热平衡电流：</b>√[(Pconv + Prad) ÷ R] = ${format(result.thermalBalanceCurrentA, 2)}A</p>
         <p><b>建议持续电流：</b>${format(result.thermalBalanceCurrentA, 2)} × ${format(result.designFactor, 2)} = ${format(result.recommendedCurrentA, 2)}A</p>
       </div>
@@ -1022,6 +1050,7 @@ function calculateBusbarAmpacityResult() {
     <div class="busbar-notices">
       <p class="${result.convectionFallback ? 'warning' : 'safe'}">${result.convectionFallback ? (result.convectionFallbackReason === 'orientation' ? '当前安装方向不适用文章宽面竖直经验式，已自动切换自然对流Nu/Ra关联式。' : '当前规格无法完成原表反校，已自动回退到自然对流关联式；请复核安装方向和参考发射率。') : `当前采用${htmlEscape(convectionModelLabel)}。`}</p>
       ${result.characteristicLengthOverridden ? '<p class="warning">特征长度已手工覆盖，未采用铜排宽度；较小L₀会提高估算载流量，须核对实际散热方向与依据。</p>' : ''}
+      <p class="neutral">周围表面ε₂=${format(result.surroundingsEmissivity, 2)}、温度=${format(result.radiationEnvironmentTemperatureC, 1)}℃，F=${format(result.radiationViewFactor, 2)}；属于等效环境假设，未逐个柜壁做辐射网络求解。${result.radiationLossWPerM < 0 ? '当前辐射项为负，周围表面正在向铜排传热。' : ''}</p>
       <p class="neutral">当前工程控制温升为 ${format(result.permittedTemperatureRiseK, 1)}K；实际最高温度还应受端子、绝缘、连接件、相邻元件和验证条件中的最低限值约束。</p>
       <p class="${surfaceModeElement.value === 'excel' ? 'warning' : 'neutral'}">当前表面：${htmlEscape(surfaceLabel)}，ε=${format(result.emissivity, 2)}。${surfaceModeElement.value === 'excel' ? '历史参考状态与依据未注明，不能代表镀锡。' : surfaceModeElement.value === 'painted' ? '喷涂高发射率假设须核对涂层热阻及工艺，不能用于热缩绝缘。' : '表面预设仅供初算，应与实际材料状态及验证值一致。'}</p>
       <p class="${isThermalLimit ? 'warning' : 'neutral'}">${isThermalLimit ? '当前选择100%：结果是达到最高温度时的理论热平衡极限，没有连续运行设计裕量。' : `当前已采用 ${format(result.designFactor * 100, 0)}% 设计系数；该系数是工程裕量，不是标准统一规定。`}</p>
@@ -1714,6 +1743,7 @@ function bindEvents() {
   document.getElementById('calculate-busbar-ampacity').addEventListener('click', calculateBusbarAmpacityResult);
   document.getElementById('busbar-ampacity-article-example').addEventListener('click', showBusbarArticleExample);
   document.getElementById('busbar-ampacity-engineering-example').addEventListener('click', loadBusbarEngineeringExample);
+  document.getElementById('busbar-ampacity-guide-example').addEventListener('click', loadBusbarGuideExample);
   document.getElementById('calculate-busbar-table').addEventListener('click', calculateBusbarTableResult);
   document.getElementById('busbar-ampacity-surface-mode').addEventListener('change', syncBusbarAmpacityControls);
   document.getElementById('busbar-ampacity-convection-model').addEventListener('change', syncBusbarAmpacityControls);

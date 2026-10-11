@@ -487,6 +487,7 @@ const dinNormalizedBusbar = calculateBusbarAmpacity(busbarCatalog, {
   roomTemperatureC: 35,
   permittedTemperatureRiseK: 30,
   internalTemperatureRiseC: 0,
+  radiationEnvironmentTemperatureC: '', // Reset the previous result's 50℃ wall to the new 35℃ air assumption.
   convectionModel: 'din-calibrated',
   dinReferenceEmissivity: 0.12,
   emissivity: 0.12,
@@ -567,7 +568,11 @@ assert.match(appShell, /温度\/放置查表/);
 assert.match(appShell, /id="calculate-busbar-table"/);
 assert.match(appShell, /提供单片与多根矩形铜排的载流量参考数据/);
 assert.match(appShell, /id="calculate-busbar-ampacity"/);
-assert.match(appShell, /新亮全镀锡（ε=0\.05，建议默认）/);
+assert.match(appShell, /指南：明亮金属（ε=0\.10）/);
+assert.match(appShell, /镀锡旧假设（ε=0\.05，需核实）/);
+assert.match(appShell, /指南自然对流（各面分项）/);
+assert.match(appShell, /id="busbar-ampacity-radiation-temperature"/);
+assert.match(appShell, /id="busbar-ampacity-surroundings-emissivity"/);
 assert.match(appShell, /历史参考参数（状态未注明，ε=0\.35）/);
 assert.match(appShell, /id="busbar-ampacity-rise-limit"/);
 assert.match(appShell, /工程对流经验式（分项散热）/);
