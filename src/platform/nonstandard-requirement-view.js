@@ -1,11 +1,12 @@
 import { PRODUCT_PROFILES, createPresalesPackage, addEquipment, updateEquipmentQuantity, addPresalesSource,
   replacePresalesSource, confirmPresalesRequirement, revisePresalesRequirement, invalidatePresalesRequirement,
   remapPresalesRequirement, createPresalesSnapshot, restorePresalesSnapshot } from '../modules/nonstandard-presales.js';
-import { extractPresalesSource, parsePresalesClause, presalesEvidenceLocation } from '../modules/nonstandard-requirements.js';
+import { extractPresalesSource, previewPresalesExtraction, parsePresalesClause, presalesEvidenceLocation } from '../modules/nonstandard-requirements.js';
 import { readPresalesFile } from './nonstandard-file-reader.js';
 import { nonstandardSchemeSection, mountNonstandardSchemes } from './nonstandard-scheme-view.js';
 import { writePresalesXlsx } from '../modules/presales-xlsx.js';
 import { requirementReviewPage, createRequirementDrafts, isRequirementTodo } from './requirement-review-state.js';
+import { specExtractionSection, mountSpecExtraction } from './spec-extraction-view.js';
 import '../css/nonstandard-requirements.css';
 
 const STORAGE_KEY = 'nonstandard_presales_working_v1';
@@ -15,50 +16,62 @@ const responses = { pending: '待应答', met: '人工复核：满足', deviatio
 const option = (value, label, current) => `<option value="${escape(value)}"${String(current) === String(value) ? ' selected' : ''}>${escape(label)}</option>`;
 export function nonstandardRequirementView() {
   return `<section class="platform-view platform-card ns-requirements" id="platform-view-requirements" hidden>
-    <header class="platform-section-head"><div><h1>非标配电售前方案</h1><p>配电柜 · PDU · 智能母线｜要求复核 → 采用方案 → 配置清单，非生产图纸。</p></div></header>
-    <div class="ns-banner">资料先留证据，再分配设备与确认参数。文件内的指令仅作为客户条款，不执行宏、公式或自动应答；不调用外部AI/OCR。</div>
+    <header class="platform-section-head"><div><h1>非标配电售前方案</h1><p>规范书自动整理设备与参数 · 原文证据复核 · 售前方案工作稿。</p></div></header>
+    <div class="ns-banner">上传规范书 → AI 整理设备与参数 → 核对原文 → 导出参数清单。无需先手动登记设备。</div>
     <div class="ns-toolbar"><label><input type="checkbox" id="ns-autosave"> 仅本机自动保存（含客户原文）</label>
       <button id="ns-backup">备份方案工作稿JSON</button><label class="ns-file-button">恢复JSON<input id="ns-restore" type="file" accept=".json"></label>
       <button id="ns-export">导出技术要求Excel工作稿</button></div>
     <p id="ns-message" role="status" aria-live="polite"></p>
-    <div class="ns-columns">
-      <section class="ns-section"><h2>1. 登记设备项</h2><div class="platform-form-grid cols-3">
+    <div class="ns-columns ns-ai-import-columns">
+      <details class="ns-section ns-manual-equipment" id="ns-manual-equipment"><summary>手动登记方案设备（可选）</summary><h2>登记设备项</h2><p class="ns-muted">仅用于下方手工方案配置，AI 整理无需先填这里。</p><div class="platform-form-grid cols-3">
         <label>品类<select id="ns-category">${Object.entries(PRODUCT_PROFILES).map(([key, p]) => option(key, p.label, 'cabinet')).join('')}</select></label>
         <label>设备名称/位号<input id="ns-equipment-label" placeholder="填写客户设备名称"></label>
         <label>设备数量<input id="ns-equipment-quantity" type="number" min="1" step="1" placeholder="未知可留空"></label>
         <label>变更原因<input id="ns-equipment-reason" placeholder="登记依据或澄清原因"></label>
-      </div><button id="ns-add-equipment" class="platform-primary-action">添加设备项</button><div id="ns-equipment-list"></div></section>
-      <section class="ns-section"><h2>2. 导入需求资料</h2>
+      </div><button id="ns-add-equipment" class="platform-primary-action">添加设备项</button><div id="ns-equipment-list"></div></details>
+      <section class="ns-section ns-main-import"><h2>1. 上传技术规范书</h2>
         <label>资料名称<input id="ns-source-name" placeholder="例如客户技术要求"></label>
         <label>粘贴原文<textarea id="ns-source-text" rows="5" placeholder="粘贴原文，不填默认技术参数"></textarea></label>
         <div class="ns-actions"><button id="ns-add-source">添加粘贴资料</button><label class="ns-file-button">选择需求文件<input id="ns-file" type="file" accept=".txt,.md,.docx,.pdf,.xlsx"></label></div>
-        <p class="ns-muted">≤20MB；文字PDF、DOCX、UTF-8 TXT/MD、XLSX。解析库及PDF字库/worker由本机或同一站点提供，不上传客户内容、不依赖解析CDN。扫描页、图片/复杂表格需另行核对。</p>
+        <p class="ns-muted">支持文字/扫描PDF、DOCX、TXT/MD、XLSX，单文件≤20MB。扫描页自动在本机OCR，首次加载中英模型可能较慢；识别后仍须核对数值与表格。</p>
+        <label class="ns-check"><input id="ns-force-ocr" type="checkbox">所有PDF页使用OCR（文字层错乱或漏字时勾选后重新选择文件）</label>
+        <label>扫描页语言<select id="ns-ocr-language"><option value="chi_sim">中文及中英混排</option><option value="eng">纯英文</option></select></label>
+        <button id="ns-cancel-read" disabled>取消文件识别</button>
         <label>已导入来源<select id="ns-source-select"></select></label>
+        <p id="ns-scope-warning" class="ns-muted" hidden></p>
+        <details class="ns-rule-preview"><summary>按行规则预览（备用，不含 AI 设备识别）</summary><p id="ns-extraction-summary" class="ns-muted"></p>
+        <details id="ns-document-text" hidden><summary id="ns-document-text-summary">文档辅助文字</summary><p class="ns-muted">以下文字默认不登记为要求，原文完整保留。若属于本项目要求，可勾选后重新提取；已登记条款不会被删除。</p><pre id="ns-document-text-preview"></pre><label class="ns-check"><input id="ns-include-document-text" type="checkbox">提取时包含这些文字</label></details>
         <div class="ns-actions"><button id="ns-extract">提取待复核条款</button><button id="ns-replace-source">用粘贴内容替换选中来源</button></div>
+        </details>
         <details><summary>查看选中来源原文</summary><pre id="ns-source-preview"></pre></details><div id="ns-read-warnings" class="ns-muted"></div>
+        <details class="ns-muted"><summary>读取方式与数据说明</summary>文件先在本机读取；点击 AI 整理后才发送所选来源的文字到已配置接口。文档内指令仅作原文，不执行宏、公式或自动应答。当前网页未接入OCR。</details>
       </section>
     </div>
+    ${specExtractionSection()}
+    <details class="ns-manual-workflow" id="ns-manual-workflow"><summary>人工条款复核与方案配置（已有工作稿 / 手动处理）</summary>
     <section class="ns-section"><h2>3. 设备归属与人工复核</h2>
       <div class="ns-toolbar"><label>复核资料<select id="ns-filter-source"></select></label><button id="ns-review-source">按选中资料复核</button><label>设备筛选<select id="ns-filter-equipment"></select></label><label>状态筛选<select id="ns-filter-status">${option('', '全部', '')}${option('todo', '待处理（含待分配）', '')}${Object.entries(statuses).map(([key, label]) => option(key, label, '')).join('')}</select></label><label>条款关键词<input id="ns-filter-keyword" type="search" placeholder="原文、字段或位置"></label><span id="ns-summary"></span></div>
-      <p class="ns-muted">先“分配/更新字段”，再确认。单值候选可预填，但不会自动确认；冲突必须人工选择并说明。复核输入一经修改，原确认立即失效。未点击确认/分配的编辑输入不写入备份，导出仅含已记录的数据。</p>
+      <p class="ns-muted">点击条款展开编辑。先分配设备与字段，再填写应答、依据并确认；修改已确认内容后需重新复核。</p>
       <p id="ns-draft-status" class="ns-muted" aria-live="polite"></p><button id="ns-discard-drafts" hidden>放弃本次条款编辑</button>
       <div class="ns-pagination" aria-label="条款分页"><label>每页条款<select id="ns-page-size"><option value="10">10条</option><option value="20" selected>20条</option><option value="50">50条</option></select></label><button id="ns-page-prev">上一页条款</button><span id="ns-page-info" role="status" aria-live="polite"></span><button id="ns-page-next">下一页条款</button><label>跳到条款页<input id="ns-page-number" type="number" min="1" step="1" value="1"></label><button id="ns-page-go">跳转条款页</button></div>
       <div id="ns-requirement-list"></div>
     </section>
-    <section class="ns-section"><h2>4. 待澄清与修订</h2><button id="ns-review-todo">查看待处理条款</button><div id="ns-clarifications"></div><details><summary>修订记录</summary><div id="ns-revisions"></div></details></section>
+    <section class="ns-section"><h2>4. 待澄清与修订</h2><button id="ns-review-todo">查看待处理条款</button><details><summary id="ns-clarifications-summary">待处理摘要</summary><div id="ns-clarifications"></div></details><details><summary>修订记录</summary><div id="ns-revisions"></div></details></section>
     ${nonstandardSchemeSection()}
+    </details>
   </section>`;
 }
 
 export function mountNonstandardRequirements(root, options = {}) {
   let pack = createPresalesPackage(), autosave = false, generation = 0, busy = false;
-  let page = 1, keywordTimer = null;
+  let page = 1, keywordTimer = null, openRequirementId = null, shownSourceId = null;
+  let specUI;
   const drafts = createRequirementDrafts();
   const get = id => root.querySelector(`#${id}`);
   const message = (value, error = false) => { get('ns-message').textContent = value; get('ns-message').className = error ? 'ns-error' : 'ns-success'; };
   function persist() {
     if (!autosave) return true;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: true, snapshot: createPresalesSnapshot(pack) })); return true; }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: true, snapshot: createPresalesSnapshot(pack) })); specUI?.persist(); return true; }
     catch { message('本机保存失败（空间或浏览器权限不足）。当前页面工作稿仍在，请下载JSON备份。', true); return false; }
   }
   const equipmentOptions = current => option('', '待分配', current || '') + pack.equipment.map(e => option(e.id, `${PRODUCT_PROFILES[e.category].label} · ${e.label}`, current)).join('');
@@ -68,8 +81,19 @@ export function mountNonstandardRequirements(root, options = {}) {
   }
   function showSource() {
     const source = pack.sources.find(s => s.id === get('ns-source-select').value);
+    if (shownSourceId !== source?.id) get('ns-include-document-text').checked = false;
+    shownSourceId = source?.id;
     get('ns-source-preview').textContent = source?.text || '尚未导入来源';
     get('ns-read-warnings').textContent = (source?.warnings || []).join('；');
+    const preview = source ? previewPresalesExtraction(source) : null;
+    get('ns-extraction-summary').textContent = preview ? `规则整理：${preview.blocks.length}段待复核文字 · ${preview.documentText.length}段文档辅助文字（默认跳过）` : '先导入资料，再提取条款。';
+    get('ns-extract').disabled = !source;
+    get('ns-replace-source').disabled = !source;
+    get('ns-document-text').hidden = !preview?.documentText.length;
+    get('ns-document-text-summary').textContent = `查看默认跳过的文档辅助文字（${preview?.documentText.length || 0}段）`;
+    get('ns-document-text-preview').textContent = preview?.documentText.map(b => `${b.reason} · ${presalesEvidenceLocation(pack, b)}\n${b.quote}`).join('\n\n') || '';
+    get('ns-scope-warning').hidden = true;
+    specUI?.render();
   }
   function reviewPage() {
     return requirementReviewPage(pack, { sourceId: get('ns-filter-source').value, equipmentId: get('ns-filter-equipment').value,
@@ -91,8 +115,11 @@ export function mountNonstandardRequirements(root, options = {}) {
     get('ns-requirement-list').innerHTML = result.items.length ? result.items.map((r, index) => {
       const values = [...new Set(r.candidates.map(c => c.value).filter(v => v != null))];
       const initial = r.confirmedValue ?? (values.length === 1 ? values[0] : '');
-      return `<article class="ns-requirement" data-ns-id="${escape(r.id)}">
-        <header><span data-ns-status>${statuses[r.reviewStatus]}</span><small>筛选序号${result.start + index} · ${escape(r.field === 'clause' ? '全文条款' : r.field)}</small><small data-ns-dirty hidden>未记录编辑</small></header>
+      const assigned = pack.equipment.find(e => e.id === r.equipmentId);
+      const fieldLabel = PRODUCT_PROFILES[assigned?.category]?.fields[r.field]?.label || '全文条款';
+      return `<details class="ns-requirement" data-ns-id="${escape(r.id)}"${openRequirementId === r.id ? ' open' : ''}>
+        <summary><span data-ns-status>${statuses[r.reviewStatus]}</span><span class="ns-row-copy"><strong>${escape(r.candidates[0]?.evidence.quote || '人工补录')}</strong><small>第${result.start + index}条 · ${escape(assigned?.label || '待分配设备')} · ${escape(fieldLabel)} · ${escape(r.candidates[0] ? presalesEvidenceLocation(pack, r.candidates[0].evidence) : '')}</small></span><small data-ns-dirty hidden>未记录编辑</small><span class="ns-expand-hint" aria-hidden="true"></span></summary>
+        <div class="ns-review-editor">
         <div class="ns-evidence">${r.candidates.map(c => {
           const source = pack.sources.find(s => s.id === c.evidence.sourceId), segment = source?.segments.find(s => c.evidence.start >= s.start && c.evidence.end <= s.end);
           return `${segment?.contextTitle ? `<b>${escape(segment.contextTitle)}（${escape(segment.contextCell)}）</b>` : ''}<blockquote>${escape(c.evidence.quote)}</blockquote><small>${escape(presalesEvidenceLocation(pack, c.evidence))} · 候选：${escape(c.value ?? '未知')}</small>`;
@@ -106,7 +133,7 @@ export function mountNonstandardRequirements(root, options = {}) {
           <label>人工应答<select data-ns-response>${Object.entries(responses).map(([key, label]) => option(key, label, r.response)).join('')}</select></label>
           <label class="ns-reason">复核/修改原因<input data-ns-reason value="${escape(r.decisionReason)}" placeholder="说明采用依据或澄清原因"></label>
         </div><div class="ns-actions"><button data-ns-action="confirm">确认本条要求</button><button data-ns-action="clear">清空确认值</button></div>
-      </article>`;
+      </div></details>`;
     }).join('') : '<p class="ns-empty">暂无符合条件的条款。先导入资料并提取，或调整筛选。</p>';
     for (const row of get('ns-requirement-list').querySelectorAll('[data-ns-id]')) {
       const values = drafts.get(row.dataset.nsId); if (!values) continue;
@@ -118,6 +145,7 @@ export function mountNonstandardRequirements(root, options = {}) {
   }
   function renderSummary() {
     const pending = pack.requirements.filter(isRequirementTodo);
+    get('ns-clarifications-summary').textContent = `待处理摘要（${pending.length}条）`;
     get('ns-summary').textContent = `版本${pack.revision} · ${pack.equipment.length}设备 · ${pack.requirements.length}条要求 · ${pending.length}条待处理`;
     get('ns-clarifications').innerHTML = !pack.requirements.length ? '<p>尚无技术要求，不能判定已复核或资料完整。</p>' : pending.length ? `<p>全包${pending.length}条待处理，仅显示前${Math.min(20, pending.length)}条摘要；请用上方按钮进入分页（保留资料/设备筛选）。</p><ul>${pending.slice(0, 20).map(r => `<li>${escape(pack.equipment.find(e => e.id === r.equipmentId)?.label || '待分配')}：${escape(r.candidates[0]?.evidence.quote || '人工补录')}（${statuses[r.reviewStatus]}）</li>`).join('')}</ul>` : '<p>当前登记条款均已人工复核，不代表资料完整或整份规范全部合规。</p>';
     get('ns-revisions').innerHTML = pack.revisions.length ? `<p>共${pack.revisions.length}条修订，仅显示最近${Math.min(20, pack.revisions.length)}条；完整记录在JSON/Excel中。</p>${pack.revisions.slice(-20).reverse().map(r => `<p data-ns-revision>v${r.revision} · ${escape(r.kind)} · ${escape(r.reason)}</p>`).join('')}` : '<p>暂无修订</p>';
@@ -133,7 +161,7 @@ export function mountNonstandardRequirements(root, options = {}) {
   }
   function commit(next, success, { clearDraftId, sourceId, targetId, reset = false } = {}) {
     if (reset) {
-      drafts.clear(); page = 1; get('ns-source-select').value = ''; get('ns-filter-source').value = ''; get('ns-filter-equipment').value = ''; get('ns-filter-status').value = ''; get('ns-filter-keyword').value = '';
+      drafts.clear(); page = 1; openRequirementId = null; get('ns-source-select').value = ''; get('ns-filter-source').value = ''; get('ns-filter-equipment').value = ''; get('ns-filter-status').value = ''; get('ns-filter-keyword').value = '';
     }
     if (clearDraftId) drafts.clear(clearDraftId);
     pack = next; generation += 1;
@@ -141,6 +169,7 @@ export function mountNonstandardRequirements(root, options = {}) {
     if (sourceId) { get('ns-filter-source').value = sourceId; page = 1; }
     let targetOutside = false;
     if (targetId) {
+      openRequirementId = targetId;
       const result = reviewPage(), index = result.ids.indexOf(targetId);
       if (index >= 0) page = Math.floor(index / result.pageSize) + 1; else targetOutside = true;
     }
@@ -159,10 +188,15 @@ export function mountNonstandardRequirements(root, options = {}) {
     if (value.length > 800000) throw new Error('文字过多，请拆分');
     const next = addPresalesSource(pack, { type: 'text', name: get('ns-source-name').value || '粘贴需求', text: value, segments: [{ start: 0, end: value.length }] }, '人工添加原文');
     // Refresh options before selecting the newly added source.
-    commit(next, '资料已添加，请提取并分配条款'); get('ns-filter-source').value = next.sources.at(-1).id; page = 1; renderRequirements();
+    commit(next, '资料已添加，点击“AI 自动整理设备与参数”开始分析'); get('ns-filter-source').value = next.sources.at(-1).id; page = 1; renderRequirements();
     get('ns-source-select').value = pack.sources.at(-1).id; showSource();
   }));
-  get('ns-extract').addEventListener('click', safe(() => commit(extractPresalesSource(pack, get('ns-source-select').value), '已生成待复核条款；默认待分配，重复片段不重复追加', { sourceId: get('ns-source-select').value })));
+  get('ns-extract').addEventListener('click', safe(() => {
+    const next = extractPresalesSource(pack, get('ns-source-select').value, { includeDocumentText: get('ns-include-document-text').checked });
+    get('ns-manual-workflow').open = true;
+    const added = next.requirements.filter(r => !pack.requirements.some(old => old.id === r.id)).length;
+    commit(next, `本次新增${added}条待复核要求；原文保留，已有条款不重复追加。点击条款展开复核`, { sourceId: get('ns-source-select').value });
+  }));
   get('ns-replace-source').addEventListener('click', safe(() => {
     const id = get('ns-source-select').value, value = get('ns-source-text').value;
     if (!id) throw new Error('请先选择要替换的来源');
@@ -170,16 +204,22 @@ export function mountNonstandardRequirements(root, options = {}) {
     commit(replacePresalesSource(pack, id, { type: 'text', name: get('ns-source-name').value || pack.sources.find(s => s.id === id).name, text: value, segments: [{ start: 0, end: value.length }] }, '人工替换资料原文'), '来源已替换；旧条款失效，请重新提取并复核', { sourceId: id });
   }));
   for (const id of ['ns-source-text', 'ns-source-name', 'ns-source-select']) get(id).addEventListener('input', () => { generation += 1; });
-  get('ns-source-select').addEventListener('change', showSource);
+  get('ns-source-select').addEventListener('change', () => { get('ns-include-document-text').checked = false; showSource(); });
+  let readController;
+  get('ns-cancel-read').addEventListener('click', () => { generation += 1; readController?.abort(); message('正在取消文件识别…'); });
   async function upload(file, restore = false) {
     if (!file || busy) return;
-    busy = true; const ticket = ++generation; message('正在本机读取…');
+    busy = true; readController = new AbortController(); get('ns-cancel-read').disabled = false;
+    const ticket = ++generation; message('正在本机读取…');
     try {
       let result;
       if (restore) {
         if (file.size > 20 * 1024 * 1024) throw new Error('JSON不得超过20MB');
         result = restorePresalesSnapshot(JSON.parse(await file.text()));
-      } else result = await readPresalesFile(file);
+      } else result = await readPresalesFile(file, globalThis, { signal: readController.signal, forceOcr: get('ns-force-ocr').checked, ocrLanguage: get('ns-ocr-language').value,
+        onProgress: info => { if (ticket === generation) message(info.phase === 'ocr'
+          ? `本机OCR：第${info.page}/${info.total}页，${Math.round((info.progress || 0)*100)}%（首次需加载识别模型）…`
+          : `正在本机读取第${info.page}/${info.total}页…`); } });
       if (ticket !== generation) throw new Error('读取期间工作稿或输入已变化，旧结果未应用，请重新导入');
       if (restore) {
         if (!window.confirm('恢复将替换当前非标需求工作稿，并重新复核确认状态。确定吗？')) { message('已取消恢复，当前工作稿保持不变'); return; }
@@ -188,15 +228,15 @@ export function mountNonstandardRequirements(root, options = {}) {
         schemeUI.reset();
         commit(result, '工作稿已恢复，确认状态回到待复核', { reset: true });
       } else {
-        commit(addPresalesSource(pack, result, '本机只读导入需求文件'), '文件已导入需求来源，UPS产品目录未改变；请提取并人工分配');
+        commit(addPresalesSource(pack, result, '本机只读导入需求文件'), '文件已导入，点击“AI 自动整理设备与参数”开始分析；UPS产品目录未改变');
         get('ns-filter-source').value = pack.sources.at(-1).id; page = 1; renderRequirements();
         get('ns-source-select').value = pack.sources.at(-1).id; showSource();
         get('ns-read-warnings').textContent = result.warnings.join('；');
       }
     } catch (error) { message(`${error.message}。当前工作稿未被本次导入覆盖。`, true); }
-    finally { busy = false; }
+    finally { busy = false; readController = null; get('ns-cancel-read').disabled = true; }
   }
-  get('ns-file').addEventListener('change', event => { if (busy) { generation += 1; message('上次读取尚未结束；其旧结果已取消，请稍后重新选择文件', true); } else upload(event.target.files[0]); event.target.value = ''; });
+  get('ns-file').addEventListener('change', event => { if (busy) { generation += 1; readController?.abort(); message('上次读取尚未结束；其旧结果已取消，请稍后重新选择文件', true); } else upload(event.target.files[0]); event.target.value = ''; });
   get('ns-restore').addEventListener('change', event => { if (busy) { generation += 1; message('上次读取尚未结束，请稍后重新选择备份', true); } else upload(event.target.files[0], true); event.target.value = ''; });
   function invalidateRow(event) {
     const row = event.target.closest('[data-ns-id]'); if (!row) return;
@@ -212,6 +252,14 @@ export function mountNonstandardRequirements(root, options = {}) {
     const values = Object.fromEntries(['equipment', 'field', 'value', 'forbidden', 'response', 'reason'].map(key => [key, row.querySelector(`[data-ns-${key}]`).value]));
     drafts.remember(pack, row.dataset.nsId, values); row.querySelector('[data-ns-dirty]').hidden = false; draftStatus();
   }
+  get('ns-requirement-list').addEventListener('toggle', event => {
+    const row = event.target;
+    if (!row.matches('.ns-requirement') || !row.isConnected) return;
+    if (row.open) {
+      openRequirementId = row.dataset.nsId;
+      for (const other of get('ns-requirement-list').querySelectorAll('.ns-requirement[open]')) if (other !== row) other.open = false;
+    } else if (openRequirementId === row.dataset.nsId) openRequirementId = null;
+  }, true);
   get('ns-requirement-list').addEventListener('input', safe(invalidateRow));
   get('ns-requirement-list').addEventListener('change', safe(event => {
     invalidateRow(event);
@@ -250,14 +298,14 @@ export function mountNonstandardRequirements(root, options = {}) {
   get('ns-filter-keyword').addEventListener('input', () => { clearTimeout(keywordTimer); keywordTimer = setTimeout(applyFilters, 250); });
   get('ns-filter-keyword').addEventListener('keydown', event => { if (event.key === 'Enter') applyFilters(); });
   get('ns-review-source').addEventListener('click', safe(() => { const id = get('ns-source-select').value; if (!id) throw new Error('请先选择资料来源'); get('ns-filter-source').value = id; applyFilters(); }));
-  get('ns-review-todo').addEventListener('click', () => { get('ns-filter-status').value = 'todo'; get('ns-filter-keyword').value = ''; applyFilters(); get('ns-page-info').scrollIntoView({ block: 'center' }); });
+  get('ns-review-todo').addEventListener('click', () => { get('ns-manual-workflow').open = true; get('ns-filter-status').value = 'todo'; get('ns-filter-keyword').value = ''; applyFilters(); get('ns-page-info').scrollIntoView({ block: 'center' }); });
   get('ns-page-prev').addEventListener('click', () => { page -= 1; renderRequirements(); });
   get('ns-page-next').addEventListener('click', () => { page += 1; renderRequirements(); });
   const goToPage = safe(() => { const target = Number(get('ns-page-number').value), count = reviewPage().totalPages; if (!Number.isSafeInteger(target) || target < 1 || target > count) throw new Error(`页码须为1—${count}的整数`); page = target; renderRequirements(); });
   get('ns-page-go').addEventListener('click', goToPage);
   get('ns-page-number').addEventListener('keydown', event => { if (event.key === 'Enter') goToPage(); });
   get('ns-discard-drafts').addEventListener('click', () => { if (!window.confirm(`放弃${drafts.size}条未记录编辑？已撤销的确认不会自动恢复。`)) return; drafts.clear(); renderRequirements(); message('已放弃本次条款编辑，已撤销的确认仍需重新复核'); });
-  window.addEventListener('beforeunload', event => { if (drafts.size) { event.preventDefault(); event.returnValue = ''; } });
+  window.addEventListener('beforeunload', event => { if (drafts.size || specUI?.busy()) { event.preventDefault(); event.returnValue = ''; } });
   get('ns-autosave').addEventListener('change', event => {
     autosave = event.target.checked;
     if (autosave) { if (persist()) message('已启用仅本机自动保存；客户原文不会上传'); }
@@ -283,6 +331,8 @@ export function mountNonstandardRequirements(root, options = {}) {
   }));
   const schemeUI = mountNonstandardSchemes(root, { pack: () => pack, commit, message, download,
     touch: () => { generation += 1; }, buswayDesign: options.buswayDesign });
+  specUI = mountSpecExtraction(root, { source: () => pack.sources.find(s => s.id === get('ns-source-select').value),
+    autosave: () => autosave, download });
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
     if (stored?.snapshot) { pack = restorePresalesSnapshot(stored.snapshot); autosave = !!stored.enabled; get('ns-autosave').checked = autosave; message(`已恢复本机工作稿，原确认回到待复核；自动保存${autosave ? '已开启' : '已关闭'}`); }

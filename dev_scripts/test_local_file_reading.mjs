@@ -22,13 +22,13 @@ const readerSource=fs.readFileSync('src/platform/nonstandard-file-reader.js','ut
 assert.match(readerSource,/externalFileAccess:false/);assert.ok(!readerSource.includes('https://'));
 const file={name:'test.pdf',size:8,arrayBuffer:async()=>new Uint8Array([37,80,68,70]).buffer};
 let destroyed=false,cleanup=0,received;
-const pdf={numPages:3,getPage:async i=>({getTextContent:async()=>({items:i===2?[]:[{str:`TEST page${i}`,hasEOL:true}]}),cleanup:()=>cleanup++})};
+const pdf={numPages:3,getPage:async i=>({getTextContent:async()=>({items:i===2?[]:[{str:`TEST page${i} complete synthetic text only for native PDF reader verification`,hasEOL:true}]}),cleanup:()=>cleanup++})};
 const task = document => ({promise:Promise.resolve(document),destroy:async()=>{destroyed=true;}});
-const libs={document:{baseURI:'https://test.invalid/platform/'},pdfjsLib:{getDocument:v=>{received=v;return task(pdf);}}};
+const libs={document:{baseURI:'https://test.invalid/platform/'},renderPdfForOcr:async()=>({canvas:{},blank:true,dpi:300}),pdfjsLib:{getDocument:v=>{received=v;return task(pdf);}}};
 const parsed=await readPresalesFile(file,libs);
-assert.deepEqual(parsed.segments.map(s=>s.page),[1,3]);assert.match(parsed.warnings[0],/第2页/);
+assert.deepEqual(parsed.segments.map(s=>s.page),[1,3]);assert.equal(parsed.pageRecords[1].method,'blank');
 assert.equal(received.isEvalSupported,false);assert.equal(received.enableScripting,false);assert.equal(destroyed,true);assert.equal(cleanup,3);
-const loading={document:libs.document,localParserReady:{pdfjsLib:Promise.resolve().then(()=>{loading.pdfjsLib=libs.pdfjsLib;})}};
+const loading={document:libs.document,renderPdfForOcr:libs.renderPdfForOcr,localParserReady:{pdfjsLib:Promise.resolve().then(()=>{loading.pdfjsLib=libs.pdfjsLib;})}};
 assert.equal((await readPresalesFile(file,loading)).type,'pdf','异步主库等待后读入');
 await assert.rejects(()=>readPresalesFile(file,{localParserReady:{pdfjsLib:Promise.reject(new Error('test missing module'))}}),/本机解析组件加载失败/);
 await assert.rejects(()=>readPresalesFile(file,{}),/本机解析组件未加载/);

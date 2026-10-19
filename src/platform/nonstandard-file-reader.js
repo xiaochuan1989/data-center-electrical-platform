@@ -1,5 +1,6 @@
 // 所有内容仅在本机解析，不执行工作簿公式、宏或文档指令。
 import { localPdfOptions } from './local-pdf-options.js';
+import { checkReadSignal, createLocalOcrSession, hasLargePdfImage, renderPdfForOcr } from './local-pdf-ocr.js';
 const MAX_TEXT = 800000;
 function checkText(value) {
   if (!value.trim()) throw new Error('未读取到有效文字，扫描件请另行识别或人工补录');
@@ -62,7 +63,9 @@ export function readPresalesWorkbook(workbook, XLSX) {
   }
   checkText(parts.text); return { ...parts, type: 'xlsx' };
 }
-export async function readPresalesFile(file, libs = globalThis) {
+export async function readPresalesFile(file, libs = globalThis, options = {}) {
+  const { signal, onProgress = () => {}, forceOcr = false, ocrLanguage = 'chi_sim' } = options;
+  checkReadSignal(signal);
   if (!file || file.size > 20 * 1024 * 1024) throw new Error('文件不得超过20MB');
   const extension = file.name.split('.').pop().toLowerCase();
   if (!['txt', 'md', 'docx', 'pdf', 'xlsx'].includes(extension)) throw new Error('仅支持TXT/MD/DOCX/文字PDF/XLSX；旧DOC请另存，宏工作簿不接受');
@@ -106,15 +109,43 @@ export async function readPresalesFile(file, libs = globalThis) {
   if (!libs.pdfjsLib) throw new Error('PDF本机解析组件未加载');
   const loadingTask = libs.pdfjsLib.getDocument({ data: buffer,
     ...localPdfOptions(libs.document?.baseURI || globalThis.document?.baseURI) });
+  let ocr;
+  const abortLoad = () => { loadingTask.destroy().catch(() => {}); };
+  signal?.addEventListener('abort', abortLoad, { once: true });
   try {
     const pdf = await loadingTask.promise;
     if (pdf.numPages > 150) throw new Error('PDF超过150页，请按设备拆分');
+    parts.pageRecords = [];
     for (let pageIndex = 1; pageIndex <= pdf.numPages; pageIndex++) {
-      const page = await pdf.getPage(pageIndex), content = await page.getTextContent();
-      const value = content.items.map(item => item.str + (item.hasEOL ? '\n' : ' ')).join('');
-      if (!value.trim()) parts.warnings.push(`PDF第${pageIndex}页未读取到文字，需另行识别/核对`);
-      append(parts, value, { page: pageIndex }); page.cleanup();
+      checkReadSignal(signal);
+      onProgress({ phase: 'read', page: pageIndex, total: pdf.numPages });
+      const page = await pdf.getPage(pageIndex);
+      let canvas;
+      try {
+        const content = await page.getTextContent();
+        let value = content.items.map(item => item.str + (item.hasEOL ? '\n' : ' ')).join('');
+        let metadata = { page: pageIndex, method: 'native' };
+        if (forceOcr || value.replace(/\s/g,'').length < 40 || await hasLargePdfImage(page,libs.pdfjsLib)) {
+          const rendered = await (libs.renderPdfForOcr || renderPdfForOcr)(page,libs,signal);
+          canvas = rendered.canvas;
+          if (rendered.blank && !value.trim()) {
+            parts.pageRecords.push({ page: pageIndex, method: 'blank' });
+            continue;
+          }
+          ocr ||= (libs.createLocalOcrSession || createLocalOcrSession)(libs,{ signal, language: ocrLanguage,
+            onProgress: info => onProgress({ ...info, total: pdf.numPages }) });
+          onProgress({ phase: 'ocr', page: pageIndex, total: pdf.numPages, progress: 0 });
+          const recognized = await ocr.recognize(canvas,pageIndex);
+          if (!recognized.text?.trim()) throw new Error(`PDF第${pageIndex}页OCR未识别到文字，未导入不完整资料`);
+          value = recognized.text;
+          metadata = { ...metadata, method: 'ocr', ocrEngine: 'tesseract.js-7.0.0', ocrConfidence: recognized.confidence, dpi: rendered.dpi };
+          parts.warnings.push(`PDF第${pageIndex}页为OCR识别文字（置信度${Math.round(recognized.confidence)}%），数值、单位、符号及表格归属须对照原图复核`);
+        }
+        checkReadSignal(signal);
+        append(parts,value,metadata); parts.pageRecords.push(metadata);
+      } finally { if (canvas) canvas.width=canvas.height=0; page.cleanup(); }
     }
-  } finally { await loadingTask.destroy(); }
+  } catch (error) { checkReadSignal(signal); throw error; }
+  finally { signal?.removeEventListener('abort',abortLoad); await ocr?.close(); await loadingTask.destroy(); }
   checkText(parts.text); return { ...parts, name: file.name, type: 'pdf' };
 }

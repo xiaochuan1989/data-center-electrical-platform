@@ -164,9 +164,20 @@ function sourceShape(source) {
   assert(['text', 'pdf', 'docx', 'xlsx', 'manual'].includes(source.type) && typeof source.text === 'string' && text(source.text), '资料为空或类型非法');
   assert(source.text.length <= 800000, '资料文字过多，请拆分');
   assert(Array.isArray(source.segments) && source.segments.length, '缺少可核对的来源范围');
+  if (source.pageRecords != null) {
+    assert(source.type === 'pdf' && Array.isArray(source.pageRecords) && source.pageRecords.length > 0 && source.pageRecords.length <= 150, 'PDF页覆盖记录无效');
+    source.pageRecords.forEach((record,index) => {
+      assert(record.page === index+1 && ['native','ocr','blank'].includes(record.method), 'PDF页覆盖记录缺失或重复');
+      if (record.method !== 'blank') assert(source.segments.some(s => s.page === record.page && s.method === record.method), 'PDF页覆盖与文字来源失配');
+    });
+  }
   for (const segment of source.segments) {
     assert(Number.isInteger(segment.start) && Number.isInteger(segment.end) && segment.start >= 0 && segment.end > segment.start && segment.end <= source.text.length, '来源范围非法');
     if (source.type === 'pdf') assert(Number.isInteger(segment.page) && segment.page > 0, 'PDF须提供真实页序');
+    if (segment.method != null) {
+      assert(source.type === 'pdf' && ['native','ocr'].includes(segment.method), 'PDF文字来源标记无效');
+      if (segment.method === 'ocr') assert(text(segment.ocrEngine) && Number.isFinite(segment.ocrConfidence) && segment.ocrConfidence >= 0 && segment.ocrConfidence <= 100 && Number.isFinite(segment.dpi) && segment.dpi > 0, 'OCR来源信息不完整');
+    }
     if (source.type === 'xlsx') assert(text(segment.sheet) && text(segment.cell), 'XLSX须提供表名和单元格');
     if (segment.forbiddenDeviation != null) assert(typeof segment.forbiddenDeviation === 'boolean', '资料禁止偏离标记非法');
     if (segment.role != null) assert(['requirement', 'context', 'unclassified'].includes(segment.role), '单元格角色非法');
@@ -179,7 +190,9 @@ function sourceShape(source) {
 }
 function makeSource(item, id = uid()) {
   const source = { id, type: item.type, name: text(item.name).split(/[\\/]/).pop(), text: item.text, warnings: (item.warnings || []).map(text),
+    ...(item.pageRecords ? { pageRecords: item.pageRecords.map(p => ({ ...p })) } : {}),
     segments: (item.segments || []).map(s => ({ start: s.start, end: s.end, ...(s.page != null ? { page: s.page } : {}),
+      ...(s.method ? { method: s.method, ...(s.method === 'ocr' ? { ocrEngine: s.ocrEngine, ocrConfidence: s.ocrConfidence, dpi: s.dpi } : {}) } : {}),
       ...(s.paragraph != null ? { paragraph: s.paragraph } : {}), ...(s.table ? { table: text(s.table) } : {}),
       ...(s.sheet ? { sheet: text(s.sheet) } : {}), ...(s.cell ? { cell: text(s.cell) } : {}),
       ...(s.forbiddenDeviation != null ? { forbiddenDeviation: s.forbiddenDeviation } : {}),

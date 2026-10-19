@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { createPresalesPackage, addEquipment, addPresalesSource, remapPresalesRequirement, replacePresalesSource,
   confirmPresalesRequirement, createPresalesSnapshot, restorePresalesSnapshot, invalidatePresalesRequirement } from '../src/modules/nonstandard-presales.js';
-import { extractPresalesSource, parsePresalesClause, presalesEvidenceLocation } from '../src/modules/nonstandard-requirements.js';
+import { extractPresalesSource, previewPresalesExtraction, parsePresalesClause, presalesEvidenceLocation } from '../src/modules/nonstandard-requirements.js';
 import { readPresalesWorkbook, readPresalesFile } from '../src/platform/nonstandard-file-reader.js';
 
 // 仅合成软件验收；不生成真实规范报告或客户技术承诺。
@@ -74,4 +74,27 @@ await assert.rejects(() => readPresalesFile({ name: '空.txt', size: 1, arrayBuf
 await assert.rejects(() => readPresalesFile({ name: '乱码.txt', size: 1, arrayBuffer: async () => new Uint8Array([0xff]).buffer }, {}), /UTF-8/);
 const valid = new TextEncoder().encode('额定电流：32A');
 assert.equal((await readPresalesFile({ name: '测试.txt', size: valid.length, arrayBuffer: async () => valid.buffer }, {})).text, '额定电流：32A');
+// Document furniture must not become engineering requirements, and all omitted
+// text must remain recoverable with its original offsets.
+const coverRaw = 'ALIBABA CLOUD CONFIDENTIAL DOCUMENTS\n本文件为保密资料，未经许可不得复制或传播。\n2025 年 09 月 30 日\n技术规格书\nUPS 电源技术规范\n额定电流：630A\n额定电流：630A\n防护等级不低于IP31\n交付日期：2026-10-19\n应提供保密通信接口';
+let coverPack = addPresalesSource(createPresalesPackage(), { type: 'pdf', name: '合成UPS规范.pdf', text: coverRaw, segments: [{ start: 0, end: coverRaw.length, page: 1 }] }, '合成原文');
+const coverSource = coverPack.sources[0];
+const preview = previewPresalesExtraction(coverSource);
+assert.equal(preview.documentText.length, 4);
+assert.equal(preview.blocks.length, 6, '技术条款、日期要求与设备标题不随意丢弃');
+assert.match(preview.scopeWarning, /UPS/);
+for (const block of [...preview.blocks, ...preview.documentText]) assert.equal(coverRaw.slice(block.start, block.end), block.quote);
+coverPack = extractPresalesSource(coverPack, coverSource.id);
+assert.equal(coverPack.requirements.length, 6);
+assert.equal(coverPack.requirements.filter(r => r.candidates[0].evidence.quote === '额定电流：630A').length, 2, '不同位置的技术要求保留独立证据');
+assert.equal(coverPack.sources[0].text, coverRaw, '不修改原文');
+assert.equal(extractPresalesSource(coverPack, coverSource.id).revision, coverPack.revision);
+const withDocumentText = extractPresalesSource(coverPack, coverSource.id, { includeDocumentText: true });
+assert.equal(withDocumentText.requirements.length, 10, '可重新纳入文档文字，无重漏');
+assert.equal(extractPresalesSource(withDocumentText, coverSource.id).requirements.length, 10, '不删除已登记的条款');
+const dateSource = { ...coverSource, type: 'xlsx', text: '2026-10-19', segments: [{ start: 0, end: 10, sheet: '参数', cell: 'B2', contextTitle: '交付日期' }] };
+assert.equal(previewPresalesExtraction(dateSource).blocks.length, 1, '表格日期可能是工程要求，不按封面日期排除');
+const onlyCover = addPresalesSource(createPresalesPackage(), { type: 'text', name: '封面.txt', text: '技术规格书\n2026-10-19', segments: [{ start: 0, end: 16 }] }, '合成封面');
+assert.throws(() => extractPresalesSource(onlyCover, onlyCover.sources[0].id), /仅识别到/);
+assert.equal(extractPresalesSource(onlyCover, onlyCover.sources[0].id, { includeDocumentText: true }).requirements.length, 2);
 console.log('非标需求提取、重分配、位置、工作簿与失效回归通过（合成软件用例）');

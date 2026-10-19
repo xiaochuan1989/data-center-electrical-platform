@@ -4,7 +4,8 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
-const pins={mammoth:'1.13.0','pdfjs-dist':'6.3.289',xlsx:'0.20.3','xlsx-js-style':'1.2.0'};
+const pins={mammoth:'1.13.0','pdfjs-dist':'6.3.289',xlsx:'0.20.3','xlsx-js-style':'1.2.0',
+  'tesseract.js':'7.0.0','tesseract.js-core':'7.0.0','@tesseract.js-data/chi_sim':'1.0.0','@tesseract.js-data/eng':'1.0.0'};
 export function localParserAssets() {
   const files=new Map(),versions={};
   const roots=Object.fromEntries(Object.entries(pins).map(([name,version])=>{
@@ -30,6 +31,17 @@ export function localParserAssets() {
   add('xlsx-js-style','dist/xlsx.bundle.js','vendor/xlsx/style-writer.min.js');
   add('pdfjs-dist','legacy/build/pdf.mjs','vendor/pdfjs/pdf.mjs');
   add('pdfjs-dist','legacy/build/pdf.worker.mjs','vendor/pdfjs/pdf.worker.mjs');
+  add('tesseract.js','dist/tesseract.min.js','vendor/ocr/tesseract.min.js');
+  add('tesseract.js','dist/worker.min.js','vendor/ocr/worker.min.js');
+  for(const file of fs.readdirSync(roots['tesseract.js-core'])) {
+    if(/^tesseract-core.*\.(wasm|wasm.js)$/.test(file)) add('tesseract.js-core',file,`vendor/ocr/core/${file}`);
+  }
+  for(const language of ['chi_sim','eng']) {
+    add(`@tesseract.js-data/${language}`,`4.0.0/${language}.traineddata.gz`,`vendor/ocr/lang/${language}.traineddata.gz`);
+    add(`@tesseract.js-data/${language}`,'package.json',`vendor/licenses/tessdata-${language}-package.json`);
+  }
+  // Language model upstream licenses, kept separately from the npm wrapper metadata.
+  files.set('vendor/licenses/tessdata-LICENSE',fs.readFileSync(new URL('../third_party/tessdata-LICENSE',import.meta.url)));
   for(const folder of ['cmaps','standard_fonts','wasm']) {
     for(const entry of fs.readdirSync(path.join(roots['pdfjs-dist'],folder),{withFileTypes:true})) {
       if(entry.isFile() && /\.(bcmap|ttf|pfb|wasm|js|mjs)$/.test(entry.name)) add('pdfjs-dist',`${folder}/${entry.name}`,`vendor/pdfjs/${folder}/${entry.name}`);
@@ -37,6 +49,7 @@ export function localParserAssets() {
     }
   }
   for(const name of Object.keys(pins)) {
+    if(name.startsWith('@tesseract.js-data/')) continue;
     const licenses=fs.readdirSync(roots[name]).filter(v=>/^LICENSE(?:\.txt|\.md)?$/i.test(v));
     if(!licenses.length) throw new Error(`Missing license for ${name}`);
     for(const file of licenses) add(name,file,`vendor/licenses/${name}-${file}`);

@@ -40,9 +40,33 @@ export function presalesClauseBlocks(source) {
   }
   return blocks;
 }
-export function extractPresalesSource(input, sourceId) {
+// Only omit recognisable document furniture. Unrecognised prose, technical titles,
+// and repeated technical clauses stay available for human review with their locations.
+function documentTextReason(quote) {
+  const text = quote.trim();
+  if (/^(?:[A-Z][A-Z\s&.-]*\s+)?CONFIDENTIAL(?:\s+DOCUMENTS?)?[.!。]?$/i.test(text)) return '保密页眉';
+  if (/^(?:本文件|本文档|本资料|本技术文件).*(?:保密|未经.*许可).*(?:复制|传播|披露|使用)/.test(text)) return '保密声明';
+  if (/^(?:日期\s*[:：]?\s*)?(?:\d{4}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日|\d{4}\s*[./-]\s*\d{1,2}\s*[./-]\s*\d{1,2})[。.]?$/.test(text)) return '独立日期';
+  if (/^(?:第\s*\d+\s*页(?:\s*[\/／，,]\s*共\s*\d+\s*页)?|\d+\s*[\/／]\s*\d+|目\s*录)$/.test(text)) return '页码或目录标题';
+  if (/^(?:技术规格书|技术规范书|技术规范|技术要求|设备技术规格书)$/.test(text)) return '文档标题';
+  return '';
+}
+export function previewPresalesExtraction(source) {
+  const blocks = [], documentText = [];
+  for (const block of presalesClauseBlocks(source)) {
+    // A spreadsheet value may be a date or text required by its row heading.
+    const reason = source.type === 'xlsx' ? '' : documentTextReason(block.quote);
+    if (reason) documentText.push({ ...block, reason }); else blocks.push(block);
+  }
+  const scopeWarning = /\bUPS\b|不间断电源/i.test(`${source.name}\n${source.text}`)
+    ? '资料包含 UPS 内容。本页的配置方案仅支持配电柜、PDU、智能母线；UPS 条款请在“智能选型”中核对，勿直接作为配电设备参数。' : '';
+  return { blocks, documentText, scopeWarning };
+}
+export function extractPresalesSource(input, sourceId, { includeDocumentText = false } = {}) {
   const source = input.sources.find(s => s.id === sourceId); if (!source) throw new Error('来源不存在');
-  const blocks = presalesClauseBlocks(source); if (!blocks.length) throw new Error('没有可提取文字');
+  const preview = previewPresalesExtraction(source);
+  const blocks = includeDocumentText ? presalesClauseBlocks(source) : preview.blocks;
+  if (!blocks.length) throw new Error(preview.documentText.length ? '仅识别到文档标题、日期或保密文字；请核对原文，或勾选包含文档辅助文字后提取' : '没有可提取文字');
   if (blocks.length > 1500) throw new Error('条款过多，请按设备拆分资料后导入');
   let pack = retireStaleSourceRequirements(input, sourceId);
   for (const block of blocks) {
@@ -60,5 +84,5 @@ export function presalesEvidenceLocation(pack, evidence) {
   const position = segment.sheet ? `${segment.sheet}!${segment.cell}` : segment.page ? `PDF第${segment.page}页`
     : segment.table ? `解析表格${segment.table}` : segment.paragraph ? `解析段落${segment.paragraph}`
     : `第${source.text.slice(0, evidence.start).split('\n').length}行`;
-  return `${source.name} · ${position}`;
+  return `${source.name} · ${position}${segment.method === 'ocr' ? ' · OCR文字，须对照原图' : ''}`;
 }
