@@ -156,7 +156,7 @@ const SYSTEM = `你是技术规范书设备与参数提取助手。遵循 extrac
 所有风险只能根据当前文档的明确矛盾或疑点，不能根据未经核验的标准摘要臆断。完成所有片段内相关内容才返回 complete:true。
 任何无法完成的分析返回 complete:false，并给出 error。`;
 
-export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, chunkSize = 12000 } = {}) {
+export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, chunkSize = 6000 } = {}) {
   assert(typeof request === 'function', '缺少 AI 请求接口');
   const chunks = splitSpecSource(source, chunkSize, Math.min(600, Math.floor(chunkSize / 10)));
   const fingerprint = await specSourceFingerprint(source);
@@ -181,9 +181,18 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
     try { data = await request({ system: SYSTEM + '\n' + instructions, user, signal }); }
     catch (error) {
       cancelled(signal);
-      if (error.code !== 'TRUNCATED' || depth >= 4 || chunk.text.length < 1800) throw error;
+      if (error.code !== 'TRUNCATED') throw error;
+      if (depth >= 6 || chunk.text.length <= 600) {
+        const stopped = new Error(`${phase === 'discovery' ? '设备识别' : '参数整理'}的回答仍被截断，自动拆分已停止（当前片段${chunk.text.length}字，拆分${depth}层${error.completionTokens != null ? `，最后返回${error.completionTokens} token` : ''}）。未采用本次不完整结果；请减少单份资料内容或切换模型后重试`);
+        stopped.code = 'TRUNCATION_EXHAUSTED'; throw stopped;
+      }
+      onProgress({ phase, completed: coverage[phase].length, total: chunks.length, requests, devices: devices.length,
+        retry: 'truncated', chunkChars: chunk.text.length, splitDepth: depth + 1 });
       const middle = chunk.start + Math.floor(chunk.text.length / 2);
-      for (const child of [{ start: chunk.start, end: Math.min(chunk.end, middle + 200) }, { start: Math.max(chunk.start, middle - 200), end: chunk.end }]) {
+      const overlap = Math.min(200, Math.floor(chunk.text.length / 10));
+      const leftEnd = middle + overlap + (/[\uD800-\uDBFF]/.test(source.text[middle + overlap - 1]) ? 1 : 0);
+      const rightStart = middle - overlap - (/[\uDC00-\uDFFF]/.test(source.text[middle - overlap]) ? 1 : 0);
+      for (const child of [{ start: chunk.start, end: leftEnd }, { start: rightStart, end: chunk.end }]) {
         await run(phase, { ...child, text: source.text.slice(child.start, child.end) }, depth + 1);
       }
       return;

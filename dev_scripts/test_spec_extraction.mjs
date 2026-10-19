@@ -125,6 +125,17 @@ const longResult = await analyzeSpecSource(longSource, { chunkSize: 2000, reques
 await validateSpecAnalysis(longSource, longResult);
 assert.ok(longResult.requestCount > 4);
 assert.equal(longResult.products[0].params_detail.length, 2, '重叠片段不重复追加同一参数证据');
+const mediumSource = { ...source, text: text + '\n' + '非技术正文，无需新增参数。\n'.repeat(60) };
+let mediumTruncated = false; const events = [];
+const recovered = await analyzeSpecSource(mediumSource, { onProgress: event => events.push(event), request: async input => {
+  if (!mediumTruncated) { mediumTruncated = true; const error = new Error('length'); error.code='TRUNCATED'; throw error; }
+  return responseFor(input);
+} });
+await validateSpecAnalysis(mediumSource,recovered);
+assert(events.some(e=>e.retry==='truncated' && e.chunkChars<1800),'不足1800字的片段也能自动恢复');
+await assert.rejects(()=>analyzeSpecSource(source,{request:async()=>{
+  const error=new Error('模型回答达到长度限制'); error.code='TRUNCATED'; error.completionTokens=8192; throw error;
+}}),error=>error.code==='TRUNCATION_EXHAUSTED' && /拆分已停止/.test(error.message) && !/正在/.test(error.message));
 assert.notEqual(await specSourceFingerprint(source), await specSourceFingerprint({ ...source, segments: [{ start: 0, end: text.length, page: 9 }] }));
 
 const config = { baseUrl: 'https://example.invalid/v1', model: 'synthetic-model', apiKey: 'synthetic-only', anthropic: false };
@@ -134,6 +145,16 @@ const success = await requestSpecJson(config, { user: 'synthetic', system: 'synt
 });
 assert.equal(success.complete, true); assert.equal(sent.url, 'https://example.invalid/v1/chat/completions');
 assert.equal(JSON.parse(sent.init.body).max_tokens, 8192);
+assert.equal('thinking' in JSON.parse(sent.init.body),false,'兼容接口不能收到DeepSeek专用参数');
+await requestSpecJson({...config,baseUrl:'https://api.deepseek.com/v1',model:'deepseek-flash'}, {system:'只输出JSON',user:'合成验证'},async(url,init)=>{
+  const body=JSON.parse(init.body);
+  assert.equal(body.thinking.type,'disabled'); assert.equal(body.response_format.type,'json_object'); assert.equal(body.max_tokens,16384);
+  return {ok:true,json:async()=>({choices:[{finish_reason:'stop',message:{content:'{"ok":true}'}}]})};
+});
+await requestSpecJson({...config,model:'deepseek-flash'}, {},async(url,init)=>{
+  const body=JSON.parse(init.body); assert.equal(body.max_tokens,8192); assert.equal('thinking' in body,false,'同名模型的第三方接口不强加参数');
+  return {ok:true,json:async()=>({choices:[{finish_reason:'stop',message:{content:'{}'}}]})};
+});
 await assert.rejects(() => requestSpecJson(config, {}, async () => ({ ok: true, json: async () => ({ choices: [{ finish_reason: 'length', message: { content: '{}' } }] }) })), e => e.code === 'TRUNCATED');
 await assert.rejects(() => requestSpecJson(config, {}, async () => ({ ok: true, json: async () => ({ choices: [{ message: { content: '{}' } }] }) })), /未正常结束/);
 await assert.rejects(() => requestSpecJson(config, {}, async () => ({ ok: false, status: 401 })), /HTTP 401/);

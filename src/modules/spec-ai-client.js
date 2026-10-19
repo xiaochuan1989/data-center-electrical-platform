@@ -23,9 +23,15 @@ export async function requestSpecJson(config, { system, user, signal }, fetchImp
   let timedOut = false;
   const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, 180000);
   try {
+    // These options are supported by the current official DeepSeek models only.
+    // Other OpenAI-compatible providers retain their existing request contract.
+    const deepseek = new URL(config.baseUrl).hostname === 'api.deepseek.com'
+      && ['deepseek-flash', 'deepseek-v4-pro'].includes(config.model);
+    const outputLimit = deepseek ? 16384 : 8192;
     const body = config.anthropic
-      ? { model: config.model, max_tokens: 8192, system, messages: [{ role: 'user', content: user }] }
-      : { model: config.model, max_tokens: 8192, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] };
+      ? { model: config.model, max_tokens: outputLimit, system, messages: [{ role: 'user', content: user }] }
+      : { model: config.model, max_tokens: outputLimit, messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+        ...(deepseek ? { thinking: { type: 'disabled' }, response_format: { type: 'json_object' }, temperature: 0 } : {}) };
     const response = await fetchImpl(config.baseUrl + (config.anthropic ? '/messages' : '/chat/completions'), {
       method: 'POST', signal: controller.signal,
       headers: config.anthropic ? { 'x-api-key': config.apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' }
@@ -37,7 +43,10 @@ export async function requestSpecJson(config, { system, user, signal }, fetchImp
     try { data = await response.json(); } catch { throw new Error('AI 接口未返回有效 JSON 响应'); }
     const stop = config.anthropic ? data.stop_reason : data.choices?.[0]?.finish_reason;
     if (['max_tokens', 'length', 'model_context_window_exceeded'].includes(stop)) {
-      const error = new Error('模型输出被截断，正在尝试缩小分析片段'); error.code = 'TRUNCATED'; throw error;
+      const error = new Error('模型回答达到长度限制，未完整返回');
+      error.code = 'TRUNCATED'; error.finishReason = stop; error.outputLimit = outputLimit;
+      error.completionTokens = Number.isFinite(data.usage?.completion_tokens) ? data.usage.completion_tokens : null;
+      throw error;
     }
     if (!(config.anthropic ? ['end_turn', 'stop_sequence'] : ['stop']).includes(stop)) throw new Error('模型未正常结束回答，无法确认输出完整性；请更换兼容接口或重试');
     const content = config.anthropic ? data.content?.filter(b => b.type === 'text').map(b => b.text).join('\n') : data.choices?.[0]?.message?.content;

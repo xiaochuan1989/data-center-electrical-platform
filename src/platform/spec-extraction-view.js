@@ -79,7 +79,9 @@ export function mountSpecExtraction(root, api) {
       progress('正在检查原文并识别设备…');
       const result = await analyzeSpecSource(source, { signal: run.controller.signal,
         request: input => requestSpecJson(config, input),
-        onProgress: info => progress(`${info.phase === 'discovery' ? '识别设备' : '整理设备参数'}：已完成${info.completed}段；初始共${info.total}段，已识别${info.devices}项设备，已发出${info.requests}次请求。输出截断时会自动细分。`) });
+        onProgress: info => progress(info.retry === 'truncated'
+          ? `模型回答达到长度限制，正在缩小${info.chunkChars}字片段后重试（第${info.splitDepth}层）；已处理的片段保留在本次任务中…`
+          : `${info.phase === 'discovery' ? '识别设备' : '整理设备参数'}：已完成${info.completed}段（含自动拆分）；初始共${info.total}段，已识别${info.devices}项设备，已发出${info.requests}次请求。`) });
       if (run.controller.signal.aborted || JSON.stringify(api.source()) !== run.sourceJson) throw new Error('资料已变化或整理已取消，本次结果未应用');
       await validateSpecAnalysis(source, result);
       result.model = config.model; result.apiOrigin = new URL(config.baseUrl).origin;

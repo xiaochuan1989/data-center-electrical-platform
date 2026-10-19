@@ -1,5 +1,7 @@
 # UPS与配电选型助手
 
+2026-10-19：v2.13.1 修复DeepSeek官方模型输出长度配置与截断重试提示，详见[修复记录](docs/release-2.13.1.md)。
+
 2026-10-19：v2.13.0 规范书AI设备/参数整理与浏览器本机扫描PDF OCR，保留页码及OCR来源，支持进度、取消和逐页失败阻断；详见[发布记录](docs/release-2.13.0.md)。
 
 2026-10-11：v2.12.3 铜排规格反算新增指南分面自然对流、壁面辐射参数和指南表面预设，保留旧模型与文章独立复现。详见[指南模型](docs/busbar-guide-model.md)及[发布记录](docs/release-2.12.3.md)。
@@ -12,7 +14,7 @@
 
 2026-10-04：[真实工作稿业务试用准备](docs/nonstandard-business-trial.md)已完成。四份PDU/母线讨论稿的证据、区域数量、恢复与同源导出通过软件预检；私有试用副本和反馈模板已准备，等待本人复核，不代确认；本轮冻结发布安排见下方。
 
-**版本**：v2.13.0 · **线上地址**：https://xiaochuan1989.github.io/data-center-electrical-platform/
+**版本**：v2.13.1 · **线上地址**：https://xiaochuan1989.github.io/data-center-electrical-platform/
 
 ## v2.12.0 非标售前试用版（功能冻结）
 
