@@ -1,15 +1,17 @@
-import { analyzeSpecSource, validateSpecAnalysis } from '../modules/spec-extraction.js';
+import { analyzeSpecSource, validateSpecAnalysis, validateSpecDraft } from '../modules/spec-extraction.js';
 import { readSpecAiConfig, specAiDestination, requestSpecJson } from '../modules/spec-ai-client.js';
 import { writePresalesXlsx } from '../modules/presales-xlsx.js';
 
 const CACHE_KEY = 'spec_ai_extractions_v1';
+const DRAFT_CACHE_KEY = 'spec_ai_partial_extractions_v1';
+const validateWork = (source, result) => result.complete === false ? validateSpecDraft(source, result) : validateSpecAnalysis(source, result);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const labels = { VERIFIED: '原文可核验', REFERENCED_EXTERNAL: '引用图纸/附件', NOT_STATED: '文档未提及' };
 const evidenceLabel = detail => detail.evidence?.ocrPages?.length ? 'OCR文字待对照原图' : labels[detail.evidence_status];
 const findingLabels = {OWNERSHIP:'设备归属',VALUE:'参数值',CONDITION:'适用条件',OMISSION:'可能漏项',DEVICE:'设备识别',OCR_UNCERTAINTY:'OCR歧义',CONFLICT:'原文冲突'};
 export function semanticReviewMarkup(result) {
   const review=result.semanticReview;
-  if (!review) return '<p class="ns-ai-note">旧版提取工作稿：尚未执行语义复核；历史参数保留，可重新整理。</p>';
+  if (!review) return `<p class="ns-ai-note">${result.complete === false ? '本次语义复核尚未完成；下列参数仅通过文字证据校验。' : '旧版提取工作稿：尚未执行语义复核；历史参数保留，可重新整理。'}</p>`;
   return `<section class="ns-ai-review"><h3>语义复核 · 待人工确认</h3><p>同一模型另发请求复核了${review.checkedParameterIds.length}项参数及原文片段；${review.findings.length ? `报告${review.findings.length}项疑点` : '未报告疑点，仍可能有遗漏或误判'}。</p>
     ${review.requiresImageCheck ? '<p class="ns-ai-note">含OCR文字：模型不能证明原图的数值、单位或★/±符号正确，必须对照原图。</p>' : ''}
     ${review.findings.length ? `<details><summary>查看${review.findings.length}项待核对疑点</summary><ul>${review.findings.map(f=>`<li><strong>${esc(findingLabels[f.kind])} · ${f.severity==='ERROR'?'需优先核对':'待核对'}</strong><p>${esc(f.message)}</p><small>${esc(f.evidence.location)}${f.parameter_id?` · 参数标识 ${esc(f.parameter_id)}`:''}</small><blockquote>${esc(f.original_text)}</blockquote></li>`).join('')}</ul></details>` : ''}</section>`;
@@ -40,30 +42,46 @@ function rowsFor(result) {
 }
 export function specExportSheets(result) {
   const review=result.semanticReview;
-  return [{name:'设备参数',rows:[['AI提取工作稿：待人工复核，不代表整份规范无遗漏或工程合规'],
+  const sheets = [{name:'设备参数',rows:[[result.complete === false ? '未完成工作稿：存在待核对项或分析中断；仅下列参数通过文字证据校验，不能作为完整清单采用' : 'AI提取工作稿：待人工复核，不代表整份规范无遗漏或工程合规'],
     ['设备类型','设备名称','适用范围','参数','规范要求','适用条件','条件原文位置','证据状态','多个值提示','禁止偏离','AI疑点等级','原文','原文位置','不可偏离定义原文','复核状态'],...rowsFor(result)]},
-    {name:'语义复核',rows:[[review?'同一模型单独请求的复核意见；全部待人工确认':'旧版工作稿：未执行语义复核'],
+    {name:'语义复核',rows:[[review?'同一模型单独请求的复核意见；全部待人工确认':result.complete === false?'本次语义复核尚未完成':'旧版工作稿：未执行语义复核'],
       [review?`覆盖${review.checkedParameterIds.length}项参数，报告${review.findings.length}项疑点；未报告疑点不代表无遗漏`:'请重新整理以执行语义复核'],
       ['疑点类型','优先级','参数标识','问题说明','原文','原文位置','复核状态'],
       ...(review?.findings||[]).map(f=>[findingLabels[f.kind],f.severity,f.parameter_id||'',f.message,f.original_text,f.evidence.location,'待人工确认'])]}];
+  if (result.complete === false) sheets.push({name:'未通过校验项',rows:[['模型候选项：未通过证据校验，不可作为已确认参数采用'],
+    ['分析状态',result.processingState,'中断说明',result.pipelineError],
+    ['设备','参数','模型候选值（未核验）','模型候选条件（未核验）','失败原因','模型引用文字（未核验）','模型条件引用（未核验）','分析片段起点','分析片段终点'],
+    ...result.rejectedParameters.map(r=>[result.products.find(p=>p.device_id===r.device_id)?.device_name||r.device_id,r.candidate.name,r.candidate.value,r.candidate.condition,r.reason,r.candidate.original_text,r.candidate.condition_original_text,r.chunk.start,r.chunk.end])]});
+  return sheets;
+}
+function partialMarkup(result) {
+  if (result.complete !== false) return '';
+  return `<section class="ns-ai-note"><h3>未完成工作稿 · ${result.rejectedParameters.length}项参数待核对</h3><p>已通过文字证据校验的参数保留在下方；待核对项单独列出，未计入已核验参数。此稿不能作为整份规范的完整清单采用。</p>
+    <p>${esc({running:'分析仍在进行，结果会逐批更新。',stopped:'本次分析已停止，已完成的批次仍可查看和下载。',needs_review:'文字提取已结束，仍有未通过校验的内容。'}[result.processingState])}</p>
+    ${result.pipelineError?`<p>停止或未完成原因：${esc(result.pipelineError)}</p>`:''}
+    ${result.rejectedParameters.length?`<details open><summary>查看未通过校验项及原因（${result.rejectedParameters.length}项）</summary><ul>${result.rejectedParameters.map(r=>`<li><strong>${esc(result.products.find(p=>p.device_id===r.device_id)?.device_name)} · ${esc(r.candidate.name||'未命名参数')}</strong><p>模型候选值（未核验）：${esc(r.candidate.value)}${r.candidate.condition?`；模型候选条件（未核验）：${esc(r.candidate.condition)}`:''}</p><p>失败原因：${esc(r.reason)}</p><details><summary>模型引用文字（未核验）· 分析片段字符 ${r.chunk.start+1}—${r.chunk.end}</summary><blockquote>${esc(r.candidate.original_text)}</blockquote>${r.candidate.condition_original_text?`<p>模型条件引用（未核验）：</p><blockquote>${esc(r.candidate.condition_original_text)}</blockquote>`:''}</details></li>`).join('')}</ul></details>`:''}</section>`;
 }
 export function specResultMarkup(result) {
   const count = result.products.reduce((n, p) => n + p.params_detail.filter(d => d.evidence_status === 'VERIFIED').length, 0);
-  return `<div class="ns-ai-overview"><b>${result.products.length}项设备 · ${count}项有原文依据的参数</b><span>全部文字分段已处理 · 待人工复核</span></div>
+  return `<div class="ns-ai-overview"><b>${result.products.length}项设备 · ${count}项有原文依据的参数</b><span>${result.complete === false ? '未完成工作稿 · 不代表整份规范已整理完成' : '全部文字分段已处理 · 待人工复核'}</span></div>
+    ${partialMarkup(result)}
     <p class="ns-muted">按设备查看参数；“原文可核验”只表示证据匹配，不代表工程要求已确认或整份规范无遗漏。提取范围包括29类设备，现有配置方案仍只支持配电柜、PDU、智能母线。</p>
     ${result.model ? `<p class="ns-muted">本次结果接口：${esc(result.apiOrigin)} · ${esc(result.model)} · 生成时间：${esc(result.createdAt)}</p>` : ''}
     ${semanticReviewMarkup(result)}
+    <p class="ns-muted">下方“人工条款复核与方案配置”的数量仅统计人工方案；本次 AI 清单显示在这里。</p>
     ${result.products.map((p, index) => `<details class="ns-ai-device"${index === 0 ? ' open' : ''}><summary><strong>${esc(p.device_name)}</strong><span>${esc(p.device_type)}${p.scope ? ` · ${esc(p.scope)}` : ''} · ${p.params_detail.length}项</span></summary>
+      ${!p.params_detail.length?'<p class="ns-ai-note">设备名称有原文依据，尚无通过校验的参数；请检查待核对项或未完成批次。</p>':''}
       <div class="ns-table-wrap"><table><thead><tr><th>参数</th><th>规范要求</th><th>证据状态</th><th>原文依据</th></tr></thead><tbody>${p.params_detail.map(d => `<tr><td>${esc(d.name)}${d.condition ? `<p class="ns-ai-note">适用条件：${esc(d.condition)}</p>` : ''}${d.forbiddenDeviation === true ? '<p class="ns-ai-note">★ 不可偏离</p>' : ''}</td><td>${esc(d.value)}${d.multipleValues ? '<p class="ns-ai-note">多个值，需核对适用条件</p>' : ''}</td><td>${evidenceLabel(d)}${d.risk !== 'LOW' ? `<p class="ns-ai-note">AI疑点：${esc(d.risk)} · 待复核</p>` : ''}</td><td>${d.evidence ? `<details><summary>${esc(d.evidence.location)}</summary><blockquote>${esc(d.original_text)}</blockquote>${d.evidence.pageFurnitureOmittedInValue ? '<p class="ns-ai-note">参数值省略重复页眉页脚；此处保留跨页完整原文。</p>' : ''}${d.deviationRuleEvidence ? `<p>不可偏离定义：${esc(d.deviationRuleEvidence.quote)}</p>` : ''}<small>原文字符 ${d.evidence.start + 1}—${d.evidence.end}</small></details>` : '该检查项在文档中未明确提及'}</td></tr>`).join('')}</tbody></table></div></details>`).join('')}`;
 }
 export function mountSpecExtraction(root, api) {
   const get = id => root.querySelector(`#${id}`);
   const results = new Map();
+  const drafts = new Map();
   let active = null, renderVersion = 0, shownSource = '';
   const progress = (text, error = false) => { get('ns-ai-progress').textContent = text; get('ns-ai-progress').className = error ? 'ns-error' : 'ns-muted'; };
   function persist() {
     if (!api.autosave()) return true;
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify([...results])); return true; }
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify([...results])); localStorage.setItem(DRAFT_CACHE_KEY, JSON.stringify([...drafts])); return true; }
     catch { progress('AI 结果本机缓存失败，当前结果仍保留；请下载JSON工作稿。', true); return false; }
   }
   async function render() {
@@ -82,14 +100,27 @@ export function mountSpecExtraction(root, api) {
     get('ns-ai-cancel').disabled = !active;
     get('ns-ai-exports').hidden = true;
     get('ns-ai-results').innerHTML = '';
-    const result = source && results.get(source.id);
+    let result = source && (drafts.get(source.id) || results.get(source.id));
     if (!result) return;
     try {
-      await validateSpecAnalysis(source, result);
+      try { await validateWork(source, result); }
+      catch (error) {
+        const previous = source && results.get(source.id);
+        if (result.complete !== false || !previous) throw error;
+        await validateSpecAnalysis(source, previous); result = previous;
+      }
       if (version !== renderVersion) return;
       get('ns-ai-results').innerHTML = specResultMarkup(result);
+      const previous = results.get(source.id);
+      if (result.complete === false && previous) {
+        try {
+          await validateSpecAnalysis(source, previous);
+          if (version !== renderVersion) return;
+          get('ns-ai-results').innerHTML += `<details><summary>查看上次完整工作稿（本次未覆盖）</summary>${specResultMarkup(previous)}</details>`;
+        } catch { /* An old source revision must not be shown. */ }
+      }
       get('ns-ai-exports').hidden = false;
-      if (sourceChanged && !active) progress('已载入当前资料上次完成的 AI 提取结果；原文证据校验通过，仍待人工复核。');
+      if (sourceChanged && !active) progress(result.complete === false ? '已载入未完成工作稿，可查看并下载已保留内容；仍需处理待核对项或重新整理。' : '已载入当前资料上次完成的 AI 提取结果；原文证据校验通过，仍待人工复核。');
     } catch {
       if (version === renderVersion) progress('原文或提取工作稿已变化，旧 AI 结果未显示；请重新整理。', true);
     }
@@ -103,22 +134,36 @@ export function mountSpecExtraction(root, api) {
       const run = { controller: new AbortController(), sourceJson: JSON.stringify(source) };
       active = run; await render();
       progress('正在检查原文并识别设备…');
-      const result = await analyzeSpecSource(source, { signal: run.controller.signal,
+      const result = await analyzeSpecSource(source, { signal: run.controller.signal, allowPartial: true,
         request: input => requestSpecJson(config, input),
+        onDraft: async draft => {
+          if (JSON.stringify(api.source()) !== run.sourceJson) return;
+          await validateSpecDraft(source, draft);
+          draft.model = config.model; draft.apiOrigin = new URL(config.baseUrl).origin;
+          drafts.set(source.id, draft); persist(); await render();
+        },
         onProgress: info => progress(specProgressMessage(info)) });
       if (run.controller.signal.aborted || JSON.stringify(api.source()) !== run.sourceJson) throw new Error('资料已变化或整理已取消，本次结果未应用');
-      await validateSpecAnalysis(source, result);
+      await validateWork(source, result);
       result.model = config.model; result.apiOrigin = new URL(config.baseUrl).origin;
-      results.set(source.id, result); const saved = persist();
-      progress(`提取及模型语义复核完成：${result.products.length}项设备，${result.semanticReview.findings.length}项模型疑点待人工确认。未自动覆盖原有方案。${saved ? '' : '本机缓存失败，请下载JSON工作稿。'}`, !saved);
-    } catch (error) { progress(`${error.message}。已有结果和方案保留。`, true); }
+      if (result.complete === false) drafts.set(source.id, result);
+      else { results.set(source.id, result); drafts.delete(source.id); }
+      const saved = persist();
+      progress(result.complete === false ? `本次保留${result.products.length}项设备、${result.products.reduce((n,p)=>n+p.params_detail.filter(d=>d.evidence_status==='VERIFIED').length,0)}项有原文依据的参数；另有${result.rejectedParameters.length}项未通过校验，请查看下方未完成工作稿。${saved?'':'本机缓存失败，请下载JSON工作稿。'}` : `提取及模型语义复核完成：${result.products.length}项设备，${result.semanticReview.findings.length}项模型疑点待人工确认。未自动覆盖原有方案。${saved ? '' : '本机缓存失败，请下载JSON工作稿。'}`, result.complete === false || !saved);
+    } catch (error) { progress(`${error.message}。已完成批次请查看下方未完成工作稿；上次完整工作稿和人工方案保留。`, true); }
     finally { active = null; await render(); }
   });
   get('ns-ai-cancel').addEventListener('click', () => { active?.controller.abort(); progress('正在取消本次整理…'); });
   async function current() {
-    const source = api.source(), result = source && results.get(source.id);
+    const source = api.source();
+    let result = source && (drafts.get(source.id) || results.get(source.id));
     if (!result) throw new Error('请先完成 AI 整理');
-    await validateSpecAnalysis(source, result);
+    try { await validateWork(source, result); }
+    catch (error) {
+      const previous = source && results.get(source.id);
+      if (result.complete !== false || !previous) throw error;
+      await validateSpecAnalysis(source, previous); result = previous;
+    }
     return { source, result };
   }
   const output = fn => async () => { try { await fn(await current()); } catch (error) { progress(error.message, true); } };
@@ -129,6 +174,10 @@ export function mountSpecExtraction(root, api) {
     const stored = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
     if (Array.isArray(stored)) for (const pair of stored) if (Array.isArray(pair) && pair.length === 2 && typeof pair[0] === 'string') results.set(pair[0], pair[1]);
   } catch { progress('AI 提取缓存无法读取，未删除旧数据；可重新整理。', true); }
+  try {
+    const stored = JSON.parse(localStorage.getItem(DRAFT_CACHE_KEY) || '[]');
+    if (Array.isArray(stored)) for (const pair of stored) if (Array.isArray(pair) && pair.length === 2 && typeof pair[0] === 'string') drafts.set(pair[0], pair[1]);
+  } catch { progress('未完成工作稿缓存无法读取，请检查已下载的JSON工作稿。', true); }
   // Changes to model settings are reflected before any request; this listener only refreshes the label.
   globalThis.addEventListener('focus', () => { get('ns-ai-destination').textContent = `分析接口：${specAiDestination()}`; });
   const updateDestination = event => {

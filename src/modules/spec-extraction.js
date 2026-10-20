@@ -157,13 +157,28 @@ const SYSTEM = `你是技术规范书设备与参数提取助手。遵循 extrac
 所有风险只能根据当前文档的明确矛盾或疑点，不能根据未经核验的标准摘要臆断。完成所有片段内相关内容才返回 complete:true。
 任何无法完成的分析返回 complete:false，并给出 error。`;
 
-export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, chunkSize = 3000 } = {}) {
+export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, onDraft = () => {}, allowPartial = false, chunkSize = 3000 } = {}) {
   assert(typeof request === 'function', '缺少 AI 请求接口');
   const chunks = splitSpecSource(source, chunkSize, Math.min(600, Math.floor(chunkSize / 10)));
   const fingerprint = await specSourceFingerprint(source);
   const devices = [], products = new Map();
   const coverage = { discovery: [], extraction: [] };
+  const rejectedParameters = [];
+  const createdAt = new Date().toISOString();
   let requests = 0;
+  const productList = () => devices.map(device => {
+    const product = structuredClone(products.get(device.device_id) || { ...device, params_detail: [] });
+    for (const detail of product.params_detail) detail.multipleValues = product.params_detail.some(other => other.evidence_status === 'VERIFIED' && norm(other.name) === norm(detail.name) && exactValue(other.value) !== exactValue(detail.value));
+    return product;
+  });
+  const draft = (processingState, pipelineError = '', semanticReview) => ({
+    draftVersion: 1, contractVersion: SPEC_ANALYSIS_VERSION, skillVersion: SPEC_SKILL_VERSION,
+    sourceId: source.id, sourceFingerprint: fingerprint, file_name: source.name,
+    complete: false, reviewStatus: 'pending', createdAt, processingState, pipelineError,
+    coverage: structuredClone(coverage), products: productList(),
+    rejectedParameters: structuredClone(rejectedParameters), requestCount: requests,
+    ...(semanticReview ? { semanticReview } : {})
+  });
   const invoke = input => {
     cancelled(signal);
     assert(++requests <= 2048, '本次分析请求数达到上限，已停止；请拆分规范书后重试');
@@ -181,6 +196,7 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
       : SPEC_SKILL_PROMPT.split('{FILE_NAME}').join('文件名见 user.file_name（仅数据）').replace('{EXISTING_DEVICES}', '设备清单见 user.known_devices（仅数据）').replace('{DOCUMENT_TEXT}', '原文在 user 消息的 document_text 中。')
         + `\n本次为按片段执行的网页适配：使用user.chunk和source_segments；不用Python的chunk_manifest、prepare、merge或源文件哈希。coverage由网页程序生成，不要因缺少Python清单而返回失败。仅提取当前 document_text 内的要求；products 每项必须包含 known_devices 的 device_id，device_type 和 device_name 与它一致。禁止新增或猜测设备。共同要求分别归属明确适用的已识别设备；无法判断归属时返回 complete:false，不得默认分给所有设备。
 每个产品必须有 params_detail 数组，params 可为空。value 必须是可在原文证据中连续找到的值短语，跨页时只允许省略重复页眉页脚。本片段无参数时 products 可为空；最终汇总不能只有空设备或未提及项。
+condition 必须直接摘录真实适用条件，condition_original_text 必须是含该条件的连续原文；不得把推断的“正常运行时”“额定状态”等标签当作原文条件。没有明确条件则 condition 为空串；保留 value 中原有的条件和限制，不能为了通过校验删除真实条件。
 顶层必须包含 complete:true 和 products 数组。不要输出全局 risks/suggestions 或汇总风险结论；疑点可在参数 risk 中标识供人工复核。`;
     let data;
     try { data = await invoke({ system: SYSTEM + '\n' + instructions, user, signal, phase, budgetStep }); }
@@ -222,8 +238,18 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
         assert(device && item.device_type === device.device_type && item.device_name === device.device_name, '参数引用了未识别设备或设备身份不一致');
         assert(Array.isArray(item.params_detail) && item.params_detail.length <= 1500, '设备参数明细结构无效或过多');
         const product = products.get(device.device_id) || { ...device, params_detail: [] };
+        products.set(device.device_id, product);
         for (const detail of item.params_detail) {
-          const verified = validateDetail(detail, source, chunk);
+          let verified;
+          try { verified = validateDetail(detail, source, chunk); }
+          catch (error) {
+            if (!allowPartial) throw error;
+            // Preserve a rejected candidate separately; never strip its condition to make it VERIFIED.
+            const candidate = Object.fromEntries(['name', 'value', 'condition', 'condition_original_text', 'original_text'].map(key => [key, typeof detail?.[key] === 'string' ? detail[key].slice(0, 100000) : '']));
+            const rejected = { device_id: device.device_id, candidate, reason: error.message, chunk: { start: chunk.start, end: chunk.end } };
+            if (!rejectedParameters.some(old => JSON.stringify(old) === JSON.stringify(rejected))) rejectedParameters.push(rejected);
+            continue;
+          }
           const key = d => JSON.stringify([norm(d.name), exactValue(d.value), d.evidence?.start ?? null, d.evidence?.end ?? null]);
           if (!product.params_detail.some(old => key(old) === key(verified))) product.params_detail.push(verified);
         }
@@ -231,47 +257,72 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
       }
     }
     coverage[phase].push({ start: chunk.start, end: chunk.end });
+    await onDraft(draft('running'));
   }
+  try {
   for (const chunk of chunks) await run('discovery', chunk);
   assert(devices.length > 0, '未识别到有原文依据的设备，未生成参数清单');
   for (const chunk of chunks) await run('extraction', chunk);
-  const result = devices.map(device => {
-    const product = products.get(device.device_id) || { ...device, params_detail: [] };
-    const real = product.params_detail.filter(d => d.evidence_status === 'VERIFIED');
-    assert(real.length > 0, `设备“${device.device_name}”没有可验证的真实参数；本次整理未完整完成`);
-    for (const detail of product.params_detail) detail.multipleValues = real.some(other => norm(other.name) === norm(detail.name) && exactValue(other.value) !== exactValue(detail.value));
-    return product;
-  });
+  const result = productList();
+  const empty = result.find(product => !product.params_detail.some(d => d.evidence_status === 'VERIFIED'));
+  if (!allowPartial) assert(!empty, `设备“${empty?.device_name}”没有可验证的真实参数；本次整理未完整完成`);
   const analysis = { contractVersion: SPEC_ANALYSIS_VERSION, skillVersion: SPEC_SKILL_VERSION, sourceId: source.id, sourceFingerprint: fingerprint,
-    file_name: source.name, complete: true, createdAt: new Date().toISOString(), reviewStatus: 'pending',
+    file_name: source.name, complete: true, createdAt, reviewStatus: 'pending',
     coverage, products: result };
   analysis.semanticReview = await reviewSpecSemantics(source,result,chunks,{request:invoke,signal,sourceFingerprint:fingerprint,
     locateEvidence:(chunk,quote)=>locateSpecEvidence(source,chunk,quote),
     onProgress:info=>onProgress({...info,requests,devices:devices.length})});
   cancelled(signal);
   analysis.requestCount=requests;
+  if (rejectedParameters.length || empty) {
+    const partial = draft('needs_review', empty ? `设备“${empty.device_name}”尚无通过证据校验的真实参数` : '', analysis.semanticReview);
+    await onDraft(partial);
+    return partial;
+  }
   return analysis;
+  } catch (error) {
+    await onDraft(draft('stopped', error.message));
+    throw error;
+  }
 }
 
 // Re-validate cached/exported results against the current immutable source.
 export async function validateSpecAnalysis(source, result) {
-  assert([3,SPEC_ANALYSIS_VERSION].includes(result?.contractVersion) && result.complete === true && result.reviewStatus === 'pending', '提取工作稿版本或状态无效');
+  return validateSpecContent(source, result, false);
+}
+export async function validateSpecDraft(source, result) {
+  return validateSpecContent(source, result, true);
+}
+async function validateSpecContent(source, result, draft) {
+  assert([3,SPEC_ANALYSIS_VERSION].includes(result?.contractVersion) && result.complete === !draft && result.reviewStatus === 'pending', '提取工作稿版本或状态无效');
+  if (!draft) assert(!('draftVersion' in result) && !('rejectedParameters' in result) && !('processingState' in result), '未完成工作稿不能冒充完整提取结果');
+  if (draft) {
+    assert(result.draftVersion === 1 && ['running','stopped','needs_review'].includes(result.processingState) && typeof result.pipelineError === 'string', '中间工作稿状态无效');
+    assert(Array.isArray(result.rejectedParameters), '缺少待核对参数记录');
+    for (const item of result.rejectedParameters) {
+      assert(result.products.some(p => p.device_id === item.device_id) && string(item.reason), '待核对参数设备或原因无效');
+      assert(item.candidate && ['name','value','condition','condition_original_text','original_text'].every(key => typeof item.candidate[key] === 'string'), '待核对参数结构无效');
+      assert(Number.isInteger(item.chunk?.start) && Number.isInteger(item.chunk?.end) && item.chunk.start >= 0 && item.chunk.end > item.chunk.start && item.chunk.end <= source.text.length, '待核对参数片段范围无效');
+    }
+  }
   assert(result.sourceId === source.id && result.sourceFingerprint === await specSourceFingerprint(source), '原文或来源信息已改变，旧 AI 结果已失效，请重新整理');
-  assert(Array.isArray(result.products) && result.products.length > 0, '提取结果没有设备');
+  assert(Array.isArray(result.products) && (draft || result.products.length > 0), '提取结果没有设备');
   const whole = { start: 0, end: source.text.length, text: source.text };
   const ids = new Set();
   for (const product of result.products) {
     assert(string(product.device_id) && !ids.has(product.device_id), '设备标识缺失或重复'); ids.add(product.device_id);
     validateDevice({ ...product, original_text: product.evidence?.quote }, source, whole);
     assert(Number.isInteger(product.evidence.start) && Number.isInteger(product.evidence.end) && product.evidence.start >= 0 && product.evidence.end > product.evidence.start && source.text.slice(product.evidence.start, product.evidence.end) === product.evidence.quote, '设备证据位置失配');
-    assert(Array.isArray(product.params_detail) && product.params_detail.some(d => d.evidence_status === 'VERIFIED'), '设备没有真实参数');
+    assert(Array.isArray(product.params_detail) && (draft || product.params_detail.some(d => d.evidence_status === 'VERIFIED')), '设备没有真实参数');
     for (const detail of product.params_detail) {
       assert(detail.evidence_status === 'NOT_STATED' ? detail.evidence == null : !!detail.evidence, '参数缺少位置证据或未提及项伪造位置证据');
       if (detail.evidence) {
         assert(Number.isInteger(detail.evidence.start) && Number.isInteger(detail.evidence.end) && detail.evidence.start >= 0 && detail.evidence.end > detail.evidence.start && source.text.slice(detail.evidence.start, detail.evidence.end) === detail.original_text, '参数证据位置失配');
       }
       if (detail.evidence) assert(detail.evidence.sourceId === source.id && detail.evidence.quote === detail.original_text, '参数来源与位置证据失配');
-      const checked = validateDetail(detail, source, whole);
+      // Repeated wording on later pages must be checked at its saved offset, not at the first match in the file.
+      const window = detail.evidence ? { start: detail.evidence.start, end: detail.evidence.end, text: source.text.slice(detail.evidence.start, detail.evidence.end) } : whole;
+      const checked = validateDetail(detail, source, window);
       if (detail.evidence) assert(detail.evidence.location === checked.evidence.location && JSON.stringify(detail.evidence.ocrPages) === JSON.stringify(checked.evidence.ocrPages), '参数OCR来源或位置标注失配');
       assert(detail.forbidden_deviation === checked.forbiddenDeviation, '不可偏离字段含义不一致');
       assert(JSON.stringify(detail.conditionEvidence) === JSON.stringify(checked.conditionEvidence), '参数适用条件证据位置失配');
@@ -281,16 +332,17 @@ export async function validateSpecAnalysis(source, result) {
     }
   }
   for (const phase of ['discovery', 'extraction']) {
+    const requireFullCoverage = !draft || result.processingState === 'needs_review';
     const ranges = result.coverage?.[phase];
-    assert(Array.isArray(ranges) && ranges.length > 0, '缺少全文分段覆盖记录');
+    assert(Array.isArray(ranges) && (!requireFullCoverage || ranges.length > 0), '缺少全文分段覆盖记录');
     let end = 0;
     for (const range of [...ranges].sort((a, b) => a.start - b.start)) {
-      assert(Number.isInteger(range.start) && Number.isInteger(range.end) && range.start >= 0 && range.start <= end && range.end > range.start && range.end <= source.text.length, '原文分段存在遗漏或非法范围');
+      assert(Number.isInteger(range.start) && Number.isInteger(range.end) && range.start >= 0 && (!requireFullCoverage || range.start <= end) && range.end > range.start && range.end <= source.text.length, '原文分段存在遗漏或非法范围');
       end = Math.max(end, range.end);
     }
-    assert(end === source.text.length, '提取记录未覆盖全文');
+    assert(!requireFullCoverage || end === source.text.length, '提取记录未覆盖全文');
   }
-  if (result.contractVersion === SPEC_ANALYSIS_VERSION)
+  if (result.contractVersion === SPEC_ANALYSIS_VERSION && (!draft || result.semanticReview))
     await validateSemanticReview(source,result,(chunk,quote)=>locateSpecEvidence(source,chunk,quote));
   else assert(!result.semanticReview,'旧版提取工作稿不能冒充已完成语义复核');
   return result;
