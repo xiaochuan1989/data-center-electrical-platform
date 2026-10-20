@@ -33,6 +33,7 @@ assert.equal(restored.sources[0].segments[1].ocrEngine,'tesseract.js-7.0.0');
 const source=restored.sources[0];
 const extracted=await analyzeSpecSource(source,{request:async input=>{
   const request=JSON.parse(input.user);
+  if(request.task==='review')return {complete:true,source_checked:true,checked_parameter_ids:request.review_parameters.map(p=>p.parameter_id),issues:[]};
   if(request.task==='discovery') return {complete:true,devices:[{device_type:'UPS主机',device_name:'UPS-B',scope:'',original_text:'UPS-B'}]};
   return {complete:true,products:[{...request.known_devices[0],params_detail:[{name:'额定功率',value:'200kVA',original_text:'UPS-B额定功率200kVA',risk:'LOW',evidence_status:'VERIFIED',source_status:'DOCUMENT'}]}]};
 }});

@@ -1,5 +1,7 @@
 # 技术规范书自动整理：extract-spec 接入设计
 
+2026-10-20 v2.14.0更新：DeepSeek官方模型恢复思考，按3000字符分批提取后另发请求做语义复核；思考预算、复核批次、证据/覆盖/失效检查及验收边界见[发布记录](release-2.14.0.md)。v2.13.1的关闭思考处理已被替代。旧提取稿明确标记未复核，新稿要求复核记录完整；模型复核意见不作为人工确认。
+
 日期：2026-10-19。状态：用户已选择网页调用现有 AI 接口并授权补齐OCR后线上发布；v2.13.0发布范围和实际验证见[发布记录](release-2.13.0.md)。以下先前“未发布/未接OCR”描述保留历史时点，当前能力以本节新增说明为准；真实AI提供商业务准确率未验收。
 
 当前网页扫描PDF在浏览器本机使用同源Tesseract.js/WASM与固定语言模型逐页识别，支持中文及中英混排/纯英文选择、自动检测、全部页OCR、进度与取消。模型采用完整4.0.0数据以改善识别，首次按需下载中文约20MB/英文约11MB；逐页记录native/ocr/blank和OCR置信度，导出保留OCR来源。图片不发送到AI接口；文字仅在用户点击AI整理时发送。配置依据见[Tesseract.js本机资源部署](https://github.com/naptha/tesseract.js/blob/master/docs/local-installation.md)和[7.0.0 API](https://github.com/naptha/tesseract.js/blob/v7.0.0/docs/api.md)。

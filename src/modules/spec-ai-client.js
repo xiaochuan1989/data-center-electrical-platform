@@ -12,26 +12,32 @@ export function readSpecAiConfig(doc = document, resolveBase = globalThis.getBas
 export function specAiDestination(doc = document, resolveBase = globalThis.getBaseUrl) {
   try {
     const config = readSpecAiConfig(doc, resolveBase);
-    return `${new URL(config.baseUrl).host} · ${config.model}`;
+    return `${new URL(config.baseUrl).host} · ${config.model} · ${specThinkingPolicy(config).deepseek ? '思考提取＋加强复核' : '单独语义复核（思考能力由模型决定）'}`;
   } catch { return '尚未完整配置；请先打开页面“设置”'; }
 }
-export async function requestSpecJson(config, { system, user, signal }, fetchImpl = fetch) {
+export function specThinkingPolicy(config, phase = 'extraction', budgetStep = 0) {
+  const deepseek = !config.anthropic && new URL(config.baseUrl).hostname === 'api.deepseek.com'
+    && ['deepseek-flash', 'deepseek-v4-pro'].includes(config.model);
+  const review = phase === 'review';
+  return { deepseek, effort: review ? 'high' : 'low',
+    outputLimit: deepseek ? (review ? 65536 : 32768) * (budgetStep === 1 ? 2 : 1) : 8192 };
+}
+export async function requestSpecJson(config, { system, user, signal, phase = 'extraction', budgetStep = 0 }, fetchImpl = fetch) {
   const controller = new AbortController();
   const abort = () => controller.abort();
   if (signal?.aborted) abort();
   signal?.addEventListener('abort', abort, { once: true });
   let timedOut = false;
-  const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, 180000);
+  const policy = specThinkingPolicy(config, phase, budgetStep);
+  const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, policy.deepseek ? 300000 : 180000);
   try {
     // These options are supported by the current official DeepSeek models only.
     // Other OpenAI-compatible providers retain their existing request contract.
-    const deepseek = new URL(config.baseUrl).hostname === 'api.deepseek.com'
-      && ['deepseek-flash', 'deepseek-v4-pro'].includes(config.model);
-    const outputLimit = deepseek ? 16384 : 8192;
+    const { deepseek, outputLimit } = policy;
     const body = config.anthropic
       ? { model: config.model, max_tokens: outputLimit, system, messages: [{ role: 'user', content: user }] }
       : { model: config.model, max_tokens: outputLimit, messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-        ...(deepseek ? { thinking: { type: 'disabled' }, response_format: { type: 'json_object' }, temperature: 0 } : {}) };
+        ...(deepseek ? { thinking: { type: 'enabled' }, reasoning_effort: policy.effort, response_format: { type: 'json_object' } } : {}) };
     const response = await fetchImpl(config.baseUrl + (config.anthropic ? '/messages' : '/chat/completions'), {
       method: 'POST', signal: controller.signal,
       headers: config.anthropic ? { 'x-api-key': config.apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' }
@@ -46,6 +52,7 @@ export async function requestSpecJson(config, { system, user, signal }, fetchImp
       const error = new Error('模型回答达到长度限制，未完整返回');
       error.code = 'TRUNCATED'; error.finishReason = stop; error.outputLimit = outputLimit;
       error.completionTokens = Number.isFinite(data.usage?.completion_tokens) ? data.usage.completion_tokens : null;
+      error.canIncreaseBudget = deepseek && budgetStep === 0 && stop === 'length';
       throw error;
     }
     if (!(config.anthropic ? ['end_turn', 'stop_sequence'] : ['stop']).includes(stop)) throw new Error('模型未正常结束回答，无法确认输出完整性；请更换兼容接口或重试');

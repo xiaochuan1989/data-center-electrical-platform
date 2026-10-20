@@ -1,6 +1,7 @@
 import { SPEC_DEVICE_REGISTRY, SPEC_SKILL_PROMPT, SPEC_SKILL_VERSION } from '../data/spec-extraction-reference.js';
+import { reviewSpecSemantics, validateSemanticReview } from './spec-semantic-review.js';
 
-export const SPEC_ANALYSIS_VERSION = 3;
+export const SPEC_ANALYSIS_VERSION = 4;
 const types = new Set(Object.keys(SPEC_DEVICE_REGISTRY));
 const levels = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 const references = ['DRAWING', 'ATTACHMENT', 'TABLE', 'SECTION', 'OTHER_DOCUMENT'];
@@ -156,16 +157,20 @@ const SYSTEM = `你是技术规范书设备与参数提取助手。遵循 extrac
 所有风险只能根据当前文档的明确矛盾或疑点，不能根据未经核验的标准摘要臆断。完成所有片段内相关内容才返回 complete:true。
 任何无法完成的分析返回 complete:false，并给出 error。`;
 
-export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, chunkSize = 6000 } = {}) {
+export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, chunkSize = 3000 } = {}) {
   assert(typeof request === 'function', '缺少 AI 请求接口');
   const chunks = splitSpecSource(source, chunkSize, Math.min(600, Math.floor(chunkSize / 10)));
   const fingerprint = await specSourceFingerprint(source);
   const devices = [], products = new Map();
   const coverage = { discovery: [], extraction: [] };
   let requests = 0;
-  async function run(phase, chunk, depth = 0) {
+  const invoke = input => {
     cancelled(signal);
-    assert(++requests <= 512, '模型多次截断，已停止；请拆分规范书后重试');
+    assert(++requests <= 2048, '本次分析请求数达到上限，已停止；请拆分规范书后重试');
+    return request(input);
+  };
+  async function run(phase, chunk, depth = 0, budgetStep = 0) {
+    cancelled(signal);
     onProgress({ phase, completed: coverage[phase].length, total: chunks.length, requests, devices: devices.length });
     const user = JSON.stringify({ task: phase, file_name: source.name, chunk: { start: chunk.start, end: chunk.end },
       known_devices: devices, source_segments: contextFor(source, chunk), document_text: chunk.text });
@@ -178,10 +183,14 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
 每个产品必须有 params_detail 数组，params 可为空。value 必须是可在原文证据中连续找到的值短语，跨页时只允许省略重复页眉页脚。本片段无参数时 products 可为空；最终汇总不能只有空设备或未提及项。
 顶层必须包含 complete:true 和 products 数组。不要输出全局 risks/suggestions 或汇总风险结论；疑点可在参数 risk 中标识供人工复核。`;
     let data;
-    try { data = await request({ system: SYSTEM + '\n' + instructions, user, signal }); }
+    try { data = await invoke({ system: SYSTEM + '\n' + instructions, user, signal, phase, budgetStep }); }
     catch (error) {
       cancelled(signal);
       if (error.code !== 'TRUNCATED') throw error;
+      if (error.canIncreaseBudget && budgetStep === 0) {
+        onProgress({phase,completed:coverage[phase].length,total:chunks.length,requests,devices:devices.length,retry:'budget'});
+        return run(phase,chunk,depth,1);
+      }
       if (depth >= 6 || chunk.text.length <= 600) {
         const stopped = new Error(`${phase === 'discovery' ? '设备识别' : '参数整理'}的回答仍被截断，自动拆分已停止（当前片段${chunk.text.length}字，拆分${depth}层${error.completionTokens != null ? `，最后返回${error.completionTokens} token` : ''}）。未采用本次不完整结果；请减少单份资料内容或切换模型后重试`);
         stopped.code = 'TRUNCATION_EXHAUSTED'; throw stopped;
@@ -233,14 +242,20 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
     for (const detail of product.params_detail) detail.multipleValues = real.some(other => norm(other.name) === norm(detail.name) && exactValue(other.value) !== exactValue(detail.value));
     return product;
   });
-  return { contractVersion: SPEC_ANALYSIS_VERSION, skillVersion: SPEC_SKILL_VERSION, sourceId: source.id, sourceFingerprint: fingerprint,
+  const analysis = { contractVersion: SPEC_ANALYSIS_VERSION, skillVersion: SPEC_SKILL_VERSION, sourceId: source.id, sourceFingerprint: fingerprint,
     file_name: source.name, complete: true, createdAt: new Date().toISOString(), reviewStatus: 'pending',
-    coverage, requestCount: requests, products: result };
+    coverage, products: result };
+  analysis.semanticReview = await reviewSpecSemantics(source,result,chunks,{request:invoke,signal,sourceFingerprint:fingerprint,
+    locateEvidence:(chunk,quote)=>locateSpecEvidence(source,chunk,quote),
+    onProgress:info=>onProgress({...info,requests,devices:devices.length})});
+  cancelled(signal);
+  analysis.requestCount=requests;
+  return analysis;
 }
 
 // Re-validate cached/exported results against the current immutable source.
 export async function validateSpecAnalysis(source, result) {
-  assert(result?.contractVersion === SPEC_ANALYSIS_VERSION && result.complete === true && result.reviewStatus === 'pending', '提取工作稿版本或状态无效');
+  assert([3,SPEC_ANALYSIS_VERSION].includes(result?.contractVersion) && result.complete === true && result.reviewStatus === 'pending', '提取工作稿版本或状态无效');
   assert(result.sourceId === source.id && result.sourceFingerprint === await specSourceFingerprint(source), '原文或来源信息已改变，旧 AI 结果已失效，请重新整理');
   assert(Array.isArray(result.products) && result.products.length > 0, '提取结果没有设备');
   const whole = { start: 0, end: source.text.length, text: source.text };
@@ -275,5 +290,8 @@ export async function validateSpecAnalysis(source, result) {
     }
     assert(end === source.text.length, '提取记录未覆盖全文');
   }
+  if (result.contractVersion === SPEC_ANALYSIS_VERSION)
+    await validateSemanticReview(source,result,(chunk,quote)=>locateSpecEvidence(source,chunk,quote));
+  else assert(!result.semanticReview,'旧版提取工作稿不能冒充已完成语义复核');
   return result;
 }

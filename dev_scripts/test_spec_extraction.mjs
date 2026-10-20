@@ -11,6 +11,7 @@ const source = { id: 'synthetic-source', type: 'pdf', name: '合成软件验收.
 const detail = (name, value, original_text) => ({ name, value, original_text, risk: 'LOW', evidence_status: 'VERIFIED', source_status: 'DOCUMENT' });
 const responseFor = input => {
   const inputData = JSON.parse(input.user), raw = inputData.document_text;
+  if (inputData.task === 'review') return {complete:true,source_checked:true,checked_parameter_ids:inputData.review_parameters.map(p=>p.parameter_id),issues:[]};
   if (inputData.task === 'discovery') return { complete: true, devices: ['UPS-A', 'UPS-B'].filter(name => raw.includes(name)).map(name => ({ device_type: 'UPS主机', device_name: name, scope: '', original_text: name })) };
   return { complete: true, products: inputData.known_devices.map(d => ({ device_id: d.device_id, device_type: d.device_type, device_name: d.device_name,
     params_detail: [raw.includes(`${d.device_name}额定功率为`) ? detail('额定功率', d.device_name === 'UPS-A' ? '100kVA' : '200kVA', `${d.device_name}额定功率为${d.device_name === 'UPS-A' ? '100' : '200'}kVA`) : null,
@@ -81,7 +82,9 @@ const header = '合成文档重复页眉，仅用于软件测试';
 const pageTexts = [`${header}\n带★标记条款：为本文中不可偏离项。\n电池开关箱。\n★工作模式 在线测试。\n`, `${header}\n裸露铜排需加装透明\n`, `${header}\n绝缘防护板。\n`];
 let position = 0;
 const continued = { id: 'continued', name: '合成跨页.pdf', type: 'pdf', text: pageTexts.join(''), warnings: [], segments: pageTexts.map((text, i) => { const page = { start: position, end: position + text.length, page: i + 1 }; position += text.length; return page; }) };
-const continuedRequest = async input => JSON.parse(input.user).task === 'discovery' ? { complete: true, devices: [{ device_type: '电池开关箱', device_name: '电池开关箱', scope: '', original_text: '电池开关箱。' }] }
+const continuedRequest = async input => JSON.parse(input.user).task === 'review'
+  ? {complete:true,source_checked:true,checked_parameter_ids:JSON.parse(input.user).review_parameters.map(p=>p.parameter_id),issues:[]}
+  : JSON.parse(input.user).task === 'discovery' ? { complete: true, devices: [{ device_type: '电池开关箱', device_name: '电池开关箱', scope: '', original_text: '电池开关箱。' }] }
   : { complete: true, products: [{ device_id: 'device-1', device_type: '电池开关箱', device_name: '电池开关箱', params_detail: [detail('工作模式', '在线测试', '★工作模式 在线测试。'), detail('绝缘防护', '裸露铜排需加装透明绝缘防护板', `裸露铜排需加装透明\n${header}\n绝缘防护板。`)] }] };
 const continuedResult = await analyzeSpecSource(continued, { request: continuedRequest });
 await validateSpecAnalysis(continued, continuedResult);
@@ -148,7 +151,7 @@ assert.equal(JSON.parse(sent.init.body).max_tokens, 8192);
 assert.equal('thinking' in JSON.parse(sent.init.body),false,'兼容接口不能收到DeepSeek专用参数');
 await requestSpecJson({...config,baseUrl:'https://api.deepseek.com/v1',model:'deepseek-flash'}, {system:'只输出JSON',user:'合成验证'},async(url,init)=>{
   const body=JSON.parse(init.body);
-  assert.equal(body.thinking.type,'disabled'); assert.equal(body.response_format.type,'json_object'); assert.equal(body.max_tokens,16384);
+  assert.equal(body.thinking.type,'enabled'); assert.equal(body.reasoning_effort,'low'); assert.equal(body.response_format.type,'json_object'); assert.equal(body.max_tokens,32768);
   return {ok:true,json:async()=>({choices:[{finish_reason:'stop',message:{content:'{"ok":true}'}}]})};
 });
 await requestSpecJson({...config,model:'deepseek-flash'}, {},async(url,init)=>{

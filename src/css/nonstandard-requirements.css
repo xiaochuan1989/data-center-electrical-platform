@@ -82,3 +82,8 @@
 .ns-requirements .ns-scheme-problems { max-height: 250px; overflow: auto; color: #8a4f19; }
 @media (max-width: 1100px) { .ns-requirements .ns-columns { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .ns-requirements .platform-form-grid { grid-template-columns: 1fr; } .ns-requirements .ns-toolbar label { flex-wrap: wrap; } .ns-requirements .ns-section { padding: 12px; } .ns-requirements .ns-requirement > summary { gap: 8px; padding: 12px 10px; flex-wrap: wrap; } .ns-requirements .ns-row-copy { flex-basis: calc(100% - 100px); } .ns-requirements .ns-expand-hint { margin-left: auto; } }
+.ns-ai-review{margin:16px 0;padding:12px 16px;border:1px solid #d9e3ef;border-radius:8px;background:#f7faff}
+.ns-ai-review h3{margin:0 0 8px;font-size:15px}
+.ns-ai-review ul{max-height:360px;overflow:auto;padding-left:22px}
+.ns-ai-review li{padding:8px 0;border-bottom:1px solid #e5edf5}
+.ns-ai-review blockquote{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0}
