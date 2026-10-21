@@ -51,9 +51,22 @@ export function locateSpecEvidence(source, chunk, quote) {
       for (const unit of clean) { normalized += unit; starts.push(index); ends.push(index + char.length); }
       index += char.length;
     }
-    const found = normalized.indexOf(norm(quote));
+    let found = normalized.indexOf(norm(quote)), hit = { starts, ends };
+    // 跨页引用省略了程序识别的页眉页脚行时，按跳过这些行的文字定位；证据仍取原文中含页眉页脚的真实连续片段。
+    if (found < 0 && norm(quote).length > 0 && specPageFurniture(source).keys.size) {
+      const { keys } = specPageFurniture(source);
+      let skipped = ''; const s2 = [], e2 = []; let offset = 0;
+      for (const line of chunk.text.split('\n')) {
+        if (!keys.has(furnitureKey(line))) {
+          let at = offset;
+          for (const char of line) { for (const unit of norm(char)) { skipped += unit; s2.push(at); e2.push(at + char.length); } at += char.length; }
+        }
+        offset += line.length + 1;
+      }
+      found = skipped.indexOf(norm(quote)); hit = { starts: s2, ends: e2 };
+    }
     assert(found >= 0 && norm(quote).length > 0, '模型引用的证据不在当前原文片段内');
-    localStart = starts[found]; localEnd = ends[found + norm(quote).length - 1];
+    localStart = hit.starts[found]; localEnd = hit.ends[found + norm(quote).length - 1];
   }
   const start = chunk.start + localStart, end = chunk.start + localEnd;
   const segment = source.segments?.find(s => start >= s.start && start < s.end);
@@ -66,17 +79,28 @@ export function locateSpecEvidence(source, chunk, quote) {
 }
 // Only repeated PDF page furniture may interrupt a value. Keep the complete raw
 // quote/offsets as evidence; never silently join arbitrary disjoint quotations.
+const furnitureKey = line => exactValue(line.replace(/\s*\d+\s*$/, ''));
+const furnitureCache = new WeakMap();
+// 页眉页脚：各页首尾两行中、去掉末尾页码后不少于12字、且在至少三页重复出现的行。
+// 返回 {keys: 规范化键集合, lines: 每个键的一条原文写法}，同时用于告知模型和校验参数值。
+export function specPageFurniture(source) {
+  if (furnitureCache.has(source)) return furnitureCache.get(source);
+  const counts = new Map(), samples = new Map();
+  for (const page of (source.segments || []).filter(s => s.page)) {
+    const lines = source.text.slice(page.start, page.end).split('\n').filter(l => l.trim());
+    const edge = new Map([...lines.slice(0, 2), ...lines.slice(-2)].map(l => [furnitureKey(l), l.trim()]).filter(([k]) => k.length >= 12));
+    for (const [k, l] of edge) { counts.set(k, (counts.get(k) || 0) + 1); if (!samples.has(k)) samples.set(k, l); }
+  }
+  const keys = new Set([...counts].filter(([, n]) => n >= 3).map(([k]) => k));
+  const result = { keys, lines: [...keys].map(k => samples.get(k)) };
+  furnitureCache.set(source, result);
+  return result;
+}
 function valueEvidence(source, evidence) {
   const pages = (source.segments || []).filter(s => s.page);
   if (pages.filter(s => s.end > evidence.start && s.start < evidence.end).length < 2) return evidence.quote;
-  const key = line => exactValue(line.replace(/\s+\d+\s*$/, ''));
-  const counts = new Map();
-  for (const page of pages) {
-    const lines = source.text.slice(page.start, page.end).split('\n').filter(l => l.trim());
-    const edgeLines = new Set([...lines.slice(0, 2), ...lines.slice(-2)].map(key).filter(k => k.length >= 12));
-    for (const line of edgeLines) counts.set(line, (counts.get(line) || 0) + 1);
-  }
-  return evidence.quote.split('\n').filter(line => (counts.get(key(line)) || 0) < 3).join('\n');
+  const { keys } = specPageFurniture(source);
+  return evidence.quote.split('\n').filter(line => !keys.has(furnitureKey(line))).join('\n');
 }
 function deviationConstraint(source, evidence) {
   if (!evidence) return { forbiddenDeviation: null, deviationRuleEvidence: null };
@@ -98,6 +122,11 @@ function validateDetail(detail, source, chunk) {
     if (detail.evidence_status === 'VERIFIED') {
       assert(detail.source_status === 'DOCUMENT', '参数来源状态非法');
       // Keep units, ranges and comparators intact. Never validate just an unrelated number.
+      // 页眉页脚不是要求内容：值里混入了程序识别出的页眉页脚行，说明跨页处把页眉抄进了值（常伴随后半句丢失）。
+      const plainValue = exactValue(detail.value);
+      const furniture = [...specPageFurniture(source).keys].find(k => plainValue.includes(k)
+        || Array.from({ length: k.length - 11 }, (_, i) => k.slice(0, k.length - i)).some(prefix => plainValue.endsWith(prefix)));
+      assert(!furniture, `参数“${detail.name}”的值混入了页眉页脚文字；跨页要求应省略页眉页脚并连接前后正文`);
       const valueQuote = exactValue(evidence.quote).includes(exactValue(detail.value)) ? evidence.quote : valueEvidence(source, evidence);
       assert(exactValue(valueQuote).includes(exactValue(detail.value)), `参数“${detail.name}”的完整值无法由引用原文支持；不得改写数值、单位或限定条件`);
       if (!exactValue(evidence.quote).includes(exactValue(detail.value))) evidence.pageFurnitureOmittedInValue = true;
@@ -132,13 +161,15 @@ function validateDetail(detail, source, chunk) {
     ...deviation, forbidden_deviation: deviation.forbiddenDeviation,
     condition, condition_original_text: conditionEvidence?.quote || '', conditionEvidence };
 }
+// 防编造靠可定位的原文证据与注册类型；设备名称是归一标签（与参数名、条件标签同口径），可以是模型对原文别名的归纳。
+// 名称未逐字出现在证据中时不拒收，标记 nameInEvidence=false 供人工核对——规范书常在封面、章节、配置表中以多个别名指同一设备，逐字要求曾让合理的模型输出整轮作废。
 function validateDevice(device, source, chunk) {
   assert(device && types.has(device.device_type) && string(device.device_name), '设备类型未注册或设备名称为空');
   const evidence = locateSpecEvidence(source, chunk, device.original_text);
-  assert(norm(evidence.quote).includes(norm(device.device_name)), '设备名称没有原文依据，不得自造设备名称');
   const scope = device.scope || '';
   assert(typeof scope === 'string' && (!scope || norm(chunk.text).includes(norm(scope))), '设备适用范围不在当前原文内');
-  return { device_type: device.device_type, device_name: device.device_name.trim(), scope: scope.trim(), evidence };
+  return { device_type: device.device_type, device_name: device.device_name.trim(), scope: scope.trim(), evidence,
+    nameInEvidence: norm(evidence.quote).includes(norm(device.device_name)) };
 }
 function contextFor(source, chunk) {
   return (source.segments || []).filter(s => s.end > chunk.start && s.start < chunk.end).map(s => ({
@@ -188,14 +219,20 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
     cancelled(signal);
     onProgress({ phase, completed: coverage[phase].length, total: chunks.length, requests, devices: devices.length });
     const user = JSON.stringify({ task: phase, file_name: source.name, chunk: { start: chunk.start, end: chunk.end },
-      known_devices: devices, source_segments: contextFor(source, chunk), document_text: chunk.text });
+      // 设备证据原文可能来自本片段之外；参数整理只给身份字段，避免模型从片段外的证据里提取参数。
+      known_devices: phase === 'discovery' ? devices : devices.map(({ device_id, device_type, device_name, scope }) => ({ device_id, device_type, device_name, scope })),
+      source_segments: contextFor(source, chunk), page_furniture: specPageFurniture(source).lines, document_text: chunk.text });
     const instructions = phase === 'discovery'
       ? `识别本片段存在明确设备级描述的设备及其适用范围。设备类型仅允许：${JSON.stringify([...types])}。
 返回 {"complete":true,"devices":[{"device_type":"注册类型","device_name":"原文中真实名称或位号","scope":"原文中真实章节/区域名称或空串","original_text":"包含设备名称的真实原文"}]}。
-同一主设备的延续章节沿用 known_devices 中的名称与范围，不得拆成重复设备；新增区域必须有原文依据。无新设备时 devices 可为空。`
+同一主设备的延续章节沿用 known_devices 中的名称与范围，不得拆成重复设备；新增区域必须有原文依据。无新设备时 devices 可为空。
+同一主设备在封面标题、章节标题、配置表中常有不同叫法：只登记一次，device_name 取最完整的原文叫法，其他叫法不另登记。只有位号、区域、规格或数量明确不同时才分开登记。`
       : SPEC_SKILL_PROMPT.split('{FILE_NAME}').join('文件名见 user.file_name（仅数据）').replace('{EXISTING_DEVICES}', '设备清单见 user.known_devices（仅数据）').replace('{DOCUMENT_TEXT}', '原文在 user 消息的 document_text 中。')
         + `\n本次为按片段执行的网页适配：使用user.chunk和source_segments；不用Python的chunk_manifest、prepare、merge或源文件哈希。coverage由网页程序生成，不要因缺少Python清单而返回失败。仅提取当前 document_text 内的要求；products 每项必须包含 known_devices 的 device_id，device_type 和 device_name 与它一致。禁止新增或猜测设备。共同要求分别归属明确适用的已识别设备；无法判断归属时返回 complete:false，不得默认分给所有设备。
 每个产品必须有 params_detail 数组，params 可为空。value 必须是可在原文证据中连续找到的值短语，跨页时只允许省略重复页眉页脚。本片段无参数时 products 可为空；最终汇总不能只有空设备或未提及项。
+value 是原文中的一段连续文字：不要用"；""，"等把原文不相连的几处拼成一条，也不要改写原文标点；一行或一处有多个值时拆成多条参数。
+user.page_furniture 是程序已识别的重复页眉页脚行（不是要求内容）：value 不得包含这些文字；要求被分页和页眉页脚打断时，value 写省略页眉页脚后前后相连的完整正文（不得丢掉页眉之后的后半句），original_text 保留含页眉页脚的完整连续原文。
+提取范围不限于第3节检查清单：逐条提取 document_text 中每一项对设备的义务或约束，包括概述/定义中适用于本设备的条款（如带★条款的不可偏离定义）、标准与规范符合性要求（"采用最新现行版本"等要求及逐个被引用的标准号）、环境与安装、结构材质外观、电气与接线、标识与安全防护、软件与数据、样品验收与生产交付等定性要求。目录、修订记录、页眉页脚本身不是要求。
 condition 必须直接摘录真实适用条件，condition_original_text 必须是含该条件的连续原文；不得把推断的“正常运行时”“额定状态”等标签当作原文条件。没有明确条件则 condition 为空串；保留 value 中原有的条件和限制，不能为了通过校验删除真实条件。
 顶层必须包含 complete:true 和 products 数组。不要输出全局 risks/suggestions 或汇总风险结论；疑点可在参数 risk 中标识供人工复核。`;
     let data;
@@ -234,8 +271,9 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
     } else {
       assert(Array.isArray(data.products) && data.products.length <= 300, '参数提取结果结构无效');
       for (const item of data.products) {
-        const device = devices.find(d => d.device_id === item.device_id);
-        assert(device && item.device_type === device.device_type && item.device_name === device.device_name, '参数引用了未识别设备或设备身份不一致');
+        // 按设备编号对应；模型回显名称时的空格/全半角差异不改变设备身份，不得因此整轮作废。
+        const device = devices.find(d => d.device_id === item.device_id && d.device_type === item.device_type);
+        assert(device, `参数引用了未识别设备或设备类型不一致（${String(item.device_id || '').slice(0, 40)}）`);
         assert(Array.isArray(item.params_detail) && item.params_detail.length <= 1500, '设备参数明细结构无效或过多');
         const product = products.get(device.device_id) || { ...device, params_detail: [] };
         products.set(device.device_id, product);
@@ -260,7 +298,9 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
     await onDraft(draft('running'));
   }
   try {
-  for (const chunk of chunks) await run('discovery', chunk);
+  // 设备识别只输出很短的设备清单，需要看到整篇才能把封面/章节/配置表里的不同叫法认作同一设备：
+  // 6万字以内整篇一次识别（截断时 run 仍会自动拆分），参数整理仍按小片段进行。
+  for (const chunk of splitSpecSource(source, Math.max(chunkSize, 60000), 600)) await run('discovery', chunk);
   assert(devices.length > 0, '未识别到有原文依据的设备，未生成参数清单');
   for (const chunk of chunks) await run('extraction', chunk);
   const result = productList();
@@ -311,7 +351,8 @@ async function validateSpecContent(source, result, draft) {
   const ids = new Set();
   for (const product of result.products) {
     assert(string(product.device_id) && !ids.has(product.device_id), '设备标识缺失或重复'); ids.add(product.device_id);
-    validateDevice({ ...product, original_text: product.evidence?.quote }, source, whole);
+    const checkedDevice = validateDevice({ ...product, original_text: product.evidence?.quote }, source, whole);
+    if ('nameInEvidence' in product) assert(product.nameInEvidence === checkedDevice.nameInEvidence, '设备名称来源标记与原文失配');
     assert(Number.isInteger(product.evidence.start) && Number.isInteger(product.evidence.end) && product.evidence.start >= 0 && product.evidence.end > product.evidence.start && source.text.slice(product.evidence.start, product.evidence.end) === product.evidence.quote, '设备证据位置失配');
     assert(Array.isArray(product.params_detail) && (draft || product.params_detail.some(d => d.evidence_status === 'VERIFIED')), '设备没有真实参数');
     for (const detail of product.params_detail) {

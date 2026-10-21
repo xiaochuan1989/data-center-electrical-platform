@@ -63,6 +63,25 @@ export function readPresalesWorkbook(workbook, XLSX) {
   }
   checkText(parts.text); return { ...parts, type: 'xlsx' };
 }
+// pdf.js 常把同一行连续文字拆成多个片段（如"再批量""生""产为""宜"首尾相接）。旧做法在片段间一律补空格，
+// 原文与参数值里便出现"再批量 生 产为 宜"。同一行且间距不超过字高10%的片段视为连续文字直接拼接；
+// 表格不同单元格间距大或另有空格片段，仍保留空格。片段缺少位置信息时沿用补空格。
+export function joinPdfTextItems(items) {
+  let out = '', prev = null;
+  for (const item of items) {
+    const str = item.str ?? '';
+    if (prev && !prev.hasEOL) {
+      const geo = x => Array.isArray(x?.transform) && Number.isFinite(x.width);
+      const height = geo(prev) && geo(item) ? Math.max(Math.abs(prev.height || prev.transform[3]), Math.abs(item.height || item.transform[3]), 1) : 0;
+      const touching = height && Math.abs(item.transform[5] - prev.transform[5]) < height * 0.5
+        && item.transform[4] - (prev.transform[4] + prev.width) <= height * 0.1 && item.transform[4] >= prev.transform[4];
+      if (!touching) out += ' ';
+    }
+    out += str + (item.hasEOL ? '\n' : '');
+    prev = item;
+  }
+  return prev && !prev.hasEOL ? out + ' ' : out;
+}
 export async function readPresalesFile(file, libs = globalThis, options = {}) {
   const { signal, onProgress = () => {}, forceOcr = false, ocrLanguage = 'chi_sim' } = options;
   checkReadSignal(signal);
@@ -116,16 +135,30 @@ export async function readPresalesFile(file, libs = globalThis, options = {}) {
     const pdf = await loadingTask.promise;
     if (pdf.numPages > 150) throw new Error('PDF超过150页，请按设备拆分');
     parts.pageRecords = [];
+    // 先读全部文字层，找出多数页重复的行（页眉/页脚/文字水印，页码数字归一）。大幅图片只在去掉这些行后正文仍不足时
+    // 才触发OCR：既不让一行文字页眉掩盖扫描正文，也不因整页底纹/水印图片丢弃完整的文字层。
+    const nativeTexts = [];
+    for (let pageIndex = 1; pageIndex <= pdf.numPages; pageIndex++) {
+      checkReadSignal(signal);
+      const content = await (await pdf.getPage(pageIndex)).getTextContent();
+      nativeTexts.push(joinPdfTextItems(content.items));
+    }
+    const lineKey = line => line.replace(/\s/g, '').replace(/\d+/g, '#'), lineCounts = new Map();
+    for (const text of nativeTexts) for (const key of new Set(text.split('\n').map(lineKey).filter(key => key.length >= 2))) lineCounts.set(key, (lineCounts.get(key) || 0) + 1);
+    const repeatedLines = new Set(nativeTexts.length < 3 ? [] : [...lineCounts].filter(([, n]) => n >= Math.max(3, Math.ceil(nativeTexts.length / 2))).map(([key]) => key));
+    const imageTextPages = [];
+    const bodyLength = text => text.split('\n').filter(line => !repeatedLines.has(lineKey(line))).join('').replace(/\s/g, '').length;
     for (let pageIndex = 1; pageIndex <= pdf.numPages; pageIndex++) {
       checkReadSignal(signal);
       onProgress({ phase: 'read', page: pageIndex, total: pdf.numPages });
       const page = await pdf.getPage(pageIndex);
       let canvas;
       try {
-        const content = await page.getTextContent();
-        let value = content.items.map(item => item.str + (item.hasEOL ? '\n' : ' ')).join('');
+        let value = nativeTexts[pageIndex - 1];
         let metadata = { page: pageIndex, method: 'native' };
-        if (forceOcr || value.replace(/\s/g,'').length < 40 || await hasLargePdfImage(page,libs.pdfjsLib)) {
+        const largeImage = !forceOcr && value.replace(/\s/g,'').length >= 40 && await hasLargePdfImage(page,libs.pdfjsLib);
+        if (largeImage && bodyLength(value) >= 40) imageTextPages.push(pageIndex);
+        if (forceOcr || value.replace(/\s/g,'').length < 40 || (largeImage && bodyLength(value) < 40)) {
           const rendered = await (libs.renderPdfForOcr || renderPdfForOcr)(page,libs,signal);
           canvas = rendered.canvas;
           if (rendered.blank && !value.trim()) {
@@ -145,6 +178,7 @@ export async function readPresalesFile(file, libs = globalThis, options = {}) {
         append(parts,value,metadata); parts.pageRecords.push(metadata);
       } finally { if (canvas) canvas.width=canvas.height=0; page.cleanup(); }
     }
+    if (imageTextPages.length) parts.warnings.push(`PDF第${imageTextPages.join("、")}页含大幅图片，已使用文字层；若图片中有文字层没有的内容（如扫描正文），请勾选“所有PDF页使用OCR”后重新选择文件`);
   } catch (error) { checkReadSignal(signal); throw error; }
   finally { signal?.removeEventListener('abort',abortLoad); await ocr?.close(); await loadingTask.destroy(); }
   checkText(parts.text); return { ...parts, name: file.name, type: 'pdf' };

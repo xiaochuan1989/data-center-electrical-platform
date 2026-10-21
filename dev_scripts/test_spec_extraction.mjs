@@ -173,4 +173,93 @@ assert.equal(specAiDestination(doc, () => 'https://example.invalid/v1').includes
 assert.throws(() => readSpecAiConfig(doc, () => 'https://example.invalid/v1?key=secret'), /查询参数/);
 const html = specResultMarkup({ ...result, products: [{ ...result.products[0], device_name: '<img src=x onerror=alert(1)>' }] });
 assert.equal(html.includes('<img'), false); assert.match(html, /&lt;img/);
-console.log('AI规范提取：设备隔离、比较条件、原文/缓存证据、全段覆盖、截断细分、取消、接口协议、空结果与HTML转义回归通过（合成软件用例）');
+// 设备别名：6万字以内整篇一次识别设备（封面/章节/配置表叫法须一起看到）；超长资料分段识别时，后续片段沿用
+// known_devices 名称而本段原文只出现别名，不得因"名称不在本段原文"整轮失败。
+{
+  const buildAlias = repeat => '合成软件验收资料。\n一、UPS电池开关箱\n' + '本行为合成填充文字，用于把资料撑到需要分段处理的长度，不含任何技术参数。\n'.repeat(repeat) + '二、配置表\n合成快速开关箱额定电压为DC480V。\n';
+  const aliasSource = { id: 'synthetic-alias', type: 'text', name: '合成别名验收.txt', text: buildAlias(14), warnings: [], segments: [] };
+  assert(splitSpecSource(aliasSource, 500, 50).length >= 2, '合成资料参数整理须分成多段');
+  let discoveryCalls = 0;
+  const aliasResponse = (newName = null, echoName = null) => async input => {
+    const data = JSON.parse(input.user), raw = data.document_text;
+    if (data.task === 'review') return { complete: true, source_checked: true, checked_parameter_ids: data.review_parameters.map(p => p.parameter_id), issues: [] };
+    if (data.task === 'discovery') {
+      discoveryCalls++;
+      const first = raw.includes('一、UPS电池开关箱'), second = raw.includes('合成快速开关箱');
+      if (first && second) return { complete: true, devices: [{ device_type: '电池开关箱', device_name: newName || 'UPS电池开关箱', scope: '', original_text: newName ? '合成快速开关箱额定电压为DC480V。' : '一、UPS电池开关箱' }] };
+      if (first) return { complete: true, devices: [{ device_type: '电池开关箱', device_name: 'UPS电池开关箱', scope: '', original_text: '一、UPS电池开关箱' }] };
+      if (second) return { complete: true, devices: [{ device_type: '电池开关箱', device_name: newName || data.known_devices[0].device_name, scope: '', original_text: '合成快速开关箱额定电压为DC480V。' }] };
+      return { complete: true, devices: [] };
+    }
+    return { complete: true, products: raw.includes('DC480V') ? data.known_devices.map(d => ({ device_id: d.device_id, device_type: d.device_type, device_name: echoName || d.device_name,
+      params_detail: [detail('额定电压', 'DC480V', '合成快速开关箱额定电压为DC480V。')] })) : [] };
+  };
+  const aliased = await analyzeSpecSource(aliasSource, { request: aliasResponse(), chunkSize: 500 });
+  assert.equal(discoveryCalls, 1, '短资料整篇一次识别设备');
+  assert.equal(aliased.products.length, 1, '沿用已识别设备名称不得拆成新设备');
+  assert.equal(aliased.products[0].device_name, 'UPS电池开关箱');
+  assert.equal(aliased.products[0].params_detail[0].value, 'DC480V');
+  assert.equal(aliased.products[0].nameInEvidence, true);
+  assert.equal(await validateSpecAnalysis(aliasSource, aliased), aliased);
+  // 名称是归一标签：未逐字出现在证据中时接收并标记待核对，证据本身仍须真实可定位。
+  const renamed = await analyzeSpecSource(aliasSource, { request: aliasResponse('电池开关箱（配置表）'), chunkSize: 500 });
+  const flagged = renamed.products.find(p => p.device_name === '电池开关箱（配置表）');
+  assert.equal(flagged?.nameInEvidence, false);
+  assert.equal(flagged.evidence.quote, '合成快速开关箱额定电压为DC480V。');
+  assert.equal(await validateSpecAnalysis(aliasSource, renamed), renamed);
+  assert.match(specResultMarkup(renamed), /设备名称为AI归纳，原文写法：“合成快速开关箱额定电压为DC480V。”/);
+  const tamperedFlag = structuredClone(renamed); tamperedFlag.products.find(p => p.nameInEvidence === false).nameInEvidence = true;
+  await assert.rejects(() => validateSpecAnalysis(aliasSource, tamperedFlag), /名称来源标记/);
+  // 超长资料（>6万字）分段识别：后续片段沿用已识别名称、本段原文只有别名，仍识别为同一设备。
+  const longSource = { ...aliasSource, id: 'synthetic-alias-long', text: buildAlias(1700) };
+  assert(longSource.text.length > 61000);
+  discoveryCalls = 0;
+  const longRun = await analyzeSpecSource(longSource, { request: aliasResponse(), chunkSize: 30000 });
+  assert(discoveryCalls >= 2, '超长资料分段识别设备');
+  assert.equal(longRun.products.length, 1);
+  assert.equal(longRun.products[0].params_detail[0].value, 'DC480V');
+  // 参数阶段回显设备名称时空格/全半角不同，按设备编号对应，不整轮失败。
+  const echoed = await analyzeSpecSource(aliasSource, { request: aliasResponse(null, 'UPS 电池开关箱'), chunkSize: 500 });
+  assert.equal(echoed.products[0].params_detail[0].value, 'DC480V');
+  // 证据不在原文中仍拒收：防编造的底线不变。
+  await assert.rejects(() => analyzeSpecSource(aliasSource, { request: async input => { const d = JSON.parse(input.user);
+    return d.task === 'discovery' ? { complete: true, devices: [{ device_type: '电池开关箱', device_name: 'X', scope: '', original_text: '原文没有这句话' }] } : { complete: true, products: [] }; }, chunkSize: 500 }), /证据不在当前原文片段内/);
+}
+// 页眉页脚：程序识别的重复行传给模型；值混入页眉（常伴后半句丢失）转入待核对；正确省略页眉的跨页值通过。
+{
+  const header = '合成保密页眉：仅供软件验收不得外传的资料\n';
+  const pages = ['一、电池开关箱\n电池开关箱安装方式为落地式安装。\n', '二、结构\n裸露铜排需加装透明\n', '绝缘防护板。\n三、其他\n外壳防护等级IP20。\n'];
+  let furnText = '', furnSegments = [];
+  for (const [i, body] of pages.entries()) { const start = furnText.length; furnText += header + body; furnSegments.push({ start, end: furnText.length, page: i + 1 }); }
+  const furnSource = { id: 'synthetic-furniture', type: 'pdf', name: '合成页眉验收.pdf', text: furnText, warnings: [], segments: furnSegments };
+  const crossQuote = furnText.slice(furnText.indexOf('裸露铜排'), furnText.indexOf('绝缘防护板。') + 6);
+  let seenFurniture = null;
+  const furnRequest = (polluted, quote = crossQuote) => async input => {
+    const data = JSON.parse(input.user);
+    if (data.task === 'review') return { complete: true, source_checked: true, checked_parameter_ids: data.review_parameters.map(p => p.parameter_id), issues: [] };
+    if (data.task === 'discovery') return { complete: true, devices: [{ device_type: '电池开关箱', device_name: '电池开关箱', scope: '', original_text: '一、电池开关箱' }] };
+    seenFurniture = data.page_furniture;
+    assert(data.known_devices.every(d => !('evidence' in d)), '参数整理不得附带设备证据原文（可能来自片段之外）');
+    return { complete: true, products: data.known_devices.map(d => ({ device_id: d.device_id, device_type: d.device_type, device_name: d.device_name, params_detail: [
+      detail('安装方式', '落地式安装', '电池开关箱安装方式为落地式安装。'),
+      detail('裸露铜排防护', polluted ? '裸露铜排需加装透明合成保密页眉：仅供软件验收' : '裸露铜排需加装透明绝缘防护板', quote)] })) };
+  };
+  const clean = await analyzeSpecSource(furnSource, { request: furnRequest(false) });
+  assert.deepEqual(seenFurniture, ['合成保密页眉：仅供软件验收不得外传的资料'], '页眉页脚清单须交给模型');
+  const crossed = clean.products[0].params_detail.find(d => d.name === '裸露铜排防护');
+  assert.equal(crossed.evidence.pageFurnitureOmittedInValue, true);
+  assert.equal(await validateSpecAnalysis(furnSource, clean), clean);
+  const partial = await analyzeSpecSource(furnSource, { request: furnRequest(true), allowPartial: true });
+  assert.deepEqual(partial.products[0].params_detail.map(d => d.name), ['安装方式']);
+  assert.match(partial.rejectedParameters[0].reason, /混入了页眉页脚文字/);
+  await assert.rejects(() => analyzeSpecSource(furnSource, { request: furnRequest(true) }), /混入了页眉页脚文字/);
+  // 模型在 original_text 中也省略了页眉：按跳过页眉的文字定位，证据仍存为含页眉的真实连续原文。
+  const omitted = await analyzeSpecSource(furnSource, { request: furnRequest(false, '裸露铜排需加装透明\n绝缘防护板。') });
+  const located = omitted.products[0].params_detail.find(d => d.name === '裸露铜排防护');
+  assert.equal(located.original_text, crossQuote, '证据须为原文中含页眉的连续片段');
+  assert.equal(furnSource.text.slice(located.evidence.start, located.evidence.end), crossQuote);
+  assert.equal(await validateSpecAnalysis(furnSource, omitted), omitted);
+  // 非页眉的正文被跳过时仍拒收：只允许省略程序识别的页眉页脚。
+  await assert.rejects(() => analyzeSpecSource(furnSource, { request: furnRequest(false, '电池开关箱安装方式为落地式安装。外壳防护等级IP20。') }), /证据不在当前原文/);
+}
+console.log('AI规范提取：设备隔离、比较条件、原文/缓存证据、全段覆盖、截断细分、取消、接口协议、空结果、跨片段设备别名、页眉页脚与HTML转义回归通过（合成软件用例）');

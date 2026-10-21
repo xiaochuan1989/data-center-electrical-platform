@@ -48,10 +48,47 @@ await validateSpecAnalysis(source,legacy);assert.match(specResultMarkup(legacy),
 for (const alter of [
   out=>{out.checked_parameter_ids=[];},
   out=>{out.source_checked=false;},
-  out=>{out.complete=false;},
-  out=>{out.issues=[{kind:'OMISSION',severity:'WARNING',parameter_id:null,message:'捏造疑点',original_text:'文档没有这段证据'}];},
-  out=>{out.issues=[{kind:'OCR_UNCERTAINTY',severity:'WARNING',parameter_id:null,message:'原生文字不能冒称OCR歧义',original_text:'额定功率100kVA'}];}
+  out=>{out.complete=false;}
 ]) await assert.rejects(()=>analyzeSpecSource(source,{request:async input=>{const out=response(input);if(input.phase==='review')alter(out);return out;}}));
+// 单条疑点不合规（证据捏造、原生文字冒称OCR、类型非法）只隔离该条：不计入已校验疑点，整次复核照常完成并保留模型原话。
+{
+  const isolated=await analyzeSpecSource(source,{request:async input=>{const out=response(input);if(input.phase==='review')out.issues=[
+    {kind:'OMISSION',severity:'WARNING',parameter_id:null,message:'捏造疑点',original_text:'文档没有这段证据'},
+    {kind:'OCR_UNCERTAINTY',severity:'WARNING',parameter_id:null,message:'原生文字不能冒称OCR歧义',original_text:'额定功率100kVA'},
+    {kind:'STYLE',severity:'WARNING',parameter_id:null,message:'非法类型',original_text:'额定功率100kVA'},
+    {kind:'OMISSION',severity:'WARNING',parameter_id:null,message:'可能漏提型式试验报告要求。',original_text:'UPS-A还须提供型式试验报告。'}];return out;}});
+  const review=isolated.semanticReview;
+  assert.equal(review.findings.length,1,'只有合规疑点计入');
+  assert.equal(review.findings[0].message,'可能漏提型式试验报告要求。');
+  assert.deepEqual(review.rejectedFindings.map(r=>r.message),['捏造疑点','原生文字不能冒称OCR歧义','非法类型']);
+  assert.match(review.rejectedFindings[0].reason,/不在当前原文/);
+  assert.match(review.rejectedFindings[1].reason,/OCR疑点须指向OCR来源/);
+  await validateSpecAnalysis(source,isolated);
+  const html=specResultMarkup(isolated);
+  assert.match(html,/另有3条复核意见未通过结构校验/);assert.match(html,/原生文字不能冒称OCR歧义/);
+  assert(specExportSheets(isolated)[1].rows.some(r=>String(r[6]).startsWith('未采纳（')),'Excel保留未采纳意见及原因');
+  const forged=structuredClone(isolated);forged.semanticReview.rejectedFindings[0].reason=1;
+  await assert.rejects(()=>validateSpecAnalysis(source,forged),/未采纳复核意见结构无效/);
+}
+// 复核按16项分批；疑点可指向其他批次中真实存在的参数（模型能看到完整catalogue），不存在的参数编号仍不计入。
+{
+  const lines=Array.from({length:20},(_,i)=>`第${i+1}项额定电流${(i+1)*10}A。`);
+  const many='合成分批复核资料。\nUPS-A技术要求：\n'+lines.join('\n');
+  const manySource={id:'review-many',type:'pdf',name:'合成分批复核.pdf',text:many,segments:[{start:0,end:many.length,page:1}],warnings:[]};
+  let batch=0;
+  const cross=await analyzeSpecSource(manySource,{request:async input=>{const data=JSON.parse(input.user);
+    if(data.task==='discovery')return {complete:true,devices:[{device_type:'UPS主机',device_name:'UPS-A',scope:'',original_text:'UPS-A'}]};
+    if(data.task==='review'){batch++;const issues=batch===2?[
+      {kind:'CONFLICT',severity:'WARNING',parameter_id:data.catalogue[0].parameter_id,message:'与第1项对照核对。',original_text:lines[0]},
+      {kind:'CONFLICT',severity:'WARNING',parameter_id:'device-9/p1',message:'不存在的参数',original_text:lines[0]}]:[];
+      return {complete:true,source_checked:true,checked_parameter_ids:data.review_parameters.map(p=>p.parameter_id),issues};}
+    return {complete:true,products:data.known_devices.map(d=>({...d,params_detail:lines.map((l,i)=>detail(`第${i+1}项额定电流`,`${(i+1)*10}A`,l))}))};
+  }});
+  assert.equal(batch,2,'20项参数分两批复核');
+  assert.deepEqual(cross.semanticReview.findings.map(f=>f.message),['与第1项对照核对。']);
+  assert.match(cross.semanticReview.rejectedFindings[0].reason,/不存在的参数/);
+  await validateSpecAnalysis(manySource,cross);
+}
 
 // Review can retry with a larger reasoning budget, then split a dense parameter batch.
 const batchSizes=[];let grew=false;

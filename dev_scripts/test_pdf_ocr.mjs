@@ -1,10 +1,16 @@
 import assert from 'node:assert/strict';
-import { readPresalesFile } from '../src/platform/nonstandard-file-reader.js';
+import { readPresalesFile, joinPdfTextItems } from '../src/platform/nonstandard-file-reader.js';
 import { localOcrUrls, hasLargePdfImage, createLocalOcrSession } from '../src/platform/local-pdf-ocr.js';
 import { createPresalesPackage, addPresalesSource, restorePresalesSnapshot, createPresalesSnapshot } from '../src/modules/nonstandard-presales.js';
 import { analyzeSpecSource, validateSpecAnalysis } from '../src/modules/spec-extraction.js';
 import { specResultMarkup } from '../src/platform/spec-extraction-view.js';
 
+// 同一行首尾相接的文字片段直接拼接，表格单元格（间距大）与换行保留；无位置信息时沿用补空格。
+const at=(str,x,w,y=100,eol=false)=>({str,transform:[12,0,0,12,x,y],width:w,height:12,hasEOL:eol});
+assert.equal(joinPdfTextItems([at('再批量',80,36),at('生',116,12),at('产为',128,24),at('宜',152,12,100,true)]),'再批量生产为宜\n');
+assert.equal(joinPdfTextItems([at('温度',159,20),at('工作范围',330,48,100,true)]),'温度 工作范围\n','单元格不得粘连');
+assert.equal(joinPdfTextItems([at('上一行末',80,48),at('下一行首',80,48,86,true)]),'上一行末 下一行首\n','不同行不拼接');
+assert.equal(joinPdfTextItems([{str:'甲'},{str:'乙',hasEOL:true}]),'甲 乙\n');
 const urls=localOcrUrls('https://test.invalid/platform/index.html');
 assert.equal(urls.workerPath,'https://test.invalid/platform/vendor/ocr/worker.min.js');
 assert.equal(urls.langPath,'https://test.invalid/platform/vendor/ocr/lang/');
@@ -45,6 +51,22 @@ await assert.rejects(()=>validateSpecAnalysis(source,hiddenOcr),/OCR来源/);
 const changed=structuredClone(source);changed.pageRecords[2].method='native';
 await assert.rejects(()=>validateSpecAnalysis(changed,extracted),/已改变/);
 await assert.rejects(()=>readPresalesFile(file,{...libs,createLocalOcrSession:()=>({recognize:async()=>({text:'',confidence:0}),close:async()=>{terminated++;}})}),/OCR未识别/);
+// 每页重复的长文字页眉 + 大幅扫描图：去掉页眉后正文不足，仍须OCR，页眉不能掩盖扫描正文。
+const header='合成文字页眉：机密资料，未经书面许可不得以任何形式披露、传播或扩散，第1页\n';
+pages=[1,2,3].map(n=>page(header.replace('第1页',`第${n}页`),true));recognized=0;
+const scanned=await readPresalesFile(file,libs);
+assert.deepEqual(scanned.pageRecords.map(p=>p.method),['ocr','ocr','ocr']);assert.equal(recognized,3);
+// 同样页眉 + 整页底纹/水印大图，但各页文字层有不同的完整正文：保留文字层不做OCR，并提示可强制OCR。
+// （各页正文只差编号时与重复页眉无法区分，按页眉处理走OCR，这是有意的。）
+const bodies=['环境要求：户内安装，环境温度零下十度至四十度，海拔不超过一千米，相对湿度百分之十至九十，地震烈度按八度设防。',
+  '电气要求：电池组电压直流四百八十伏，最大支持六百伏，放电电流不超过一千六百安，充放电电流控制精度优于百分之一。',
+  '结构要求：冷板喷塑箱体，双开门并自带锁具，上下出线设计，内部铜排正负极套绝缘套管，裸露铜排加装透明绝缘防护板。'];
+assert(bodies.every(b=>b.length>=40),'合成正文须达到文字层判定下限');
+pages=bodies.map((body,i)=>page(header.replace('第1页',`第${i+1}页`)+body,true));recognized=0;
+const watermarked=await readPresalesFile(file,libs);
+assert.deepEqual(watermarked.pageRecords.map(p=>p.method),['native','native','native']);assert.equal(recognized,0);
+assert.equal(watermarked.text.includes(bodies[1]),true);
+{const w=watermarked.warnings.filter(x=>/含大幅图片，已使用文字层/.test(x));assert.equal(w.length,1,"多页同类提示合并为一条");assert.match(w[0],/^PDF第1、2、3页含大幅图片/);}
 pages=[page('只有页眉',true)];
 const forced=await readPresalesFile(file,libs,{forceOcr:true});assert.equal(forced.segments[0].method,'ocr');
 const controller=new AbortController();controller.abort();

@@ -14,7 +14,8 @@ export function semanticReviewMarkup(result) {
   if (!review) return `<p class="ns-ai-note">${result.complete === false ? '本次语义复核尚未完成；下列参数仅通过文字证据校验。' : '旧版提取工作稿：尚未执行语义复核；历史参数保留，可重新整理。'}</p>`;
   return `<section class="ns-ai-review"><h3>语义复核 · 待人工确认</h3><p>同一模型另发请求复核了${review.checkedParameterIds.length}项参数及原文片段；${review.findings.length ? `报告${review.findings.length}项疑点` : '未报告疑点，仍可能有遗漏或误判'}。</p>
     ${review.requiresImageCheck ? '<p class="ns-ai-note">含OCR文字：模型不能证明原图的数值、单位或★/±符号正确，必须对照原图。</p>' : ''}
-    ${review.findings.length ? `<details><summary>查看${review.findings.length}项待核对疑点</summary><ul>${review.findings.map(f=>`<li><strong>${esc(findingLabels[f.kind])} · ${f.severity==='ERROR'?'需优先核对':'待核对'}</strong><p>${esc(f.message)}</p><small>${esc(f.evidence.location)}${f.parameter_id?` · 参数标识 ${esc(f.parameter_id)}`:''}</small><blockquote>${esc(f.original_text)}</blockquote></li>`).join('')}</ul></details>` : ''}</section>`;
+    ${review.findings.length ? `<details><summary>查看${review.findings.length}项待核对疑点</summary><ul>${review.findings.map(f=>`<li><strong>${esc(findingLabels[f.kind])} · ${f.severity==='ERROR'?'需优先核对':'待核对'}</strong><p>${esc(f.message)}</p><small>${esc(f.evidence.location)}${f.parameter_id?` · 参数标识 ${esc(f.parameter_id)}`:''}</small><blockquote>${esc(f.original_text)}</blockquote></li>`).join('')}</ul></details>` : ''}
+    ${(review.rejectedFindings||[]).length ? `<details><summary>另有${review.rejectedFindings.length}条复核意见未通过结构校验（未计入疑点，模型原话供参考）</summary><ul>${review.rejectedFindings.map(r=>`<li><strong>${esc(findingLabels[r.kind]||r.kind||'未知类型')}</strong><p>${esc(r.message)}</p><small>未采纳原因：${esc(r.reason)}</small>${r.original_text?`<blockquote>${esc(r.original_text)}</blockquote>`:''}</li>`).join('')}</ul></details>` : ''}</section>`;
 }
 export function specProgressMessage(info) {
   const phase={discovery:'识别设备',extraction:'整理参数',review:'语义复核'}[info.phase]||'分析';
@@ -47,7 +48,8 @@ export function specExportSheets(result) {
     {name:'语义复核',rows:[[review?'同一模型单独请求的复核意见；全部待人工确认':result.complete === false?'本次语义复核尚未完成':'旧版工作稿：未执行语义复核'],
       [review?`覆盖${review.checkedParameterIds.length}项参数，报告${review.findings.length}项疑点；未报告疑点不代表无遗漏`:'请重新整理以执行语义复核'],
       ['疑点类型','优先级','参数标识','问题说明','原文','原文位置','复核状态'],
-      ...(review?.findings||[]).map(f=>[findingLabels[f.kind],f.severity,f.parameter_id||'',f.message,f.original_text,f.evidence.location,'待人工确认'])]}];
+      ...(review?.findings||[]).map(f=>[findingLabels[f.kind],f.severity,f.parameter_id||'',f.message,f.original_text,f.evidence.location,'待人工确认']),
+      ...(review?.rejectedFindings||[]).map(r=>[findingLabels[r.kind]||r.kind||'未知类型',r.severity,r.parameter_id||'',r.message,r.original_text,'',`未采纳（${r.reason}）`])]}];
   if (result.complete === false) sheets.push({name:'未通过校验项',rows:[['模型候选项：未通过证据校验，不可作为已确认参数采用'],
     ['分析状态',result.processingState,'中断说明',result.pipelineError],
     ['设备','参数','模型候选值（未核验）','模型候选条件（未核验）','失败原因','模型引用文字（未核验）','模型条件引用（未核验）','分析片段起点','分析片段终点'],
@@ -70,7 +72,8 @@ export function specResultMarkup(result) {
     ${semanticReviewMarkup(result)}
     <p class="ns-muted">下方“人工条款复核与方案配置”的数量仅统计人工方案；本次 AI 清单显示在这里。</p>
     ${result.products.map((p, index) => `<details class="ns-ai-device"${index === 0 ? ' open' : ''}><summary><strong>${esc(p.device_name)}</strong><span>${esc(p.device_type)}${p.scope ? ` · ${esc(p.scope)}` : ''} · ${p.params_detail.length}项</span></summary>
-      ${!p.params_detail.length?'<p class="ns-ai-note">设备名称有原文依据，尚无通过校验的参数；请检查待核对项或未完成批次。</p>':''}
+      ${p.nameInEvidence === false ? `<p class="ns-ai-note">设备名称为AI归纳，原文写法：“${esc(p.evidence?.quote || '')}”（${esc(p.evidence?.location || '')}），请核对。</p>` : ''}
+      ${!p.params_detail.length?'<p class="ns-ai-note">设备已识别，尚无通过校验的参数；请检查待核对项或未完成批次。</p>':''}
       <div class="ns-table-wrap"><table><thead><tr><th>参数</th><th>规范要求</th><th>证据状态</th><th>原文依据</th></tr></thead><tbody>${p.params_detail.map(d => `<tr><td>${esc(d.name)}${d.condition ? `<p class="ns-ai-note">适用条件：${esc(d.condition)}</p>` : ''}${d.forbiddenDeviation === true ? '<p class="ns-ai-note">★ 不可偏离</p>' : ''}</td><td>${esc(d.value)}${d.multipleValues ? '<p class="ns-ai-note">多个值，需核对适用条件</p>' : ''}</td><td>${evidenceLabel(d)}${d.risk !== 'LOW' ? `<p class="ns-ai-note">AI疑点：${esc(d.risk)} · 待复核</p>` : ''}</td><td>${d.evidence ? `<details><summary>${esc(d.evidence.location)}</summary><blockquote>${esc(d.original_text)}</blockquote>${d.evidence.pageFurnitureOmittedInValue ? '<p class="ns-ai-note">参数值省略重复页眉页脚；此处保留跨页完整原文。</p>' : ''}${d.deviationRuleEvidence ? `<p>不可偏离定义：${esc(d.deviationRuleEvidence.quote)}</p>` : ''}<small>原文字符 ${d.evidence.start + 1}—${d.evidence.end}</small></details>` : '该检查项在文档中未明确提及'}</td></tr>`).join('')}</tbody></table></div></details>`).join('')}`;
 }
 export function mountSpecExtraction(root, api) {
