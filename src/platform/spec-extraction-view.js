@@ -54,7 +54,9 @@ export function specExportSheets(result) {
   if (result.complete === false) sheets.push({name:'未通过校验项',rows:[['模型候选项：未通过证据校验，不可作为已确认参数采用'],
     ['分析状态',result.processingState,'中断说明',result.pipelineError],
     ['设备','参数','模型候选值（未核验）','模型候选条件（未核验）','失败原因','模型引用文字（未核验）','模型条件引用（未核验）','分析片段起点','分析片段终点'],
-    ...result.rejectedParameters.map(r=>[result.products.find(p=>p.device_id===r.device_id)?.device_name||r.device_id,r.candidate.name,r.candidate.value,r.candidate.condition,r.reason,r.candidate.original_text,r.candidate.condition_original_text,r.chunk.start,r.chunk.end])]});
+    ...result.rejectedParameters.map(r=>[result.products.find(p=>p.device_id===r.device_id)?.device_name||r.device_id,r.candidate.name,r.candidate.value,r.candidate.condition,r.reason,r.candidate.original_text,r.candidate.condition_original_text,r.chunk.start,r.chunk.end]),
+    ...((result.rejectedDevices||[]).length?[[],['未通过校验的设备候选'],['设备类型','设备名称','适用范围','失败原因','模型引用文字（未核验）','分析片段起点','分析片段终点'],
+      ...result.rejectedDevices.map(r=>[r.candidate.device_type,r.candidate.device_name,r.candidate.scope,r.reason,r.candidate.original_text,r.chunk.start,r.chunk.end])]:[])]});
   if ((result.deviceMerges || []).length) sheets.push({ name: '设备合并记录', rows: [['人工确认为同一设备的不同叫法后合并；参数内容未改动'],
     ['被合并设备', '合并到', '并入参数项数', '合并时间', '被合并设备原文', '原文位置'],
     ...result.deviceMerges.map(m => { const record = result.products.flatMap(p => p.mergedFrom || []).find(x => x.device_id === m.from.device_id);
@@ -63,9 +65,11 @@ export function specExportSheets(result) {
 }
 function partialMarkup(result) {
   if (result.complete !== false) return '';
-  return `<section class="ns-ai-note"><h3>未完成工作稿 · ${result.rejectedParameters.length}项参数待核对</h3><p>已通过文字证据校验的参数保留在下方；待核对项单独列出，未计入已核验参数。此稿不能作为整份规范的完整清单采用。</p>
+  const rejectedDevices = result.rejectedDevices || [];
+  return `<section class="ns-ai-note"><h3>未完成工作稿 · ${rejectedDevices.length ? `${rejectedDevices.length}项设备、` : ''}${result.rejectedParameters.length}项参数待核对</h3><p>已通过文字证据校验的参数保留在下方；待核对项单独列出，未计入已核验参数。此稿不能作为整份规范的完整清单采用。</p>
     <p>${esc({running:'分析仍在进行，结果会逐批更新。',stopped:'本次分析已停止，已完成的批次仍可查看和下载。',needs_review:'文字提取已结束，仍有未通过校验的内容。'}[result.processingState])}</p>
     ${result.pipelineError?`<p>停止或未完成原因：${esc(result.pipelineError)}</p>`:''}
+    ${rejectedDevices.length?`<details open><summary>查看未通过校验的设备候选及原因（${rejectedDevices.length}项）</summary><ul>${rejectedDevices.map(r=>`<li><strong>${esc(r.candidate.device_name||'（未命名）')} · ${esc(r.candidate.device_type||'类型未返回')}</strong>${r.candidate.scope?`<p>适用范围：${esc(r.candidate.scope)}</p>`:''}<p>未通过原因：${esc(r.reason)}</p>${r.candidate.original_text?`<blockquote>${esc(r.candidate.original_text)}</blockquote>`:''}</li>`).join('')}</ul></details>`:''}
     ${result.rejectedParameters.length?`<details open><summary>查看未通过校验项及原因（${result.rejectedParameters.length}项）</summary><ul>${result.rejectedParameters.map(r=>`<li><strong>${esc(result.products.find(p=>p.device_id===r.device_id)?.device_name)} · ${esc(r.candidate.name||'未命名参数')}</strong><p>模型候选值（未核验）：${esc(r.candidate.value)}${r.candidate.condition?`；模型候选条件（未核验）：${esc(r.candidate.condition)}`:''}</p><p>失败原因：${esc(r.reason)}</p><details><summary>模型引用文字（未核验）· 分析片段字符 ${r.chunk.start+1}—${r.chunk.end}</summary><blockquote>${esc(r.candidate.original_text)}</blockquote>${r.candidate.condition_original_text?`<p>模型条件引用（未核验）：</p><blockquote>${esc(r.candidate.condition_original_text)}</blockquote>`:''}</details></li>`).join('')}</ul></details>`:''}</section>`;
 }
 export function specResultMarkup(result, { interactive = false } = {}) {
@@ -79,6 +83,7 @@ export function specResultMarkup(result, { interactive = false } = {}) {
     ${result.products.map((p, index) => `<details class="ns-ai-device"${index === 0 ? ' open' : ''}><summary><strong>${esc(p.device_name)}</strong><span>${esc(p.device_type)}${p.scope ? ` · ${esc(p.scope)}` : ''} · ${p.params_detail.length}项</span></summary>
       ${(p.mergedFrom || []).length ? `<p class="ns-ai-note">已人工合并的其他叫法：${p.mergedFrom.map(m => `“${esc(m.device_name)}”（${esc(m.evidence?.location || '')}）`).join('、')}</p>` : ''}
       ${interactive && mergeableDevices(result, p.device_id).length ? `<div class="ns-actions ns-ai-merge"><label>确认是同一台设备的不同叫法时，合并到 <select data-merge-into-for="${esc(p.device_id)}">${mergeableDevices(result, p.device_id).map(o => `<option value="${esc(o.device_id)}">${esc(o.device_name)}（${o.params_detail.length}项）</option>`).join('')}</select></label><button type="button" data-merge-from="${esc(p.device_id)}">合并设备</button></div>` : ''}
+      ${p.scopeInEvidence === false ? `<p class="ns-ai-note">适用范围“${esc(p.scope)}”为AI归纳，原文中未找到相同写法，请核对。</p>` : ''}
       ${p.nameInEvidence === false ? `<p class="ns-ai-note">设备名称为AI归纳，原文写法：“${esc(p.evidence?.quote || '')}”（${esc(p.evidence?.location || '')}），请核对。</p>` : ''}
       ${!p.params_detail.length?'<p class="ns-ai-note">设备已识别，尚无通过校验的参数；请检查待核对项或未完成批次。</p>':''}
       <div class="ns-table-wrap"><table><thead><tr><th>参数</th><th>规范要求</th><th>证据状态</th><th>原文依据</th></tr></thead><tbody>${p.params_detail.map(d => `<tr><td>${esc(d.name)}${d.condition ? `<p class="ns-ai-note">适用条件：${esc(d.condition)}</p>` : ''}${d.forbiddenDeviation === true ? '<p class="ns-ai-note">★ 不可偏离</p>' : ''}</td><td>${esc(d.value)}${d.multipleValues ? '<p class="ns-ai-note">多个值，需核对适用条件</p>' : ''}</td><td>${evidenceLabel(d)}${d.risk !== 'LOW' ? `<p class="ns-ai-note">AI疑点：${esc(d.risk)} · 待复核</p>` : ''}</td><td>${d.evidence ? `<details><summary>${esc(d.evidence.location)}</summary><blockquote>${esc(d.original_text)}</blockquote>${d.evidence.pageFurnitureOmittedInValue ? '<p class="ns-ai-note">参数值省略重复页眉页脚；此处保留跨页完整原文。</p>' : ''}${d.deviationRuleEvidence ? `<p>不可偏离定义：${esc(d.deviationRuleEvidence.quote)}</p>` : ''}<small>原文字符 ${d.evidence.start + 1}—${d.evidence.end}</small></details>` : '该检查项在文档中未明确提及'}</td></tr>`).join('')}</tbody></table></div></details>`).join('')}`;

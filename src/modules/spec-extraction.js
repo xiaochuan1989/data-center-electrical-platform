@@ -167,9 +167,11 @@ function validateDevice(device, source, chunk) {
   assert(device && types.has(device.device_type) && string(device.device_name), '设备类型未注册或设备名称为空');
   const evidence = locateSpecEvidence(source, chunk, device.original_text);
   const scope = device.scope || '';
-  assert(typeof scope === 'string' && (!scope || norm(chunk.text).includes(norm(scope))), '设备适用范围不在当前原文内');
+  assert(typeof scope === 'string', '设备适用范围格式无效');
+  // 适用范围同为归一标签（模型常概括章节名，Word 标题解析写法也可能不同）：未在原文中逐字出现时标记待核对，不拒收。
   return { device_type: device.device_type, device_name: device.device_name.trim(), scope: scope.trim(), evidence,
-    nameInEvidence: norm(evidence.quote).includes(norm(device.device_name)) };
+    nameInEvidence: norm(evidence.quote).includes(norm(device.device_name)),
+    scopeInEvidence: !scope.trim() || norm(source.text).includes(norm(scope)) };
 }
 function contextFor(source, chunk) {
   return (source.segments || []).filter(s => s.end > chunk.start && s.start < chunk.end).map(s => ({
@@ -194,7 +196,7 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
   const fingerprint = await specSourceFingerprint(source);
   const devices = [], products = new Map();
   const coverage = { discovery: [], extraction: [] };
-  const rejectedParameters = [];
+  const rejectedParameters = [], rejectedDevices = [];
   const createdAt = new Date().toISOString();
   let requests = 0;
   const productList = () => devices.map(device => {
@@ -207,7 +209,7 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
     sourceId: source.id, sourceFingerprint: fingerprint, file_name: source.name,
     complete: false, reviewStatus: 'pending', createdAt, processingState, pipelineError,
     coverage: structuredClone(coverage), products: productList(),
-    rejectedParameters: structuredClone(rejectedParameters), requestCount: requests,
+    rejectedParameters: structuredClone(rejectedParameters), rejectedDevices: structuredClone(rejectedDevices), requestCount: requests,
     ...(semanticReview ? { semanticReview } : {})
   });
   const invoke = input => {
@@ -264,7 +266,16 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
     if (phase === 'discovery') {
       assert(Array.isArray(data.devices) && data.devices.length <= 200, '设备识别结果结构无效或过多');
       for (const item of data.devices) {
-        const device = validateDevice(item, source, chunk);
+        let device;
+        // 单台设备候选不合规（证据无法定位、类型未注册等）只隔离该台，列为待核对设备，其余设备继续。
+        try { device = validateDevice(item, source, chunk); }
+        catch (error) {
+          if (!allowPartial) throw error;
+          const candidate = Object.fromEntries(['device_type', 'device_name', 'scope', 'original_text'].map(key => [key, typeof item?.[key] === 'string' ? item[key].slice(0, 2000) : '']));
+          const rejected = { candidate, reason: error.message, chunk: { start: chunk.start, end: chunk.end } };
+          if (!rejectedDevices.some(old => JSON.stringify(old) === JSON.stringify(rejected))) rejectedDevices.push(rejected);
+          continue;
+        }
         if (!devices.some(old => identity(old) === identity(device))) devices.push({ ...device, device_id: `device-${devices.length + 1}` });
       }
       assert(devices.length <= 300, '设备过多，请按系统拆分资料');
@@ -273,7 +284,16 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
       for (const item of data.products) {
         // 按设备编号对应；模型回显名称时的空格/全半角差异不改变设备身份，不得因此整轮作废。
         const device = devices.find(d => d.device_id === item.device_id && d.device_type === item.device_type);
-        assert(device, `参数引用了未识别设备或设备类型不一致（${String(item.device_id || '').slice(0, 40)}）`);
+        if (!device) {
+          const reason = `参数引用了未识别设备或设备类型不一致（${String(item?.device_id || '').slice(0, 40)}）`;
+          assert(allowPartial, reason);
+          // 只隔离这一组参数：记为待核对设备候选并注明未采用的参数数量，其余设备继续。
+          const count = Array.isArray(item?.params_detail) ? item.params_detail.length : 0;
+          const rejected = { candidate: { device_type: typeof item?.device_type === 'string' ? item.device_type.slice(0, 200) : '', device_name: typeof item?.device_name === 'string' ? item.device_name.slice(0, 200) : '',
+            scope: '', original_text: '' }, reason: `${reason}；该组${count}项参数未采用`, chunk: { start: chunk.start, end: chunk.end } };
+          if (!rejectedDevices.some(old => JSON.stringify(old) === JSON.stringify(rejected))) rejectedDevices.push(rejected);
+          continue;
+        }
         assert(Array.isArray(item.params_detail) && item.params_detail.length <= 1500, '设备参数明细结构无效或过多');
         const product = products.get(device.device_id) || { ...device, params_detail: [] };
         products.set(device.device_id, product);
@@ -301,7 +321,7 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
   // 设备识别只输出很短的设备清单，需要看到整篇才能把封面/章节/配置表里的不同叫法认作同一设备：
   // 6万字以内整篇一次识别（截断时 run 仍会自动拆分），参数整理仍按小片段进行。
   for (const chunk of splitSpecSource(source, Math.max(chunkSize, 60000), 600)) await run('discovery', chunk);
-  assert(devices.length > 0, '未识别到有原文依据的设备，未生成参数清单');
+  assert(devices.length > 0, rejectedDevices.length ? `未识别到有原文依据的设备：${rejectedDevices.length}项设备候选未通过校验，原因见待核对设备` : '未识别到有原文依据的设备，未生成参数清单');
   for (const chunk of chunks) await run('extraction', chunk);
   const result = productList();
   const empty = result.find(product => !product.params_detail.some(d => d.evidence_status === 'VERIFIED'));
@@ -314,8 +334,8 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
     onProgress:info=>onProgress({...info,requests,devices:devices.length})});
   cancelled(signal);
   analysis.requestCount=requests;
-  if (rejectedParameters.length || empty) {
-    const partial = draft('needs_review', empty ? `设备“${empty.device_name}”尚无通过证据校验的真实参数` : '', analysis.semanticReview);
+  if (rejectedParameters.length || rejectedDevices.length || empty) {
+    const partial = draft('needs_review', empty ? `设备“${empty.device_name}”尚无通过证据校验的真实参数` : rejectedDevices.length ? `${rejectedDevices.length}项设备候选未通过校验，见待核对设备` : '', analysis.semanticReview);
     await onDraft(partial);
     return partial;
   }
@@ -335,7 +355,10 @@ export async function validateSpecDraft(source, result) {
 }
 async function validateSpecContent(source, result, draft) {
   assert([3,SPEC_ANALYSIS_VERSION].includes(result?.contractVersion) && result.complete === !draft && result.reviewStatus === 'pending', '提取工作稿版本或状态无效');
-  if (!draft) assert(!('draftVersion' in result) && !('rejectedParameters' in result) && !('processingState' in result), '未完成工作稿不能冒充完整提取结果');
+  if (!draft) assert(!('draftVersion' in result) && !('rejectedParameters' in result) && !('rejectedDevices' in result) && !('processingState' in result), '未完成工作稿不能冒充完整提取结果');
+  if (draft && 'rejectedDevices' in result) assert(Array.isArray(result.rejectedDevices) && result.rejectedDevices.every(item => item && string(item.reason)
+    && item.candidate && ['device_type', 'device_name', 'scope', 'original_text'].every(key => typeof item.candidate[key] === 'string')
+    && Number.isInteger(item.chunk?.start) && Number.isInteger(item.chunk?.end) && item.chunk.start >= 0 && item.chunk.end > item.chunk.start && item.chunk.end <= source.text.length), '待核对设备记录无效');
   if (draft) {
     assert(result.draftVersion === 1 && ['running','stopped','needs_review'].includes(result.processingState) && typeof result.pipelineError === 'string', '中间工作稿状态无效');
     assert(Array.isArray(result.rejectedParameters), '缺少待核对参数记录');
@@ -353,6 +376,7 @@ async function validateSpecContent(source, result, draft) {
     assert(string(product.device_id) && !ids.has(product.device_id), '设备标识缺失或重复'); ids.add(product.device_id);
     const checkedDevice = validateDevice({ ...product, original_text: product.evidence?.quote }, source, whole);
     if ('nameInEvidence' in product) assert(product.nameInEvidence === checkedDevice.nameInEvidence, '设备名称来源标记与原文失配');
+    if ('scopeInEvidence' in product) assert(product.scopeInEvidence === checkedDevice.scopeInEvidence, '设备适用范围来源标记与原文失配');
     // 人工合并留下的被合并设备记录：类型一致、名称非空、原文证据仍是当前原文中的真实片段。
     if ('mergedFrom' in product) assert(Array.isArray(product.mergedFrom) && product.mergedFrom.every(m => m && m.device_type === product.device_type && string(m.device_name)
       && Number.isInteger(m.evidence?.start) && Number.isInteger(m.evidence?.end) && m.evidence.start >= 0 && m.evidence.end > m.evidence.start

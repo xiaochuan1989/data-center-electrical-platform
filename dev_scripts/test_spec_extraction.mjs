@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { analyzeSpecSource, splitSpecSource, validateSpecAnalysis, specSourceFingerprint } from '../src/modules/spec-extraction.js';
+import { analyzeSpecSource, splitSpecSource, validateSpecAnalysis, validateSpecDraft, specSourceFingerprint } from '../src/modules/spec-extraction.js';
 import { requestSpecJson, readSpecAiConfig, specAiDestination } from '../src/modules/spec-ai-client.js';
 import { SPEC_DEVICE_REGISTRY } from '../src/data/spec-extraction-reference.js';
-import { specResultMarkup } from '../src/platform/spec-extraction-view.js';
+import { specResultMarkup, specExportSheets } from '../src/platform/spec-extraction-view.js';
 
 // Synthetic software fixtures only. Never presented as a real customer extraction.
 assert.equal(Object.keys(SPEC_DEVICE_REGISTRY).length, 29);
@@ -224,6 +224,57 @@ assert.equal(html.includes('<img'), false); assert.match(html, /&lt;img/);
   // 证据不在原文中仍拒收：防编造的底线不变。
   await assert.rejects(() => analyzeSpecSource(aliasSource, { request: async input => { const d = JSON.parse(input.user);
     return d.task === 'discovery' ? { complete: true, devices: [{ device_type: '电池开关箱', device_name: 'X', scope: '', original_text: '原文没有这句话' }] } : { complete: true, products: [] }; }, chunkSize: 500 }), /证据不在当前原文片段内/);
+}
+// 设备识别单条隔离与适用范围标签：范围是AI概括的章节名时照收并标记；单台设备候选证据不在原文时只隔离该台，其余继续；
+// 全部不合格时停止并保留每台的原因。
+{
+  const devText = '合成设备隔离验收资料。\n第一章 甲柜技术要求\n甲柜额定电流为630A。\n第二章 乙柜\n乙柜额定电流为400A。\n';
+  const devSource = { id: 'synthetic-device-isolation', type: 'text', name: '合成设备隔离.txt', text: devText, warnings: [], segments: [] };
+  const devRequest = devicesOut => async input => {
+    const data = JSON.parse(input.user);
+    if (data.task === 'review') return { complete: true, source_checked: true, checked_parameter_ids: data.review_parameters.map(p => p.parameter_id), issues: [] };
+    if (data.task === 'discovery') return { complete: true, devices: devicesOut };
+    return { complete: true, products: data.known_devices.map(d => ({ ...d, params_detail: [d.device_name === '甲柜' ? detail('额定电流', '630A', '甲柜额定电流为630A。') : detail('额定电流', '400A', '乙柜额定电流为400A。')] })) };
+  };
+  const good = { device_type: '低压配电柜', device_name: '甲柜', scope: '甲柜部分（AI概括）', original_text: '第一章 甲柜技术要求' };
+  const bad = { device_type: '低压配电柜', device_name: '丙柜', scope: '', original_text: '原文没有丙柜这句话' };
+  const scoped = await analyzeSpecSource(devSource, { request: devRequest([good]) });
+  assert.equal(scoped.products[0].scopeInEvidence, false);
+  assert.equal(await validateSpecAnalysis(devSource, scoped), scoped);
+  assert.match(specResultMarkup(scoped), /适用范围“甲柜部分（AI概括）”为AI归纳/);
+  const flipped = structuredClone(scoped); flipped.products[0].scopeInEvidence = true;
+  await assert.rejects(() => validateSpecAnalysis(devSource, flipped), /适用范围来源标记/);
+  const exactScope = await analyzeSpecSource(devSource, { request: devRequest([{ ...good, scope: '第一章 甲柜技术要求' }]) });
+  assert.equal(exactScope.products[0].scopeInEvidence, true);
+  // 一台不合格：隔离为待核对设备，另一台照常整理并复核。
+  const mixed = await analyzeSpecSource(devSource, { request: devRequest([good, bad]), allowPartial: true });
+  assert.equal(mixed.complete, false);
+  assert.equal(mixed.processingState, 'needs_review');
+  assert.deepEqual(mixed.products.map(p => p.device_name), ['甲柜']);
+  assert.equal(mixed.products[0].params_detail[0].value, '630A');
+  assert.equal(mixed.rejectedDevices[0].candidate.device_name, '丙柜');
+  assert.match(mixed.rejectedDevices[0].reason, /证据不在当前原文/);
+  assert(mixed.semanticReview, '其余设备照常复核');
+  assert.equal(await validateSpecDraft(devSource, mixed), mixed);
+  assert.match(specResultMarkup(mixed), /未通过校验的设备候选及原因（1项）/);
+  assert(specExportSheets(mixed).find(s => s.name === '未通过校验项').rows.some(r => r[1] === '丙柜'));
+  const forgedRejected = structuredClone(mixed); forgedRejected.rejectedDevices[0].reason = '';
+  await assert.rejects(() => validateSpecDraft(devSource, forgedRejected), /待核对设备记录/);
+  // 全部不合格：停止，未完成稿保留每台原因；严格模式仍直接报原错误。
+  const stoppedDrafts = [];
+  await assert.rejects(() => analyzeSpecSource(devSource, { request: devRequest([bad]), allowPartial: true, onDraft: d => stoppedDrafts.push(d) }), /1项设备候选未通过校验/);
+  assert.equal(stoppedDrafts.at(-1).rejectedDevices[0].candidate.device_name, '丙柜');
+  await assert.rejects(() => analyzeSpecSource(devSource, { request: devRequest([good, bad]) }), /证据不在当前原文/);
+  // 参数阶段引用了未识别设备：只隔离该组参数，已识别设备照常保留。
+  const strayRequest = async input => { const data = JSON.parse(input.user);
+    if (data.task !== 'extraction') return devRequest([good])(input);
+    const out = await devRequest([good])(input);
+    out.products.push({ device_id: 'device-99', device_type: '低压配电柜', device_name: '幽灵柜', params_detail: [detail('额定电流', '400A', '乙柜额定电流为400A。')] });
+    return out; };
+  const stray = await analyzeSpecSource(devSource, { request: strayRequest, allowPartial: true });
+  assert.deepEqual(stray.products.map(p => p.device_name), ['甲柜']);
+  assert.match(stray.rejectedDevices[0].reason, /未识别设备.*该组1项参数未采用/);
+  assert.equal(await validateSpecDraft(devSource, stray), stray);
 }
 // 页眉页脚：程序识别的重复行传给模型；值混入页眉（常伴后半句丢失）转入待核对；正确省略页眉的跨页值通过。
 {
