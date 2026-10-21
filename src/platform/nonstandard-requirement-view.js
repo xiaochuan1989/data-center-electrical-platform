@@ -1,6 +1,6 @@
 import { PRODUCT_PROFILES, createPresalesPackage, addEquipment, updateEquipmentQuantity, addPresalesSource,
   replacePresalesSource, confirmPresalesRequirement, revisePresalesRequirement, invalidatePresalesRequirement,
-  remapPresalesRequirement, createPresalesSnapshot, restorePresalesSnapshot, adoptExtractedEquipment } from '../modules/nonstandard-presales.js';
+  remapPresalesRequirement, createPresalesSnapshot, restorePresalesSnapshot, adoptExtractedEquipment, withdrawAdoptedEquipment } from '../modules/nonstandard-presales.js';
 import { extractPresalesSource, previewPresalesExtraction, parsePresalesClause, presalesEvidenceLocation } from '../modules/nonstandard-requirements.js';
 import { readPresalesFile } from './nonstandard-file-reader.js';
 import { nonstandardSchemeSection, mountNonstandardSchemes } from './nonstandard-scheme-view.js';
@@ -156,7 +156,7 @@ export function mountNonstandardRequirements(root, options = {}) {
     if (!sourceId && pack.sources.length) get('ns-source-select').value = pack.sources.at(-1).id;
     get('ns-filter-source').innerHTML = option('', '全部资料', reviewId) + pack.sources.map(s => option(s.id, s.name, reviewId)).join('');
     get('ns-filter-equipment').innerHTML = option('', '全部设备', filterId) + option('unassigned', '待分配', filterId) + pack.equipment.map(e => option(e.id, e.label, filterId)).join('');
-    get('ns-equipment-list').innerHTML = pack.equipment.map(e => `<div class="ns-equipment" data-ns-equipment-row="${escape(e.id)}"><b>${escape(e.label)}</b><span>${escape(PRODUCT_PROFILES[e.category].label)}</span><label>数量<input type="number" min="1" step="1" value="${escape(e.quantity ?? '')}" data-ns-quantity></label><input data-ns-quantity-reason aria-label="数量修改原因" placeholder="数量修改原因"><button data-ns-quantity-save>更新数量</button></div>`).join('') || '<p class="ns-empty">尚未登记设备；未知数量留空，不默认为1。</p>';
+    get('ns-equipment-list').innerHTML = pack.equipment.map(e => `<div class="ns-equipment" data-ns-equipment-row="${escape(e.id)}"><b>${escape(e.label)}</b><span>${escape(PRODUCT_PROFILES[e.category].label)}</span><label>数量<input type="number" min="1" step="1" value="${escape(e.quantity ?? '')}" data-ns-quantity></label><input data-ns-quantity-reason aria-label="数量修改原因" placeholder="数量修改原因"><button data-ns-quantity-save>更新数量</button>${e.origin?.kind === 'ai-extraction' ? '<button data-ns-withdraw title="未确认/应答任何条款时可撤销，撤销后可在AI结果中重新采用">撤销AI采用</button>' : ''}</div>`).join('') || '<p class="ns-empty">尚未登记设备；未知数量留空，不默认为1。</p>';
     showSource(); renderRequirements(); renderSummary(); schemeUI.render();
   }
   function commit(next, success, { clearDraftId, sourceId, targetId, reset = false } = {}) {
@@ -179,6 +179,16 @@ export function mountNonstandardRequirements(root, options = {}) {
   const safe = fn => (...args) => { try { fn(...args); } catch (error) { message(error.message, true); } };
   get('ns-add-equipment').addEventListener('click', safe(() => commit(addEquipment(pack, { category: get('ns-category').value, label: get('ns-equipment-label').value, quantity: get('ns-equipment-quantity').value }, get('ns-equipment-reason').value), '设备项已登记（数量为空时保持未知）')));
   get('ns-equipment-list').addEventListener('click', safe(event => {
+    if (event.target.matches('[data-ns-withdraw]')) {
+      const equipment = pack.equipment.find(e => e.id === event.target.closest('[data-ns-equipment-row]').dataset.nsEquipmentRow);
+      const count = pack.requirements.filter(r => r.equipmentId === equipment.id).length;
+      if (!globalThis.confirm(`撤销“${equipment.label}”的AI采用？将移除该设备及其${count}条待复核条款，之后可在AI结果中重新采用。`)) return;
+      const next = withdrawAdoptedEquipment(pack, equipment.id, `撤销AI采用：${equipment.label}（${count}条条款）`);
+      if (get('ns-filter-equipment').value === equipment.id) get('ns-filter-equipment').value = '';
+      openRequirementId = null; page = 1;
+      commit(next, `已撤销“${equipment.label}”的AI采用，可在上方AI结果中重新采用`);
+      specUI?.render(); return;
+    }
     if (!event.target.matches('[data-ns-quantity-save]')) return;
     const row = event.target.closest('[data-ns-equipment-row]');
     commit(updateEquipmentQuantity(pack, row.dataset.nsEquipmentRow, row.querySelector('[data-ns-quantity]').value, row.querySelector('[data-ns-quantity-reason]').value), '设备数量已更新，关联方案需重新复核');

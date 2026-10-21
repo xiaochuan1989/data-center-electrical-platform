@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { analyzeSpecSource } from '../src/modules/spec-extraction.js';
 import { specAdoptionItems, specCategoryFor, specAdoptionKey } from '../src/modules/spec-adoption.js';
 import { createPresalesPackage, addPresalesSource, adoptExtractedEquipment, confirmPresalesRequirement, remapPresalesRequirement,
-  createPresalesSnapshot, restorePresalesSnapshot, replacePresalesSource } from '../src/modules/nonstandard-presales.js';
+  createPresalesSnapshot, restorePresalesSnapshot, replacePresalesSource, withdrawAdoptedEquipment, addEquipment } from '../src/modules/nonstandard-presales.js';
 import { specResultMarkup } from '../src/platform/spec-extraction-view.js';
 
 // Synthetic software fixtures only: a Word-like source split into paragraph segments.
@@ -91,4 +91,34 @@ assert.match(after, /已采用到下方人工复核/);
 assert.equal(specResultMarkup(result).includes('data-adopt-device'), false);
 assert.equal(specAdoptionKey(result, pdu), `${origin.sourceId}|${origin.deviceId}|${origin.analysisCreatedAt}`, '页面采用标识与工作稿来源标记一致');
 
-console.log('AI结果采用到人工复核：品类映射、证据收窄与跨段隔离、一次修订采用与防重复、确认/字段重分配/备份/资料替换、页面按钮通过（合成软件用例）');
+// 同一句被提成多个参数（分段重叠重复提取、同句不同名称、同句不同值）只生成一条条款。
+const at = quote => { const start = text.indexOf(quote); return { sourceId: source.id, start, end: start + quote.length, quote }; };
+const dupProduct = { params_detail: [
+  { name: '防护等级', value: 'IP20', evidence_status: 'VERIFIED', evidence: at('2）防护等级：IP20。') },
+  { name: '外壳防护', value: 'IP20', evidence_status: 'VERIFIED', evidence: at('2）防护等级：IP20。') },
+  { name: '防护等级', value: 'IP20', evidence_status: 'VERIFIED', evidence: at('一、PDU技术要求\n★1）PDU额定电流为32A。\n2）防护等级：IP20。') },
+  { name: '额定电流', value: '32A', evidence_status: 'VERIFIED', evidence: at('★1）PDU额定电流为32A。'), forbiddenDeviation: true },
+  { name: '电流类型', value: 'PDU额定电流', evidence_status: 'VERIFIED', evidence: at('★1）PDU额定电流为32A。') }] };
+const dup = specAdoptionItems(source, dupProduct).items;
+assert.equal(dup.length, 2, '同段同句只保留一条条款');
+assert.deepEqual(dup.map(i => i.name), ['防护等级 / 外壳防护', '额定电流 / 电流类型']);
+assert.equal(dup[0].value, 'IP20');
+assert.equal(dup[1].value, 'PDU额定电流为32A', '同句不同值合并为覆盖两者的原文范围');
+assert.equal(dup[1].forbiddenDeviation, true);
+const dupPack = adoptExtractedEquipment(pack0, { category: 'pdu', label: '合成PDU', items: dup,
+  origin: { sourceId: source.id, deviceId: 'dup', analysisCreatedAt: 't', deviceType: 'PDU' } }, '合成去重采用');
+assert.equal(dupPack.requirements.length, 2);
+
+// 撤销采用：未确认/应答时可撤销，连同条款移除并可重新采用；已确认后不可撤销；手工登记设备不可撤销。
+const withdrawn = withdrawAdoptedEquipment(dupPack, dupPack.equipment[0].id, '合成撤销');
+assert.equal(withdrawn.equipment.length, 0); assert.equal(withdrawn.requirements.length, 0);
+assert.equal(withdrawn.revisions.at(-1).kind, 'equipment:withdraw-ai');
+assert.equal(restorePresalesSnapshot(createPresalesSnapshot(withdrawn)).equipment.length, 0);
+assert.equal(adoptExtractedEquipment(withdrawn, { category: 'pdu', label: '合成PDU', items: dup,
+  origin: { sourceId: source.id, deviceId: 'dup', analysisCreatedAt: 't', deviceType: 'PDU' } }, '重新采用').requirements.length, 2, '撤销后可重新采用');
+const confirmedDup = confirmPresalesRequirement(dupPack, dupPack.requirements[0].id, { value: 'IP20', forbiddenDeviation: false, response: 'met' }, '合成确认');
+assert.throws(() => withdrawAdoptedEquipment(confirmedDup, confirmedDup.equipment[0].id, '合成撤销'), /已有确认或应答/);
+const manual = addEquipment(pack0, { category: 'pdu', label: '手工PDU', quantity: 1 }, '手工登记');
+assert.throws(() => withdrawAdoptedEquipment(manual, manual.equipment[0].id, '合成撤销'), /只能撤销由AI结果采用/);
+
+console.log('AI结果采用到人工复核：同句多参数合并、撤销采用、品类映射、证据收窄与跨段隔离、一次修订采用与防重复、确认/字段重分配/备份/资料替换、页面按钮通过（合成软件用例）');

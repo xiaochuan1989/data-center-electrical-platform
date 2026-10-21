@@ -269,6 +269,17 @@ export function adoptExtractedEquipment(input, { category, label, origin, items 
   }
   return changed(pack, 'equipment:adopt-ai', equipment.id, reason, equipment.id, { origin: equipment.origin, requirementCount: items.length });
 }
+// 撤销 AI 采用：只允许撤销尚未确认/应答任何条款、也未建方案的 AI 采用设备，连同其条款一并移除，可重新采用。
+export function withdrawAdoptedEquipment(input, id, reason) {
+  const pack = clone(integrity(input)), equipment = equipmentFor(pack, id);
+  assert(equipment.origin?.kind === 'ai-extraction', '只能撤销由AI结果采用的设备');
+  const linked = pack.requirements.filter(r => r.equipmentId === id);
+  assert(linked.every(r => r.reviewStatus !== 'confirmed' && r.response === 'pending'), '该设备已有确认或应答的条款，不能撤销；请逐条处理');
+  assert(!pack.schemes.some(s => s.equipmentId === id), '该设备已有方案，不能撤销');
+  pack.equipment = pack.equipment.filter(e => e.id !== id);
+  pack.requirements = pack.requirements.filter(r => r.equipmentId !== id);
+  return changed(pack, 'equipment:withdraw-ai', id, reason, id, { origin: equipment.origin, requirementCount: linked.length });
+}
 export function confirmPresalesRequirement(input, id, decision, reason) {
   const pack = clone(integrity(input)), requirement = pack.requirements.find(r => r.id === id); assert(requirement, '要求不存在');
   assert(requirement.reviewStatus !== 'stale', '来源已替换，请重新提取要求');
