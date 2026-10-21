@@ -70,12 +70,23 @@ assert.equal(restored.equipment[0].origin.deviceId, pdu.device_id);
 const replaced = replacePresalesSource(pack1, source.id, { type: 'docx', name: '合成采用验收.docx', text: text + '修订', segments, warnings: [] }, '资料更新');
 assert(replaced.requirements.every(r => r.reviewStatus === 'stale'));
 
-// 页面：PDU 显示采用按钮，UPS主机不显示；采用后显示已采用；导出HTML不含按钮。
+// 页面：每台设备都可采用并由人选品类——认得的类型预选（PDU→PDU），认不得的（UPS主机）默认"请选择"并提示；
+// 采用后显示已采用；导出HTML不含按钮。
 const live = specResultMarkup(result, { interactive: true });
-assert.equal((live.match(/data-adopt-device=/g) || []).length, 1);
-assert(live.includes(`data-adopt-device="${pdu.device_id}"`));
+assert.equal((live.match(/data-adopt-device=/g) || []).length, 2);
+const selectFor = id => live.slice(live.indexOf(`data-adopt-category-for="${id}"`)).split('</select>')[0];
+assert.match(selectFor(pdu.device_id), /<option value="pdu" selected>PDU<\/option>/);
+assert.doesNotMatch(selectFor(ups.device_id), / selected/);
+assert.match(live, /该设备类型没有默认品类，请按复核需要选择/);
+// 认不得的类型由人选品类后照样采用（如 UPS 主机按配电柜复核）。
+const upsItems = specAdoptionItems(source, ups).items;
+const byChoice = adoptExtractedEquipment(pack0, { category: 'cabinet', label: ups.device_name, items: upsItems,
+  origin: { sourceId: result.sourceId, deviceId: ups.device_id, analysisCreatedAt: result.createdAt, deviceType: ups.device_type } }, '人工选择品类后采用');
+assert.equal(byChoice.equipment[0].category, 'cabinet');
+assert.equal(byChoice.requirements[0].candidates[0].value, '200kVA');
 const after = specResultMarkup(result, { interactive: true, adoptedKeys: [specAdoptionKey(result, pdu)] });
-assert.equal(after.includes('data-adopt-device='), false);
+assert.equal(after.includes(`data-adopt-device="${pdu.device_id}"`), false, '已采用的设备不再显示按钮');
+assert(after.includes(`data-adopt-device="${ups.device_id}"`), '未采用的设备仍可采用');
 assert.match(after, /已采用到下方人工复核/);
 assert.equal(specResultMarkup(result).includes('data-adopt-device'), false);
 assert.equal(specAdoptionKey(result, pdu), `${origin.sourceId}|${origin.deviceId}|${origin.analysisCreatedAt}`, '页面采用标识与工作稿来源标记一致');

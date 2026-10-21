@@ -39,7 +39,7 @@ export function nonstandardRequirementView() {
         <button id="ns-cancel-read" disabled>取消文件识别</button>
         <label>已导入来源<select id="ns-source-select"></select></label>
         <p id="ns-scope-warning" class="ns-muted" hidden></p>
-        <details class="ns-rule-preview"><summary>按行规则预览（备用，不含 AI 设备识别）</summary><p id="ns-extraction-summary" class="ns-muted"></p>
+        <details class="ns-rule-preview"><summary>按行规则预览（备用：仅在没有 AI 接口时使用）</summary><p class="ns-error">按换行切分，每一行都会成为一条待复核条款，包括封面、目录、页眉、人名等非技术内容，且不分配设备。有 AI 接口时请改用下方“AI 自动整理设备与参数”，再“采用到人工复核”。</p><p id="ns-extraction-summary" class="ns-muted"></p>
         <details id="ns-document-text" hidden><summary id="ns-document-text-summary">文档辅助文字</summary><p class="ns-muted">以下文字默认不登记为要求，原文完整保留。若属于本项目要求，可勾选后重新提取；已登记条款不会被删除。</p><pre id="ns-document-text-preview"></pre><label class="ns-check"><input id="ns-include-document-text" type="checkbox">提取时包含这些文字</label></details>
         <div class="ns-actions"><button id="ns-extract">提取待复核条款</button><button id="ns-replace-source">用粘贴内容替换选中来源</button></div>
         </details>

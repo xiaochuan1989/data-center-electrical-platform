@@ -3,6 +3,7 @@ import { readSpecAiConfig, specAiDestination, requestSpecJson } from '../modules
 import { writePresalesXlsx } from '../modules/presales-xlsx.js';
 import { mergeSpecDevices, mergeableDevices } from '../modules/spec-device-merge.js';
 import { specAdoptionItems, specCategoryFor, specAdoptionKey } from '../modules/spec-adoption.js';
+import { PRODUCT_PROFILES } from '../modules/nonstandard-presales.js';
 
 const CACHE_KEY = 'spec_ai_extractions_v1';
 const DRAFT_CACHE_KEY = 'spec_ai_partial_extractions_v1';
@@ -86,7 +87,7 @@ export function specResultMarkup(result, { interactive = false, adoptedKeys = []
     <p class="ns-muted">下方“人工条款复核与方案配置”的数量仅统计人工方案；本次 AI 清单显示在这里。</p>
     ${result.products.map((p, index) => `<details class="ns-ai-device"${index === 0 ? ' open' : ''}><summary><strong>${esc(p.device_name)}</strong><span>${esc(p.device_type)}${p.scope ? ` · ${esc(p.scope)}` : ''} · ${p.params_detail.length}项</span></summary>
       ${(p.mergedFrom || []).length ? `<p class="ns-ai-note">已人工合并的其他叫法：${p.mergedFrom.map(m => `“${esc(m.device_name)}”（${esc(m.evidence?.location || '')}）`).join('、')}</p>` : ''}
-      ${interactive && specCategoryFor(p) ? (adoptedKeys.includes(specAdoptionKey(result, p)) ? '<p class="ns-ai-note">已采用到下方人工复核（作为待复核条款）。</p>' : `<div class="ns-actions ns-ai-adopt"><button type="button" data-adopt-device="${esc(p.device_id)}">采用到人工复核</button><span class="ns-muted">把本设备的参数作为待复核条款加入下方“设备归属与人工复核”，字段分配与确认仍由人完成。</span></div>`) : ''}
+      ${interactive ? (adoptedKeys.includes(specAdoptionKey(result, p)) ? '<p class="ns-ai-note">已采用到下方人工复核（作为待复核条款）。</p>' : `<div class="ns-actions ns-ai-adopt"><label>人工复核品类<select data-adopt-category-for="${esc(p.device_id)}"><option value="">请选择</option>${Object.entries(PRODUCT_PROFILES).map(([key, profile]) => `<option value="${key}"${specCategoryFor(p) === key ? ' selected' : ''}>${esc(profile.label)}</option>`).join('')}</select></label><button type="button" data-adopt-device="${esc(p.device_id)}">采用到人工复核</button><span class="ns-muted">${specCategoryFor(p) ? '' : '该设备类型没有默认品类，请按复核需要选择（如电池开关箱可按配电柜复核）。'}参数作为待复核条款加入下方“设备归属与人工复核”，字段分配与确认仍由人完成。</span></div>`) : ''}
       ${interactive && mergeableDevices(result, p.device_id).length ? `<div class="ns-actions ns-ai-merge"><label>确认是同一台设备的不同叫法时，合并到 <select data-merge-into-for="${esc(p.device_id)}">${mergeableDevices(result, p.device_id).map(o => `<option value="${esc(o.device_id)}">${esc(o.device_name)}（${o.params_detail.length}项）</option>`).join('')}</select></label><button type="button" data-merge-from="${esc(p.device_id)}">合并设备</button></div>` : ''}
       ${p.scopeInEvidence === false ? `<p class="ns-ai-note">适用范围“${esc(p.scope)}”为AI归纳，原文中未找到相同写法，请核对。</p>` : ''}
       ${p.nameInEvidence === false ? `<p class="ns-ai-note">设备名称为AI归纳，原文写法：“${esc(p.evidence?.quote || '')}”（${esc(p.evidence?.location || '')}），请核对。</p>` : ''}
@@ -184,13 +185,15 @@ export function mountSpecExtraction(root, api) {
       const { source, result } = await current();
       if (button.hasAttribute('data-adopt-device')) {
         const product = result.products.find(p => p.device_id === button.dataset.adoptDevice);
-        if (!product || !specCategoryFor(product)) throw new Error('该设备类型不能采用到人工复核');
+        if (!product) throw new Error('设备不存在');
+        const category = [...get('ns-ai-results').querySelectorAll('select[data-adopt-category-for]')].find(x => x.dataset.adoptCategoryFor === product.device_id)?.value || '';
+        if (!PRODUCT_PROFILES[category]) throw new Error('请先选择人工复核品类（配电柜 / PDU / 智能母线）');
         if (typeof api.adopt !== 'function') throw new Error('当前页面未接入人工复核');
         const { items, skipped } = specAdoptionItems(source, product);
         if (!items.length) throw new Error('该设备没有可采用的条款');
         const note = skipped.length ? `\n另有${skipped.length}条参数的证据跨段落/页，不能作为单段证据加入，请在AI清单中查看。` : '';
-        if (!globalThis.confirm(`把“${product.device_name}”的${items.length}条参数作为待复核条款加入人工复核？${result.complete === false ? '\n注意：这是未完成工作稿。' : ''}${note}`)) return;
-        api.adopt({ category: specCategoryFor(product), label: product.device_name, items,
+        if (!globalThis.confirm(`把“${product.device_name}”的${items.length}条参数按“${PRODUCT_PROFILES[category].label}”作为待复核条款加入人工复核？${result.complete === false ? '\n注意：这是未完成工作稿。' : ''}${note}`)) return;
+        api.adopt({ category, label: product.device_name, items,
           origin: { sourceId: result.sourceId, deviceId: product.device_id, analysisCreatedAt: result.createdAt, deviceType: product.device_type } }, { skipped });
         progress(`已把“${product.device_name}”的${items.length}条参数加入人工复核${skipped.length ? `；${skipped.length}条证据跨段未加入（${skipped.slice(0, 3).map(x => x.name).join('、')}${skipped.length > 3 ? '…' : ''}）` : ''}。`);
         await render(); return;
@@ -208,7 +211,7 @@ export function mountSpecExtraction(root, api) {
       await validateWork(source, merged);
       mergeUndo.set(source.id, result); store(source, merged); persist();
       progress(`已把“${from.device_name}”合并到“${into.device_name}”；语义复核意见已改到合并后的参数标识，仍待人工复核。`); await render();
-    } catch (error) { progress(`设备合并未完成：${error.message}`, true); }
+    } catch (error) { progress(`${button.hasAttribute('data-adopt-device') ? '采用未完成' : '设备合并未完成'}：${error.message}`, true); }
   });
   get('ns-ai-cancel').addEventListener('click', () => { active?.controller.abort(); progress('正在取消本次整理…'); });
   async function current() {
