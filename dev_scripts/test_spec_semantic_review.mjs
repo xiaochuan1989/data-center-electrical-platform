@@ -70,6 +70,27 @@ for (const alter of [
   const forged=structuredClone(isolated);forged.semanticReview.rejectedFindings[0].reason=1;
   await assert.rejects(()=>validateSpecAnalysis(source,forged),/未采纳复核意见结构无效/);
 }
+// 网页模式：复核批次漏写参数编号时单独补复核一次；补后覆盖则正常完成，仍漏写则记为未复核、结果保留并标为待处理。
+{
+  let calls = 0;
+  const once = await analyzeSpecSource(source, { allowPartial: true, request: async input => { const out = response(input);
+    if (input.phase === 'review' && ++calls === 1) out.checked_parameter_ids = out.checked_parameter_ids.slice(1).concat(['不存在的编号']); return out; } });
+  assert.equal(once.complete, true, '补复核一次后全部覆盖');
+  assert.equal('uncheckedParameterIds' in once.semanticReview, false);
+  assert.equal(calls, 2);
+  await validateSpecAnalysis(source, once);
+  const never = await analyzeSpecSource(source, { allowPartial: true, request: async input => { const out = response(input);
+    if (input.phase === 'review') out.checked_parameter_ids = out.checked_parameter_ids.filter(id => !id.endsWith('/p1') || !id.startsWith('device-1')); return out; } });
+  assert.equal(never.complete, false);
+  assert.equal(never.processingState, 'needs_review');
+  assert.deepEqual(never.semanticReview.uncheckedParameterIds, ['device-1/p1']);
+  assert.match(never.pipelineError, /1项参数语义复核时被模型漏查/);
+  assert.match(specResultMarkup(never), /另有1项参数复核时被模型漏查/);
+  const { validateSpecDraft } = await import('../src/modules/spec-extraction.js');
+  await validateSpecDraft(source, never);
+  const overlap = structuredClone(never); overlap.semanticReview.uncheckedParameterIds.push(overlap.semanticReview.checkedParameterIds[0]);
+  await assert.rejects(() => validateSpecDraft(source, overlap), /已复核与未复核清单/);
+}
 // 复核按16项分批；疑点可指向其他批次中真实存在的参数（模型能看到完整catalogue），不存在的参数编号仍不计入。
 {
   const lines=Array.from({length:20},(_,i)=>`第${i+1}项额定电流${(i+1)*10}A。`);

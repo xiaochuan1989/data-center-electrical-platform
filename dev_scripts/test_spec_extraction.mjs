@@ -276,6 +276,60 @@ assert.equal(html.includes('<img'), false); assert.match(html, /&lt;img/);
   assert.match(stray.rejectedDevices[0].reason, /未识别设备.*该组1项参数未采用/);
   assert.equal(await validateSpecDraft(devSource, stray), stray);
 }
+// 电气整理范围：只登记范围内设备；已注册的范围外类型（精密空调）不登记、不提参数，只记名称；复核同样只查范围内漏项。
+{
+  const { SPEC_ELECTRICAL_TYPES, SPEC_NON_ELECTRICAL_TYPES } = await import('../src/modules/spec-extraction.js');
+  assert.deepEqual(SPEC_NON_ELECTRICAL_TYPES, ['精密空调', '火灾自动报警系统']);
+  assert(SPEC_ELECTRICAL_TYPES.includes('PDU') && SPEC_ELECTRICAL_TYPES.includes('列头柜') && !SPEC_ELECTRICAL_TYPES.includes('精密空调'));
+  const scopeText = '合成范围验收资料。\n一、PDU技术要求\nPDU额定电流为32A。\n二、列间空调\n列间空调制冷量为25kW。\n';
+  const scopeSource = { id: 'synthetic-scope', type: 'text', name: '合成范围.txt', text: scopeText, warnings: [], segments: [] };
+  let discoveryPrompt = '', reviewScope;
+  const scopeRequest = async input => {
+    const data = JSON.parse(input.user);
+    if (data.task === 'review') { reviewScope = data.device_scope; return { complete: true, source_checked: true, checked_parameter_ids: data.review_parameters.map(p => p.parameter_id), issues: [] }; }
+    if (data.task === 'discovery') { discoveryPrompt = input.system; return { complete: true, devices: [
+      { device_type: 'PDU', device_name: 'PDU', scope: '', original_text: '一、PDU技术要求' },
+      { device_type: '精密空调', device_name: '列间空调', scope: '', original_text: '二、列间空调' }] }; }
+    return { complete: true, products: data.known_devices.map(d => ({ ...d, params_detail: d.device_type === 'PDU' ? [detail('额定电流', '32A', 'PDU额定电流为32A。')] : [detail('制冷量', '25kW', '列间空调制冷量为25kW。')] })) };
+  };
+  const electrical = await analyzeSpecSource(scopeSource, { request: scopeRequest, deviceTypes: SPEC_ELECTRICAL_TYPES });
+  assert.deepEqual(electrical.products.map(p => p.device_name), ['PDU']);
+  assert.deepEqual(electrical.outOfScopeDevices, [{ device_type: '精密空调', device_name: '列间空调' }]);
+  assert(!discoveryPrompt.includes('"精密空调"') && discoveryPrompt.includes('IT/通信机柜不是列头柜'), '识别提示只列范围内类型');
+  assert(Array.isArray(reviewScope) && !reviewScope.includes('精密空调'), '复核只查范围内漏项');
+  assert.equal(await validateSpecAnalysis(scopeSource, electrical), electrical);
+  assert.match(specResultMarkup(electrical), /按电气范围未整理：列间空调（精密空调）/);
+  const forgedScope = structuredClone(electrical); forgedScope.outOfScopeDevices[0].device_type = '不存在的类型';
+  await assert.rejects(() => validateSpecAnalysis(scopeSource, forgedScope), /范围外设备记录/);
+  const all = await analyzeSpecSource(scopeSource, { request: scopeRequest });
+  assert.deepEqual(all.products.map(p => p.device_name), ['PDU', '列间空调'], '不传范围时保持全部类型');
+  assert.equal('outOfScopeDevices' in all, false);
+  const { specExtractionSection } = await import('../src/platform/spec-extraction-view.js');
+  assert.match(specExtractionSection(), /整理范围：电气设备（不含精密空调、火灾自动报警系统）/);
+}
+// 表格数值行：按提示词写法（value 为整行、original_text 从表头到该行为止）可通过证据与数值校验；引用后续行时以数字开头的行会被拒。
+{
+  const table = '合成表格验收资料。\n一、PDU安全性\n额定绝缘电压（V） | 爬电距离（mm） | 电气间隙（mm）\n≤60 | ≥3 | ≥2\n60-300 | ≥6 | ≥4\n300-660 | ≥12 | ≥6\n';
+  const tableSource = { id: 'synthetic-table', type: 'text', name: '合成表格.txt', text: table, warnings: [], segments: [] };
+  const head = '额定绝缘电压（V） | 爬电距离（mm） | 电气间隙（mm）\n';
+  const rowsOut = full => async input => { const data = JSON.parse(input.user);
+    if (data.task === 'review') return { complete: true, source_checked: true, checked_parameter_ids: data.review_parameters.map(p => p.parameter_id), issues: [] };
+    if (data.task === 'discovery') return { complete: true, devices: [{ device_type: 'PDU', device_name: 'PDU', scope: '', original_text: '一、PDU安全性' }] };
+    return { complete: true, products: data.known_devices.map(d => ({ ...d, params_detail: [
+      detail('爬电距离/电气间隙（≤60V档）', '≤60 | ≥3 | ≥2', head + '≤60 | ≥3 | ≥2'),
+      detail('爬电距离/电气间隙（60-300V档）', '60-300 | ≥6 | ≥4', head + '≤60 | ≥3 | ≥2\n60-300 | ≥6 | ≥4' + (full ? '\n300-660 | ≥12 | ≥6' : ''))] })) }; };
+  const ok = await analyzeSpecSource(tableSource, { request: rowsOut(false) });
+  assert.deepEqual(ok.products[0].params_detail.map(d => d.value), ['≤60 | ≥3 | ≥2', '60-300 | ≥6 | ≥4']);
+  assert.equal(await validateSpecAnalysis(tableSource, ok), ok);
+  // 换行是数值边界：引用包含后续行（以数字开头）也不构成截取。
+  const withNext = await analyzeSpecSource(tableSource, { request: rowsOut(true), allowPartial: true });
+  assert.equal(withNext.complete, true);
+  assert.equal(withNext.products[0].params_detail.length, 2);
+  // 同一行内真正截取另一数值仍拒收：从"300-660"中只取"00-660"。
+  const cut = await analyzeSpecSource(tableSource, { allowPartial: true, request: async input => { const out = await rowsOut(false)(input);
+    if (out.products) out.products[0].params_detail = [detail('截取', '00-660 | ≥12 | ≥6', '300-660 | ≥12 | ≥6')]; return out; } });
+  assert.match(cut.rejectedParameters[0].reason, /截取了另一数值/);
+}
 // 页眉页脚：程序识别的重复行传给模型；值混入页眉（常伴后半句丢失）转入待核对；正确省略页眉的跨页值通过。
 {
   const header = '合成保密页眉：仅供软件验收不得外传的资料\n';

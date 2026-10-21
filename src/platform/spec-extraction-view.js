@@ -1,4 +1,4 @@
-import { analyzeSpecSource, validateSpecAnalysis, validateSpecDraft } from '../modules/spec-extraction.js';
+import { analyzeSpecSource, validateSpecAnalysis, validateSpecDraft, SPEC_ELECTRICAL_TYPES, SPEC_NON_ELECTRICAL_TYPES } from '../modules/spec-extraction.js';
 import { readSpecAiConfig, specAiDestination, requestSpecJson } from '../modules/spec-ai-client.js';
 import { writePresalesXlsx } from '../modules/presales-xlsx.js';
 import { mergeSpecDevices, mergeableDevices } from '../modules/spec-device-merge.js';
@@ -14,6 +14,7 @@ export function semanticReviewMarkup(result) {
   const review=result.semanticReview;
   if (!review) return `<p class="ns-ai-note">${result.complete === false ? '本次语义复核尚未完成；下列参数仅通过文字证据校验。' : '旧版提取工作稿：尚未执行语义复核；历史参数保留，可重新整理。'}</p>`;
   return `<section class="ns-ai-review"><h3>语义复核 · 待人工确认</h3><p>同一模型另发请求复核了${review.checkedParameterIds.length}项参数及原文片段；${review.findings.length ? `报告${review.findings.length}项疑点` : '未报告疑点，仍可能有遗漏或误判'}。</p>
+    ${(review.uncheckedParameterIds||[]).length ? `<p class="ns-ai-note">另有${review.uncheckedParameterIds.length}项参数复核时被模型漏查（已补复核一次仍未覆盖），未经语义复核：${esc(review.uncheckedParameterIds.slice(0, 20).join('、'))}${review.uncheckedParameterIds.length > 20 ? '…' : ''}</p>` : ''}
     ${review.requiresImageCheck ? '<p class="ns-ai-note">含OCR文字：模型不能证明原图的数值、单位或★/±符号正确，必须对照原图。</p>' : ''}
     ${review.findings.length ? `<details><summary>查看${review.findings.length}项待核对疑点</summary><ul>${review.findings.map(f=>`<li><strong>${esc(findingLabels[f.kind])} · ${f.severity==='ERROR'?'需优先核对':'待核对'}</strong><p>${esc(f.message)}</p><small>${esc(f.evidence.location)}${f.parameter_id?` · 参数标识 ${esc(f.parameter_id)}`:''}</small><blockquote>${esc(f.original_text)}</blockquote></li>`).join('')}</ul></details>` : ''}
     ${(review.rejectedFindings||[]).length ? `<details><summary>另有${review.rejectedFindings.length}条复核意见未通过结构校验（未计入疑点，模型原话供参考）</summary><ul>${review.rejectedFindings.map(r=>`<li><strong>${esc(findingLabels[r.kind]||r.kind||'未知类型')}</strong><p>${esc(r.message)}</p><small>未采纳原因：${esc(r.reason)}</small>${r.original_text?`<blockquote>${esc(r.original_text)}</blockquote>`:''}</li>`).join('')}</ul></details>` : ''}</section>`;
@@ -29,6 +30,7 @@ export function specExtractionSection() {
   return `<section class="ns-section ns-ai-section" id="ns-ai-section">
     <h2>设备与参数 · AI 自动整理</h2>
     <p>上传规范书后直接整理设备与参数，无需先手动登记设备。支持 extract-spec 的29类设备；结果保留原文依据，供人工复核。</p>
+    <p class="ns-muted">整理范围：电气设备（不含${SPEC_NON_ELECTRICAL_TYPES.join('、')}）；范围外设备只列名称，不提取参数。</p>
     <p class="ns-muted">分批提取后另做语义复核，检查设备归属、条件和漏项；会增加调用次数与耗时，模型复核不能替代人工确认。</p>
     <p class="ns-muted" id="ns-ai-destination"></p>
     <div class="ns-actions"><button id="ns-ai-analyze" class="platform-primary-action">AI 自动整理设备与参数</button><button id="ns-ai-cancel" disabled>取消整理</button></div>
@@ -75,6 +77,7 @@ function partialMarkup(result) {
 export function specResultMarkup(result, { interactive = false } = {}) {
   const count = result.products.reduce((n, p) => n + p.params_detail.filter(d => d.evidence_status === 'VERIFIED').length, 0);
   return `<div class="ns-ai-overview"><b>${result.products.length}项设备 · ${count}项有原文依据的参数</b><span>${result.complete === false ? '未完成工作稿 · 不代表整份规范已整理完成' : '全部文字分段已处理 · 待人工复核'}</span></div>
+    ${(result.outOfScopeDevices || []).length ? `<p class="ns-ai-note">按电气范围未整理：${result.outOfScopeDevices.map(d => `${esc(d.device_name || '未命名')}（${esc(d.device_type)}）`).join('、')}</p>` : ''}
     ${partialMarkup(result)}
     <p class="ns-muted">按设备查看参数；“原文可核验”只表示证据匹配，不代表工程要求已确认或整份规范无遗漏。提取范围包括29类设备，现有配置方案仍只支持配电柜、PDU、智能母线。</p>
     ${result.model ? `<p class="ns-muted">本次结果接口：${esc(result.apiOrigin)} · ${esc(result.model)} · 生成时间：${esc(result.createdAt)}</p>` : ''}
@@ -151,7 +154,7 @@ export function mountSpecExtraction(root, api) {
       const run = { controller: new AbortController(), sourceJson: JSON.stringify(source) };
       active = run; await render();
       progress('正在检查原文并识别设备…');
-      const result = await analyzeSpecSource(source, { signal: run.controller.signal, allowPartial: true,
+      const result = await analyzeSpecSource(source, { signal: run.controller.signal, allowPartial: true, deviceTypes: SPEC_ELECTRICAL_TYPES,
         request: input => requestSpecJson(config, input),
         onDraft: async draft => {
           if (JSON.stringify(api.source()) !== run.sourceJson) return;

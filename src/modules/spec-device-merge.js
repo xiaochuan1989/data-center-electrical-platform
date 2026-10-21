@@ -44,6 +44,12 @@ export async function mergeSpecDevices(result, fromId, intoId, { now = () => new
   if (review) {
     const remap = id => (id && idMap.has(id) ? idMap.get(id) : id);
     review.checkedParameterIds = [...new Set(review.checkedParameterIds.map(remap))].sort();
+    // 合并去重后同一参数可能同时出现在已复核与未复核中：以已复核为准。
+    if (Array.isArray(review.uncheckedParameterIds)) {
+      const checked = new Set(review.checkedParameterIds);
+      review.uncheckedParameterIds = [...new Set(review.uncheckedParameterIds.map(remap))].filter(id => !checked.has(id)).sort();
+      if (!review.uncheckedParameterIds.length) delete review.uncheckedParameterIds;
+    }
     const seen = new Set();
     review.findings = review.findings.map(f => ({ ...f, parameter_id: remap(f.parameter_id) })).filter(f => {
       const key = JSON.stringify([f.kind, f.parameter_id, f.evidence.start, f.evidence.end]);

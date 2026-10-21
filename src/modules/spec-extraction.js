@@ -3,6 +3,9 @@ import { reviewSpecSemantics, validateSemanticReview } from './spec-semantic-rev
 
 export const SPEC_ANALYSIS_VERSION = 4;
 const types = new Set(Object.keys(SPEC_DEVICE_REGISTRY));
+// 网页默认的电气整理范围：注册表中去掉暖通与消防类型。复验仍按完整注册表，旧工作稿不受影响。
+export const SPEC_NON_ELECTRICAL_TYPES = Object.freeze(['精密空调', '火灾自动报警系统']);
+export const SPEC_ELECTRICAL_TYPES = Object.freeze([...types].filter(t => !SPEC_NON_ELECTRICAL_TYPES.includes(t)));
 const levels = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 const references = ['DRAWING', 'ATTACHMENT', 'TABLE', 'SECTION', 'OTHER_DOCUMENT'];
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
@@ -130,11 +133,17 @@ function validateDetail(detail, source, chunk) {
       const valueQuote = exactValue(evidence.quote).includes(exactValue(detail.value)) ? evidence.quote : valueEvidence(source, evidence);
       assert(exactValue(valueQuote).includes(exactValue(detail.value)), `参数“${detail.name}”的完整值无法由引用原文支持；不得改写数值、单位或限定条件`);
       if (!exactValue(evidence.quote).includes(exactValue(detail.value))) evidence.pageFurnitureOmittedInValue = true;
-      const normalizedQuote = norm(valueQuote), normalizedValue = norm(detail.value);
-      const at = normalizedQuote.indexOf(normalizedValue);
+      const normalizedValue = norm(detail.value);
+      // 边界检查保留换行：换行是两个数值之间的明确边界（如表格上一行末尾"≥2"与本行开头"60-300"），
+      // 去掉换行会把它们拼成"≥260"而误判截取。定位时跳过换行，以兼容值本身跨行。
+      const lineQuote = String(valueQuote).normalize('NFKC').toLowerCase().replace(/[^\S\n]/g, '');
+      const positions = []; let joined = '';
+      for (let i = 0; i < lineQuote.length; i++) if (lineQuote[i] !== '\n') { joined += lineQuote[i]; positions.push(i); }
+      const found = joined.indexOf(normalizedValue);
+      const startAt = found < 0 ? 0 : positions[found], endAt = found < 0 ? 0 : positions[found + normalizedValue.length - 1] + 1;
       if (/^[+\-]?\d/.test(normalizedValue)) {
-        const before = normalizedQuote.slice(0, at).split(/[，,；;。\n]/).pop();
-        const after = normalizedQuote.slice(at + normalizedValue.length);
+        const before = lineQuote.slice(0, startAt).split(/[，,；;。\n]/).pop();
+        const after = lineQuote.slice(endAt).split('\n')[0];
         assert(!/[A-Za-z\d.+\-]$/.test(before) && !/^\d/.test(after), '参数值截取了另一数值的一部分，或丢失了电气前缀/正负号');
         assert(!/(?:≥|≤|>|<|不低于|不少于|至少|不高于|不大于|不超过|不得低于|不得高于|大于|小于|超过|最大|最小|最多|最少|±)[:：]?\s*$/.test(before), '参数值丢失了原文比较条件');
         assert(!/^(?:[～~至\/-]\d|[%℃A-Za-z]|及?以上|及?以下|以内)/.test(after), '参数值丢失了原文范围或单位');
@@ -190,7 +199,10 @@ const SYSTEM = `你是技术规范书设备与参数提取助手。遵循 extrac
 所有风险只能根据当前文档的明确矛盾或疑点，不能根据未经核验的标准摘要臆断。完成所有片段内相关内容才返回 complete:true。
 任何无法完成的分析返回 complete:false，并给出 error。`;
 
-export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, onDraft = () => {}, allowPartial = false, chunkSize = 3000 } = {}) {
+export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, onDraft = () => {}, allowPartial = false, chunkSize = 3000, deviceTypes = null } = {}) {
+  const scopeTypes = deviceTypes ? new Set(deviceTypes.filter(t => types.has(t))) : types;
+  assert(scopeTypes.size > 0, '整理范围没有有效的设备类型');
+  const outOfScopeDevices = [];
   assert(typeof request === 'function', '缺少 AI 请求接口');
   const chunks = splitSpecSource(source, chunkSize, Math.min(600, Math.floor(chunkSize / 10)));
   const fingerprint = await specSourceFingerprint(source);
@@ -209,7 +221,7 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
     sourceId: source.id, sourceFingerprint: fingerprint, file_name: source.name,
     complete: false, reviewStatus: 'pending', createdAt, processingState, pipelineError,
     coverage: structuredClone(coverage), products: productList(),
-    rejectedParameters: structuredClone(rejectedParameters), rejectedDevices: structuredClone(rejectedDevices), requestCount: requests,
+    rejectedParameters: structuredClone(rejectedParameters), rejectedDevices: structuredClone(rejectedDevices), outOfScopeDevices: structuredClone(outOfScopeDevices), requestCount: requests,
     ...(semanticReview ? { semanticReview } : {})
   });
   const invoke = input => {
@@ -225,7 +237,7 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
       known_devices: phase === 'discovery' ? devices : devices.map(({ device_id, device_type, device_name, scope }) => ({ device_id, device_type, device_name, scope })),
       source_segments: contextFor(source, chunk), page_furniture: specPageFurniture(source).lines, document_text: chunk.text });
     const instructions = phase === 'discovery'
-      ? `识别本片段存在明确设备级描述的设备及其适用范围。设备类型仅允许：${JSON.stringify([...types])}。
+      ? `识别本片段存在明确设备级描述的设备及其适用范围。设备类型仅允许：${JSON.stringify([...scopeTypes])}。不在此清单中的设备（如暖通空调、恒湿机、IT/通信机柜、冷热通道、消防等）不要登记，也不要套用相近类型；IT/通信机柜不是列头柜。
 返回 {"complete":true,"devices":[{"device_type":"注册类型","device_name":"原文中真实名称或位号","scope":"原文中真实章节/区域名称或空串","original_text":"包含设备名称的真实原文"}]}。
 同一主设备的延续章节沿用 known_devices 中的名称与范围，不得拆成重复设备；新增区域必须有原文依据。无新设备时 devices 可为空。
 同一主设备在封面标题、章节标题、配置表中常有不同叫法：只登记一次，device_name 取最完整的原文叫法，其他叫法不另登记。只有位号、区域、规格或数量明确不同时才分开登记。`
@@ -234,6 +246,8 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
 每个产品必须有 params_detail 数组，params 可为空。value 必须是可在原文证据中连续找到的值短语，跨页时只允许省略重复页眉页脚。本片段无参数时 products 可为空；最终汇总不能只有空设备或未提及项。
 value 是原文中的一段连续文字：不要用"；""，"等把原文不相连的几处拼成一条，也不要改写原文标点；一行或一处有多个值时拆成多条参数。
 user.page_furniture 是程序已识别的重复页眉页脚行（不是要求内容）：value 不得包含这些文字；要求被分页和页眉页脚打断时，value 写省略页眉页脚后前后相连的完整正文（不得丢掉页眉之后的后半句），original_text 保留含页眉页脚的完整连续原文。
+表格中的数值要求（如按电压、电流档位分级的爬电距离/电气间隙、试验电压等）也要提取：每个数据行单独成为一条参数，value 取该行原文（保留"|"分隔），name 写明表头含义与该行档位，original_text 引用从表头行到该数据行为止的连续原文（不要包含后面的行）。
+原文写明同时适用于多台已识别设备的条款（如"交直流PDU"、各设备共用的通用要求、安全性章节），对每一台适用的设备分别输出该参数；只写明某一台的，只归该台。
 提取范围不限于第3节检查清单：逐条提取 document_text 中每一项对设备的义务或约束，包括概述/定义中适用于本设备的条款（如带★条款的不可偏离定义）、标准与规范符合性要求（"采用最新现行版本"等要求及逐个被引用的标准号）、环境与安装、结构材质外观、电气与接线、标识与安全防护、软件与数据、样品验收与生产交付等定性要求。目录、修订记录、页眉页脚本身不是要求。
 condition 必须直接摘录真实适用条件，condition_original_text 必须是含该条件的连续原文；不得把推断的“正常运行时”“额定状态”等标签当作原文条件。没有明确条件则 condition 为空串；保留 value 中原有的条件和限制，不能为了通过校验删除真实条件。
 顶层必须包含 complete:true 和 products 数组。不要输出全局 risks/suggestions 或汇总风险结论；疑点可在参数 risk 中标识供人工复核。`;
@@ -266,6 +280,12 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
     if (phase === 'discovery') {
       assert(Array.isArray(data.devices) && data.devices.length <= 200, '设备识别结果结构无效或过多');
       for (const item of data.devices) {
+        // 已注册但不在本次整理范围内的类型：不登记、不提参数，只记名称供界面提示（不是校验失败）。
+        if (types.has(item?.device_type) && !scopeTypes.has(item.device_type)) {
+          const skipped = { device_type: item.device_type, device_name: typeof item.device_name === 'string' ? item.device_name.trim().slice(0, 200) : '' };
+          if (!outOfScopeDevices.some(old => old.device_type === skipped.device_type && old.device_name === skipped.device_name)) outOfScopeDevices.push(skipped);
+          continue;
+        }
         let device;
         // 单台设备候选不合规（证据无法定位、类型未注册等）只隔离该台，列为待核对设备，其余设备继续。
         try { device = validateDevice(item, source, chunk); }
@@ -328,14 +348,16 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
   if (!allowPartial) assert(!empty, `设备“${empty?.device_name}”没有可验证的真实参数；本次整理未完整完成`);
   const analysis = { contractVersion: SPEC_ANALYSIS_VERSION, skillVersion: SPEC_SKILL_VERSION, sourceId: source.id, sourceFingerprint: fingerprint,
     file_name: source.name, complete: true, createdAt, reviewStatus: 'pending',
-    coverage, products: result };
-  analysis.semanticReview = await reviewSpecSemantics(source,result,chunks,{request:invoke,signal,sourceFingerprint:fingerprint,
+    coverage, products: result, ...(outOfScopeDevices.length ? { outOfScopeDevices: structuredClone(outOfScopeDevices) } : {}) };
+  analysis.semanticReview = await reviewSpecSemantics(source,result,chunks,{request:invoke,signal,sourceFingerprint:fingerprint,deviceScope:deviceTypes?[...scopeTypes]:null,
     locateEvidence:(chunk,quote)=>locateSpecEvidence(source,chunk,quote),
     onProgress:info=>onProgress({...info,requests,devices:devices.length})});
   cancelled(signal);
   analysis.requestCount=requests;
-  if (rejectedParameters.length || rejectedDevices.length || empty) {
-    const partial = draft('needs_review', empty ? `设备“${empty.device_name}”尚无通过证据校验的真实参数` : rejectedDevices.length ? `${rejectedDevices.length}项设备候选未通过校验，见待核对设备` : '', analysis.semanticReview);
+  const unreviewed = analysis.semanticReview?.uncheckedParameterIds?.length || 0;
+  if (!allowPartial) assert(!unreviewed, `语义复核漏查：${unreviewed}项参数未被复核`);
+  if (rejectedParameters.length || rejectedDevices.length || empty || unreviewed) {
+    const partial = draft('needs_review', empty ? `设备“${empty.device_name}”尚无通过证据校验的真实参数` : rejectedDevices.length ? `${rejectedDevices.length}项设备候选未通过校验，见待核对设备` : unreviewed ? `${unreviewed}项参数语义复核时被模型漏查，未复核` : '', analysis.semanticReview);
     await onDraft(partial);
     return partial;
   }
@@ -356,6 +378,7 @@ export async function validateSpecDraft(source, result) {
 async function validateSpecContent(source, result, draft) {
   assert([3,SPEC_ANALYSIS_VERSION].includes(result?.contractVersion) && result.complete === !draft && result.reviewStatus === 'pending', '提取工作稿版本或状态无效');
   if (!draft) assert(!('draftVersion' in result) && !('rejectedParameters' in result) && !('rejectedDevices' in result) && !('processingState' in result), '未完成工作稿不能冒充完整提取结果');
+  if ('outOfScopeDevices' in result) assert(Array.isArray(result.outOfScopeDevices) && result.outOfScopeDevices.every(item => item && types.has(item.device_type) && typeof item.device_name === 'string'), '范围外设备记录无效');
   if (draft && 'rejectedDevices' in result) assert(Array.isArray(result.rejectedDevices) && result.rejectedDevices.every(item => item && string(item.reason)
     && item.candidate && ['device_type', 'device_name', 'scope', 'original_text'].every(key => typeof item.candidate[key] === 'string')
     && Number.isInteger(item.chunk?.start) && Number.isInteger(item.chunk?.end) && item.chunk.start >= 0 && item.chunk.end > item.chunk.start && item.chunk.end <= source.text.length), '待核对设备记录无效');
