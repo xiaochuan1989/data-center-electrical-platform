@@ -353,6 +353,10 @@ async function validateSpecContent(source, result, draft) {
     assert(string(product.device_id) && !ids.has(product.device_id), '设备标识缺失或重复'); ids.add(product.device_id);
     const checkedDevice = validateDevice({ ...product, original_text: product.evidence?.quote }, source, whole);
     if ('nameInEvidence' in product) assert(product.nameInEvidence === checkedDevice.nameInEvidence, '设备名称来源标记与原文失配');
+    // 人工合并留下的被合并设备记录：类型一致、名称非空、原文证据仍是当前原文中的真实片段。
+    if ('mergedFrom' in product) assert(Array.isArray(product.mergedFrom) && product.mergedFrom.every(m => m && m.device_type === product.device_type && string(m.device_name)
+      && Number.isInteger(m.evidence?.start) && Number.isInteger(m.evidence?.end) && m.evidence.start >= 0 && m.evidence.end > m.evidence.start
+      && source.text.slice(m.evidence.start, m.evidence.end) === m.evidence.quote), '人工合并设备记录无效或与原文失配');
     assert(Number.isInteger(product.evidence.start) && Number.isInteger(product.evidence.end) && product.evidence.start >= 0 && product.evidence.end > product.evidence.start && source.text.slice(product.evidence.start, product.evidence.end) === product.evidence.quote, '设备证据位置失配');
     assert(Array.isArray(product.params_detail) && (draft || product.params_detail.some(d => d.evidence_status === 'VERIFIED')), '设备没有真实参数');
     for (const detail of product.params_detail) {
