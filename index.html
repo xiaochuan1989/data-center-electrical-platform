@@ -6,7 +6,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232d6a9f'/%3E%3Cpath d='M36 4 14 36h16l-2 24 22-34H34z' fill='%23fff'/%3E%3C/svg%3E">
 <title>UPS与配电选型助手</title>
 <script>
-const APP_VERSION = "v2.14.7";
+const APP_VERSION = "v2.14.8";
 const DEBUG_MODE = false;
 const CLIENT_SIDE_ACCESS_CODE = '173205';
 const PRICE_VIEW_CODE = '314159';
@@ -2066,7 +2066,15 @@ async function testApi() {
     await callAI("连接测试", "你是助手");
     s.textContent = "✓ 连接成功"; s.className = "api-status ok";
   } catch(e) {
-    s.textContent = "✗ " + e.message; s.className = "api-status err";
+    // Failed to fetch 是网络层失败（连不上或接口不允许网页跨域），给出可操作的原因。
+    let host = "";
+    try { host = new URL(getBaseUrl()).hostname; } catch (_) {}
+    const local = host === "127.0.0.1" || host === "localhost";
+    const msg = e instanceof TypeError && /fetch|NetworkError|Load failed/i.test(e.message)
+      ? (local ? "无法连接本机转发：请确认 start-ai-proxy 窗口仍在运行，并允许浏览器访问本地网络"
+               : "Failed to fetch：连不上接口或接口不支持网页跨域；中转站请运行 tools\\start-ai-proxy.cmd，Base URL 填 http://127.0.0.1:8787")
+      : e.message;
+    s.textContent = "✗ " + msg; s.className = "api-status err";
   }
 }
 

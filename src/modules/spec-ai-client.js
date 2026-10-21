@@ -22,6 +22,13 @@ export function specThinkingPolicy(config, phase = 'extraction', budgetStep = 0)
   return { deepseek, effort: review ? 'high' : 'low',
     outputLimit: deepseek ? (review ? 65536 : 32768) * (budgetStep === 1 ? 2 : 1) : 8192 };
 }
+// 浏览器报 Failed to fetch 时给出可操作的原因：网页受跨域限制，桌面程序不受；第三方中转站常不支持网页跨域调用。
+export function specConnectionHint(baseUrl) {
+  let host = '';
+  try { host = new URL(baseUrl).hostname; } catch { /* 地址已在读取设置时校验 */ }
+  if (['127.0.0.1', 'localhost'].includes(host)) return '无法连接本机转发：请确认 tools\\start-ai-proxy.cmd 窗口仍在运行，且 Chrome 已允许本网站访问本地网络；本次未生成结果';
+  return '无法连接 AI 接口（浏览器报 Failed to fetch）：可能是网络/DNS 暂时连不上该接口，或接口不支持网页跨域调用（第三方中转站多见）。中转站可运行 tools\\start-ai-proxy.cmd 本机转发，并把设置里的 Base URL 改为 http://127.0.0.1:8787；本次未生成结果';
+}
 export async function requestSpecJson(config, { system, user, signal, phase = 'extraction', budgetStep = 0 }, fetchImpl = fetch) {
   const controller = new AbortController();
   const abort = () => controller.abort();
@@ -66,7 +73,8 @@ export async function requestSpecJson(config, { system, user, signal, phase = 'e
   } catch (error) {
     if (timedOut) throw new Error('AI 请求超时，本次整理未完成；请拆分文档或重试');
     if (controller.signal.aborted) { const cancelled = new Error('已取消 AI 整理'); cancelled.name = 'AbortError'; throw cancelled; }
-    if (error instanceof TypeError) throw new Error('无法连接 AI 接口；请检查网络及接口是否支持浏览器跨域请求');
+    // 只把网络层失败（各浏览器 fetch 的 TypeError 文案）归为连接问题；读取响应结构出错的 TypeError 原样抛出。
+    if (error instanceof TypeError && /fetch|NetworkError|Load failed/i.test(error.message)) throw new Error(specConnectionHint(config.baseUrl));
     throw error;
   } finally { clearTimeout(timeout); signal?.removeEventListener('abort', abort); }
 }

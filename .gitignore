@@ -28,3 +28,5 @@ __pycache__/
 .playwright-cli/
 *.pdf
 /工具模板/
+# 本机AI转发配置（中转地址，不入库）
+tools/ai-local-proxy.config.json
