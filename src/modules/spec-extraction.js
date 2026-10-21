@@ -1,5 +1,6 @@
 import { SPEC_DEVICE_REGISTRY, SPEC_SKILL_PROMPT, SPEC_SKILL_VERSION } from '../data/spec-extraction-reference.js';
 import { reviewSpecSemantics, validateSemanticReview } from './spec-semantic-review.js';
+import { runPooled } from './run-pooled.js';
 
 export const SPEC_ANALYSIS_VERSION = 4;
 const types = new Set(Object.keys(SPEC_DEVICE_REGISTRY));
@@ -199,7 +200,7 @@ const SYSTEM = `你是技术规范书设备与参数提取助手。遵循 extrac
 所有风险只能根据当前文档的明确矛盾或疑点，不能根据未经核验的标准摘要臆断。完成所有片段内相关内容才返回 complete:true。
 任何无法完成的分析返回 complete:false，并给出 error。`;
 
-export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, onDraft = () => {}, allowPartial = false, chunkSize = 3000, deviceTypes = null } = {}) {
+export async function analyzeSpecSource(source, { request, signal, onProgress = () => {}, onDraft = () => {}, allowPartial = false, chunkSize = 3000, deviceTypes = null, concurrency = 3 } = {}) {
   const scopeTypes = deviceTypes ? new Set(deviceTypes.filter(t => types.has(t))) : types;
   assert(scopeTypes.size > 0, '整理范围没有有效的设备类型');
   const outOfScopeDevices = [];
@@ -213,15 +214,20 @@ export async function analyzeSpecSource(source, { request, signal, onProgress = 
   let requests = 0;
   const productList = () => devices.map(device => {
     const product = structuredClone(products.get(device.device_id) || { ...device, params_detail: [] });
+    // 并行后完成顺序不固定：按原文位置排序（无证据的未提及项排最后），保证每次输出顺序一致。
+    product.params_detail.sort((x, y) => (x.evidence?.start ?? Infinity) - (y.evidence?.start ?? Infinity) || (x.evidence?.end ?? Infinity) - (y.evidence?.end ?? Infinity));
     for (const detail of product.params_detail) detail.multipleValues = product.params_detail.some(other => other.evidence_status === 'VERIFIED' && norm(other.name) === norm(detail.name) && exactValue(other.value) !== exactValue(detail.value));
     return product;
   });
+  // 中间稿串行：并行片段各自完成时排队发出，避免较早的中间稿覆盖较新的。
+  let draftChain = Promise.resolve();
+  const emitDraft = () => (draftChain = draftChain.then(() => onDraft(draft('running'))));
   const draft = (processingState, pipelineError = '', semanticReview) => ({
     draftVersion: 1, contractVersion: SPEC_ANALYSIS_VERSION, skillVersion: SPEC_SKILL_VERSION,
     sourceId: source.id, sourceFingerprint: fingerprint, file_name: source.name,
     complete: false, reviewStatus: 'pending', createdAt, processingState, pipelineError,
     coverage: structuredClone(coverage), products: productList(),
-    rejectedParameters: structuredClone(rejectedParameters), rejectedDevices: structuredClone(rejectedDevices), outOfScopeDevices: structuredClone(outOfScopeDevices), requestCount: requests,
+    rejectedParameters: structuredClone(rejectedParameters).sort((x, y) => x.chunk.start - y.chunk.start), rejectedDevices: structuredClone(rejectedDevices), outOfScopeDevices: structuredClone(outOfScopeDevices), requestCount: requests,
     ...(semanticReview ? { semanticReview } : {})
   });
   const invoke = input => {
@@ -335,21 +341,22 @@ condition 必须直接摘录真实适用条件，condition_original_text 必须�
       }
     }
     coverage[phase].push({ start: chunk.start, end: chunk.end });
-    await onDraft(draft('running'));
+    await emitDraft();
   }
   try {
   // 设备识别只输出很短的设备清单，需要看到整篇才能把封面/章节/配置表里的不同叫法认作同一设备：
   // 6万字以内整篇一次识别（截断时 run 仍会自动拆分），参数整理仍按小片段进行。
   for (const chunk of splitSpecSource(source, Math.max(chunkSize, 60000), 600)) await run('discovery', chunk);
   assert(devices.length > 0, rejectedDevices.length ? `未识别到有原文依据的设备：${rejectedDevices.length}项设备候选未通过校验，原因见待核对设备` : '未识别到有原文依据的设备，未生成参数清单');
-  for (const chunk of chunks) await run('extraction', chunk);
+  // 各片段互不依赖（设备清单已在识别阶段确定），并行整理。
+  await runPooled(chunks, concurrency, chunk => run('extraction', chunk));
   const result = productList();
   const empty = result.find(product => !product.params_detail.some(d => d.evidence_status === 'VERIFIED'));
   if (!allowPartial) assert(!empty, `设备“${empty?.device_name}”没有可验证的真实参数；本次整理未完整完成`);
   const analysis = { contractVersion: SPEC_ANALYSIS_VERSION, skillVersion: SPEC_SKILL_VERSION, sourceId: source.id, sourceFingerprint: fingerprint,
     file_name: source.name, complete: true, createdAt, reviewStatus: 'pending',
     coverage, products: result, ...(outOfScopeDevices.length ? { outOfScopeDevices: structuredClone(outOfScopeDevices) } : {}) };
-  analysis.semanticReview = await reviewSpecSemantics(source,result,chunks,{request:invoke,signal,sourceFingerprint:fingerprint,deviceScope:deviceTypes?[...scopeTypes]:null,
+  analysis.semanticReview = await reviewSpecSemantics(source,result,chunks,{request:invoke,signal,sourceFingerprint:fingerprint,concurrency,deviceScope:deviceTypes?[...scopeTypes]:null,
     locateEvidence:(chunk,quote)=>locateSpecEvidence(source,chunk,quote),
     onProgress:info=>onProgress({...info,requests,devices:devices.length})});
   cancelled(signal);

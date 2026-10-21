@@ -1,6 +1,6 @@
 import { PRODUCT_PROFILES, createPresalesPackage, addEquipment, updateEquipmentQuantity, addPresalesSource,
   replacePresalesSource, confirmPresalesRequirement, revisePresalesRequirement, invalidatePresalesRequirement,
-  remapPresalesRequirement, createPresalesSnapshot, restorePresalesSnapshot } from '../modules/nonstandard-presales.js';
+  remapPresalesRequirement, createPresalesSnapshot, restorePresalesSnapshot, adoptExtractedEquipment } from '../modules/nonstandard-presales.js';
 import { extractPresalesSource, previewPresalesExtraction, parsePresalesClause, presalesEvidenceLocation } from '../modules/nonstandard-requirements.js';
 import { readPresalesFile } from './nonstandard-file-reader.js';
 import { nonstandardSchemeSection, mountNonstandardSchemes } from './nonstandard-scheme-view.js';
@@ -332,7 +332,11 @@ export function mountNonstandardRequirements(root, options = {}) {
   const schemeUI = mountNonstandardSchemes(root, { pack: () => pack, commit, message, download,
     touch: () => { generation += 1; }, buswayDesign: options.buswayDesign });
   specUI = mountSpecExtraction(root, { source: () => pack.sources.find(s => s.id === get('ns-source-select').value),
-    autosave: () => autosave, download });
+    autosave: () => autosave, download,
+    // AI 结果采用到人工复核：由 AI 结果页的按钮触发，一次修订内新建设备并加入待复核条款。
+    adoptedKeys: () => pack.equipment.filter(e => e.origin?.kind === 'ai-extraction').map(e => `${e.origin.sourceId}|${e.origin.deviceId}|${e.origin.analysisCreatedAt}`),
+    adopt: (item, { skipped = [] } = {}) => commit(adoptExtractedEquipment(pack, item, `采用AI整理结果：${item.label}（${item.items.length}条待复核条款${skipped.length ? `，${skipped.length}条证据跨段未加入` : ''}）`),
+      `已采用AI设备“${item.label}”：${item.items.length}条待复核条款`, { sourceId: item.origin.sourceId }) });
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
     if (stored?.snapshot) { pack = restorePresalesSnapshot(stored.snapshot); autosave = !!stored.enabled; get('ns-autosave').checked = autosave; message(`已恢复本机工作稿，原确认回到待复核；自动保存${autosave ? '已开启' : '已关闭'}`); }

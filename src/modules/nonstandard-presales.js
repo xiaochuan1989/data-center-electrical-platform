@@ -245,6 +245,30 @@ export function addRequirement(input, item, reason) {
   assert([true, false, null].includes(requirement.forbiddenDeviation), '禁止偏离标记非法');
   pack.requirements.push(requirement); return changed(pack, 'requirement:add', requirement.id, reason, requirement.equipmentId);
 }
+// AI 整理结果的设备类型 → 人工方案品类（只有配置方案支持的三类可采用）。
+export const SPEC_TYPE_TO_CATEGORY = freeze({ PDU: 'pdu', 列头柜: 'cabinet', 直流列头柜: 'cabinet', 低压配电柜: 'cabinet', 电源配电柜: 'cabinet',
+  UPS配电柜: 'cabinet', 配电箱: 'cabinet', 智能母线槽: 'busway', 母线槽: 'busway' });
+// 人工确认后把 AI 整理的一台设备采用到人工复核：一次修订内新建设备并以"条款"加入全部候选。参数值与原文证据原样核对，
+// 不做字段映射（由人在复核中重新分配字段）；同一份 AI 结果的同一台设备只能采用一次。
+export function adoptExtractedEquipment(input, { category, label, origin, items }, reason) {
+  const pack = clone(integrity(input));
+  assert(PRODUCT_PROFILES[category] && text(label), '设备品类或标签缺失');
+  assert(origin && text(origin.sourceId) && text(origin.deviceId) && text(origin.analysisCreatedAt), 'AI来源标识缺失');
+  assert(pack.sources.some(s => s.id === origin.sourceId), 'AI结果对应的资料来源不在当前工作稿中');
+  assert(!pack.equipment.some(e => e.origin?.sourceId === origin.sourceId && e.origin?.deviceId === origin.deviceId && e.origin?.analysisCreatedAt === origin.analysisCreatedAt), '该AI设备已采用到人工复核');
+  assert(Array.isArray(items) && items.length > 0, '没有可采用的条款');
+  const equipment = { id: uid(), category, label: text(label), quantity: null, unit: '套',
+    origin: { kind: 'ai-extraction', sourceId: origin.sourceId, deviceId: origin.deviceId, analysisCreatedAt: origin.analysisCreatedAt, deviceType: text(origin.deviceType) } };
+  pack.equipment.push(equipment);
+  for (const item of items) {
+    const value = valueFor(category, 'clause', item.value);
+    assert(verifyPresalesEvidence(pack, item.evidence, value), `条款证据无法核对：${text(item.value).slice(0, 40)}`);
+    pack.requirements.push({ id: uid(), equipmentId: equipment.id, field: 'clause', candidates: [{ value, evidence: clone(item.evidence) }],
+      confirmedValue: null, reviewStatus: value == null ? 'unknown' : 'pending', forbiddenDeviation: item.forbiddenDeviation === true ? true : null,
+      response: 'pending', decisionReason: '' });
+  }
+  return changed(pack, 'equipment:adopt-ai', equipment.id, reason, equipment.id, { origin: equipment.origin, requirementCount: items.length });
+}
 export function confirmPresalesRequirement(input, id, decision, reason) {
   const pack = clone(integrity(input)), requirement = pack.requirements.find(r => r.id === id); assert(requirement, '要求不存在');
   assert(requirement.reviewStatus !== 'stale', '来源已替换，请重新提取要求');

@@ -1,4 +1,5 @@
 // A separate model request checks source meaning. Its findings remain unconfirmed.
+import { runPooled } from './run-pooled.js';
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
 const kinds = ['OWNERSHIP', 'VALUE', 'CONDITION', 'OMISSION', 'DEVICE', 'OCR_UNCERTAINTY', 'CONFLICT'];
 const cancelled = signal => { if (signal?.aborted) throw new DOMException('已取消语义复核', 'AbortError'); };
@@ -21,7 +22,7 @@ NOT_STATED仅核对本片段是否存在相反证据，不据此确认整份未�
 只输出JSON：{"complete":true,"source_checked":true,"checked_parameter_ids":[本批所有parameter_id，逐项恰好一次],"issues":[{"kind":"OWNERSHIP|VALUE|CONDITION|OMISSION|DEVICE|OCR_UNCERTAINTY|CONFLICT","severity":"WARNING|ERROR","parameter_id":"本批ID或null（漏项/原文歧义）","message":"待人工核对的具体问题，不超过300字","original_text":"本片段中支持该疑点的真实连续原文"}]}。
 最多40条issues；检查未完成则complete:false，不输出半份完成结论。不得修改、删除或新增已提取参数。`;
 
-export async function reviewSpecSemantics(source, products, chunks, { request, signal, onProgress = () => {}, locateEvidence, sourceFingerprint, deviceScope = null } = {}) {
+export async function reviewSpecSemantics(source, products, chunks, { request, signal, onProgress = () => {}, locateEvidence, sourceFingerprint, deviceScope = null, concurrency = 1 } = {}) {
   const parameters = semanticParameterIndex(products), reviewed = new Set(), findings = [], rejectedFindings = [];
   let completed = 0;
   const jobs = chunks.map(chunk => ({chunk, rows: parameters.filter(p => !p.detail.evidence
@@ -93,10 +94,10 @@ export async function reviewSpecSemantics(source, products, chunks, { request, s
     got.forEach(id=>reviewed.add(id)); if (!missingRetry) completed++;
     if (missing.length && !missingRetry) await run(chunk, missing, catalogue, 0, 0, true);
   }
-  for (const {chunk,rows} of jobs) {
-    if (!rows.length) await run(chunk,[],rows);
-    else for(let index=0;index<rows.length;index+=16) await run(chunk,rows.slice(index,index+16),rows);
-  }
+  // 各批互不依赖，并行复核；疑点按原文位置排序，保证输出与完成顺序无关。
+  const batches = jobs.flatMap(({chunk,rows}) => rows.length ? Array.from({length:Math.ceil(rows.length/16)}, (_,i) => ({chunk, rows:rows.slice(i*16,i*16+16), catalogue:rows})) : [{chunk, rows:[], catalogue:rows}]);
+  await runPooled(batches, concurrency, b => run(b.chunk, b.rows, b.catalogue));
+  findings.sort((x,y) => x.evidence.start - y.evidence.start || x.evidence.end - y.evidence.end || String(x.parameter_id).localeCompare(String(y.parameter_id)) || x.kind.localeCompare(y.kind));
   return {status:findings.length?'ISSUES_FOUND':'MODEL_REVIEWED',method:'SEPARATE_REQUESTS_SAME_MODEL',
     sourceFingerprint,resultFingerprint:await semanticResultFingerprint(products),
     coverage:chunks.map(({start,end})=>({start,end})),checkedParameterIds:[...reviewed].sort(),findings,rejectedFindings,

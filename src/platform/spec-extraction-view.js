@@ -2,6 +2,7 @@ import { analyzeSpecSource, validateSpecAnalysis, validateSpecDraft, SPEC_ELECTR
 import { readSpecAiConfig, specAiDestination, requestSpecJson } from '../modules/spec-ai-client.js';
 import { writePresalesXlsx } from '../modules/presales-xlsx.js';
 import { mergeSpecDevices, mergeableDevices } from '../modules/spec-device-merge.js';
+import { specAdoptionItems, specCategoryFor, specAdoptionKey } from '../modules/spec-adoption.js';
 
 const CACHE_KEY = 'spec_ai_extractions_v1';
 const DRAFT_CACHE_KEY = 'spec_ai_partial_extractions_v1';
@@ -74,7 +75,7 @@ function partialMarkup(result) {
     ${rejectedDevices.length?`<details open><summary>查看未通过校验的设备候选及原因（${rejectedDevices.length}项）</summary><ul>${rejectedDevices.map(r=>`<li><strong>${esc(r.candidate.device_name||'（未命名）')} · ${esc(r.candidate.device_type||'类型未返回')}</strong>${r.candidate.scope?`<p>适用范围：${esc(r.candidate.scope)}</p>`:''}<p>未通过原因：${esc(r.reason)}</p>${r.candidate.original_text?`<blockquote>${esc(r.candidate.original_text)}</blockquote>`:''}</li>`).join('')}</ul></details>`:''}
     ${result.rejectedParameters.length?`<details open><summary>查看未通过校验项及原因（${result.rejectedParameters.length}项）</summary><ul>${result.rejectedParameters.map(r=>`<li><strong>${esc(result.products.find(p=>p.device_id===r.device_id)?.device_name)} · ${esc(r.candidate.name||'未命名参数')}</strong><p>模型候选值（未核验）：${esc(r.candidate.value)}${r.candidate.condition?`；模型候选条件（未核验）：${esc(r.candidate.condition)}`:''}</p><p>失败原因：${esc(r.reason)}</p><details><summary>模型引用文字（未核验）· 分析片段字符 ${r.chunk.start+1}—${r.chunk.end}</summary><blockquote>${esc(r.candidate.original_text)}</blockquote>${r.candidate.condition_original_text?`<p>模型条件引用（未核验）：</p><blockquote>${esc(r.candidate.condition_original_text)}</blockquote>`:''}</details></li>`).join('')}</ul></details>`:''}</section>`;
 }
-export function specResultMarkup(result, { interactive = false } = {}) {
+export function specResultMarkup(result, { interactive = false, adoptedKeys = [] } = {}) {
   const count = result.products.reduce((n, p) => n + p.params_detail.filter(d => d.evidence_status === 'VERIFIED').length, 0);
   return `<div class="ns-ai-overview"><b>${result.products.length}项设备 · ${count}项有原文依据的参数</b><span>${result.complete === false ? '未完成工作稿 · 不代表整份规范已整理完成' : '全部文字分段已处理 · 待人工复核'}</span></div>
     ${(result.outOfScopeDevices || []).length ? `<p class="ns-ai-note">按电气范围未整理：${result.outOfScopeDevices.map(d => `${esc(d.device_name || '未命名')}（${esc(d.device_type)}）`).join('、')}</p>` : ''}
@@ -85,6 +86,7 @@ export function specResultMarkup(result, { interactive = false } = {}) {
     <p class="ns-muted">下方“人工条款复核与方案配置”的数量仅统计人工方案；本次 AI 清单显示在这里。</p>
     ${result.products.map((p, index) => `<details class="ns-ai-device"${index === 0 ? ' open' : ''}><summary><strong>${esc(p.device_name)}</strong><span>${esc(p.device_type)}${p.scope ? ` · ${esc(p.scope)}` : ''} · ${p.params_detail.length}项</span></summary>
       ${(p.mergedFrom || []).length ? `<p class="ns-ai-note">已人工合并的其他叫法：${p.mergedFrom.map(m => `“${esc(m.device_name)}”（${esc(m.evidence?.location || '')}）`).join('、')}</p>` : ''}
+      ${interactive && specCategoryFor(p) ? (adoptedKeys.includes(specAdoptionKey(result, p)) ? '<p class="ns-ai-note">已采用到下方人工复核（作为待复核条款）。</p>' : `<div class="ns-actions ns-ai-adopt"><button type="button" data-adopt-device="${esc(p.device_id)}">采用到人工复核</button><span class="ns-muted">把本设备的参数作为待复核条款加入下方“设备归属与人工复核”，字段分配与确认仍由人完成。</span></div>`) : ''}
       ${interactive && mergeableDevices(result, p.device_id).length ? `<div class="ns-actions ns-ai-merge"><label>确认是同一台设备的不同叫法时，合并到 <select data-merge-into-for="${esc(p.device_id)}">${mergeableDevices(result, p.device_id).map(o => `<option value="${esc(o.device_id)}">${esc(o.device_name)}（${o.params_detail.length}项）</option>`).join('')}</select></label><button type="button" data-merge-from="${esc(p.device_id)}">合并设备</button></div>` : ''}
       ${p.scopeInEvidence === false ? `<p class="ns-ai-note">适用范围“${esc(p.scope)}”为AI归纳，原文中未找到相同写法，请核对。</p>` : ''}
       ${p.nameInEvidence === false ? `<p class="ns-ai-note">设备名称为AI归纳，原文写法：“${esc(p.evidence?.quote || '')}”（${esc(p.evidence?.location || '')}），请核对。</p>` : ''}
@@ -129,7 +131,7 @@ export function mountSpecExtraction(root, api) {
         await validateSpecAnalysis(source, previous); result = previous;
       }
       if (version !== renderVersion) return;
-      get('ns-ai-results').innerHTML = specResultMarkup(result, { interactive: !active })
+      get('ns-ai-results').innerHTML = specResultMarkup(result, { interactive: !active, adoptedKeys: api.adoptedKeys?.() || [] })
         + (mergeUndo.has(source.id) && !active ? '<div class="ns-actions"><button type="button" data-merge-undo>撤销上次设备合并</button></div>' : '');
       const previous = results.get(source.id);
       if (result.complete === false && previous) {
@@ -176,10 +178,23 @@ export function mountSpecExtraction(root, api) {
   // 人工合并设备：先由人确认是同一设备的不同叫法；合并后整份工作稿重新复验，失败则不保存。可撤销最近一次。
   const store = (source, result) => { if (result.complete === false) drafts.set(source.id, result); else results.set(source.id, result); };
   get('ns-ai-results').addEventListener('click', async event => {
-    const button = event.target.closest('button[data-merge-from], button[data-merge-undo]');
+    const button = event.target.closest('button[data-merge-from], button[data-merge-undo], button[data-adopt-device]');
     if (!button || active) return;
     try {
       const { source, result } = await current();
+      if (button.hasAttribute('data-adopt-device')) {
+        const product = result.products.find(p => p.device_id === button.dataset.adoptDevice);
+        if (!product || !specCategoryFor(product)) throw new Error('该设备类型不能采用到人工复核');
+        if (typeof api.adopt !== 'function') throw new Error('当前页面未接入人工复核');
+        const { items, skipped } = specAdoptionItems(source, product);
+        if (!items.length) throw new Error('该设备没有可采用的条款');
+        const note = skipped.length ? `\n另有${skipped.length}条参数的证据跨段落/页，不能作为单段证据加入，请在AI清单中查看。` : '';
+        if (!globalThis.confirm(`把“${product.device_name}”的${items.length}条参数作为待复核条款加入人工复核？${result.complete === false ? '\n注意：这是未完成工作稿。' : ''}${note}`)) return;
+        api.adopt({ category: specCategoryFor(product), label: product.device_name, items,
+          origin: { sourceId: result.sourceId, deviceId: product.device_id, analysisCreatedAt: result.createdAt, deviceType: product.device_type } }, { skipped });
+        progress(`已把“${product.device_name}”的${items.length}条参数加入人工复核${skipped.length ? `；${skipped.length}条证据跨段未加入（${skipped.slice(0, 3).map(x => x.name).join('、')}${skipped.length > 3 ? '…' : ''}）` : ''}。`);
+        await render(); return;
+      }
       if (button.hasAttribute('data-merge-undo')) {
         const previous = mergeUndo.get(source.id); if (!previous) return;
         await validateWork(source, previous); store(source, previous); mergeUndo.delete(source.id); persist();
