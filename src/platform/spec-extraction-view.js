@@ -48,20 +48,20 @@ function rowsFor(result) {
 }
 export function specExportSheets(result) {
   const review=result.semanticReview;
-  const sheets = [{name:'设备参数',rows:[[result.complete === false ? '未完成工作稿：存在待核对项或分析中断；仅下列参数通过文字证据校验，不能作为完整清单采用' : 'AI提取工作稿：待人工复核，不代表整份规范无遗漏或工程合规'],
+  const sheets = [{name:'设备参数',header:1,rows:[[result.complete === false ? '未完成工作稿：存在待核对项或分析中断；仅下列参数通过文字证据校验，不能作为完整清单采用' : 'AI提取工作稿：待人工复核，不代表整份规范无遗漏或工程合规'],
     ['设备类型','设备名称','适用范围','参数','规范要求','适用条件','条件原文位置','证据状态','多个值提示','禁止偏离','AI疑点等级','原文','原文位置','不可偏离定义原文','复核状态'],...rowsFor(result)]},
-    {name:'语义复核',rows:[[review?'同一模型单独请求的复核意见；全部待人工确认':result.complete === false?'本次语义复核尚未完成':'旧版工作稿：未执行语义复核'],
+    {name:'语义复核',header:2,rows:[[review?'同一模型单独请求的复核意见；全部待人工确认':result.complete === false?'本次语义复核尚未完成':'旧版工作稿：未执行语义复核'],
       [review?`覆盖${review.checkedParameterIds.length}项参数，报告${review.findings.length}项疑点；未报告疑点不代表无遗漏`:'请重新整理以执行语义复核'],
       ['疑点类型','优先级','参数标识','问题说明','原文','原文位置','复核状态'],
       ...(review?.findings||[]).map(f=>[findingLabels[f.kind],f.severity,f.parameter_id||'',f.message,f.original_text,f.evidence.location,'待人工确认']),
       ...(review?.rejectedFindings||[]).map(r=>[findingLabels[r.kind]||r.kind||'未知类型',r.severity,r.parameter_id||'',r.message,r.original_text,'',`未采纳（${r.reason}）`])]}];
-  if (result.complete === false) sheets.push({name:'未通过校验项',rows:[['模型候选项：未通过证据校验，不可作为已确认参数采用'],
+  if (result.complete === false) sheets.push({name:'未通过校验项',header:2,rows:[['模型候选项：未通过证据校验，不可作为已确认参数采用'],
     ['分析状态',result.processingState,'中断说明',result.pipelineError],
     ['设备','参数','模型候选值（未核验）','模型候选条件（未核验）','失败原因','模型引用文字（未核验）','模型条件引用（未核验）','分析片段起点','分析片段终点'],
     ...result.rejectedParameters.map(r=>[result.products.find(p=>p.device_id===r.device_id)?.device_name||r.device_id,r.candidate.name,r.candidate.value,r.candidate.condition,r.reason,r.candidate.original_text,r.candidate.condition_original_text,r.chunk.start,r.chunk.end]),
     ...((result.rejectedDevices||[]).length?[[],['未通过校验的设备候选'],['设备类型','设备名称','适用范围','失败原因','模型引用文字（未核验）','分析片段起点','分析片段终点'],
       ...result.rejectedDevices.map(r=>[r.candidate.device_type,r.candidate.device_name,r.candidate.scope,r.reason,r.candidate.original_text,r.chunk.start,r.chunk.end])]:[])]});
-  if ((result.deviceMerges || []).length) sheets.push({ name: '设备合并记录', rows: [['人工确认为同一设备的不同叫法后合并；参数内容未改动'],
+  if ((result.deviceMerges || []).length) sheets.push({ name: '设备合并记录', header: 1, rows: [['人工确认为同一设备的不同叫法后合并；参数内容未改动'],
     ['被合并设备', '合并到', '并入参数项数', '合并时间', '被合并设备原文', '原文位置'],
     ...result.deviceMerges.map(m => { const record = result.products.flatMap(p => p.mergedFrom || []).find(x => x.device_id === m.from.device_id);
       return [m.from.device_name, m.into.device_name, m.movedParameters, m.mergedAt, record?.evidence?.quote || '', record?.evidence?.location || '']; })] });

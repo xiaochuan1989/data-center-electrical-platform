@@ -337,7 +337,7 @@ export function mountNonstandardRequirements(root, options = {}) {
     if (!pack.requirements.length) throw new Error('尚无条款，不能导出空提取结果');
     const rows = [['工作稿：待人工复核，不是完整合规结论', `版本${pack.revision}`], ['设备', '字段', '状态', '候选值', '确认值', '禁止偏离', '人工应答', '原文', '位置', '原因']];
     pack.requirements.forEach(r => r.candidates.forEach(c => rows.push([pack.equipment.find(e => e.id === r.equipmentId)?.label || '待分配', r.field, statuses[r.reviewStatus], c.value ?? '未知', r.confirmedValue ?? '未知', r.forbiddenDeviation == null ? '未核对' : r.forbiddenDeviation ? '是' : '否', responses[r.response], c.evidence.quote, presalesEvidenceLocation(pack, c.evidence), r.decisionReason])));
-    download(writePresalesXlsx([{ name: '技术要求工作稿', rows }, { name: '修订记录', rows: [['版本', '操作', '原因', '时间'], ...pack.revisions.map(r => [r.revision, r.kind, r.reason, r.at])] }]), '非标技术要求工作稿.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    download(writePresalesXlsx([{ name: '技术要求工作稿', header: 1, rows }, { name: '修订记录', rows: [['版本', '操作', '原因', '时间'], ...pack.revisions.map(r => [r.revision, r.kind, r.reason, r.at])] }]), '非标技术要求工作稿.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   }));
   const schemeUI = mountNonstandardSchemes(root, { pack: () => pack, commit, message, download,
     touch: () => { generation += 1; }, buswayDesign: options.buswayDesign });

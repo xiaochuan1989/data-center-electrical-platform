@@ -33,6 +33,14 @@ const workbook = writePresalesXlsx([{ name: '合成清单', rows: data.tables.bo
 assert.equal(new DataView(workbook.buffer).getUint32(0, true), 0x04034b50);
 const workbookText = new TextDecoder().decode(workbook);
 assert.ok(workbookText.includes('t="inlineStr"') && workbookText.includes('=1+1') && !workbookText.includes('<f>'));
+// 排版：正文/表头带框线；header 之上的单格说明行合并到整表宽并用说明样式；表头下冻结、表头行自动筛选；列宽按表头与正文、长文本封顶。
+const laid = new TextDecoder().decode(writePresalesXlsx([{ name: "合成'排版", header: 1, rows: [['说明：合成工作稿'], ['参数', '原文'], ['额定电流', '原文'.repeat(80)], ['数量', 3]] }]));
+assert.ok(laid.includes('<border><left style="thin">') && laid.includes('<mergeCell ref="A1:B1"/>') && laid.includes('<c r="A1" s="3"') && laid.includes('<c r="A2" s="1"'));
+assert.ok(laid.includes('<c r="A3" s="0"') && laid.includes('<c r="B4" s="2" t="n">') && laid.includes('<pane ySplit="2" topLeftCell="A3"'));
+assert.ok(laid.includes('<autoFilter ref="A2:B4"/>') && laid.includes(`<definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">&apos;合成&apos;&apos;排版&apos;!$A$2:$B$4</definedName>`));
+assert.ok(laid.includes('<col min="1" max="1" width="11"') && laid.includes('<col min="2" max="2" width="50"'), '列宽不受说明行影响，长文本封顶50');
+assert.ok(!laid.includes('showGridLines="0"'));
+assert.throws(() => writePresalesXlsx([{ name: '表头', header: 2, rows: [['A']] }]), /表头行/);
 assert.throws(() => writePresalesXlsx([{ name: '错/名', rows: [[1]] }]), /名称/);
 assert.throws(() => writePresalesXlsx([{ name: '过长', rows: [['A'.repeat(32768)]] }]), /32767/);
 assert.throws(() => writePresalesXlsx([{ name: '非法', rows: [[Infinity]] }]), /有限数/);
