@@ -75,7 +75,8 @@ assert.match((await bad.json()).error.message, /本机转发连接上游失败/)
   await assert.rejects(() => call('https://relay.example.com/v1', new TypeError('Failed to fetch')), /start-ai-proxy\.cmd.*127\.0\.0\.1:8787/);
   await assert.rejects(() => call('http://127.0.0.1:8787', new TypeError('NetworkError when attempting to fetch resource.')), /无法连接本机转发/);
   await assert.rejects(() => call('https://relay.example.com/v1', new TypeError("Cannot read properties of undefined (reading '0')")), /Cannot read properties/);
-  assert.match(specConnectionHint('https://api.deepseek.com'), /网络\/DNS/);
+  assert.match(specConnectionHint('https://api.deepseek.com'), /网络\/代理\/DNS.*代理例外/);
+  assert.doesNotMatch(specConnectionHint('https://api.deepseek.com'), /start-ai-proxy/, 'DeepSeek官方支持跨域，不引导开中转转发');
 }
 // 日志不含 Key 与正文。
 assert(logs.length >= 5 && logs.every(l => !l.includes('sk-synthetic') && !l.includes('合成测试')));

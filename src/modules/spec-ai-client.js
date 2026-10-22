@@ -27,6 +27,8 @@ export function specConnectionHint(baseUrl) {
   let host = '';
   try { host = new URL(baseUrl).hostname; } catch { /* 地址已在读取设置时校验 */ }
   if (['127.0.0.1', 'localhost'].includes(host)) return '无法连接本机转发：请确认 tools\\start-ai-proxy.cmd 窗口仍在运行，且 Chrome 已允许本网站访问本地网络；本次未生成结果';
+  // DeepSeek 官方允许网页跨域，连不上多为网络/代理/DNS（曾遇个别 CDN 节点不可用）。
+  if (host === 'api.deepseek.com') return '无法连接 DeepSeek（浏览器报 Failed to fetch）：多为网络/代理/DNS 问题，接口本身支持网页调用。开着代理软件时，请把 api.deepseek.com 加入系统代理例外或设为直连，再完全重启浏览器；本次未生成结果';
   return '无法连接 AI 接口（浏览器报 Failed to fetch）：可能是网络/DNS 暂时连不上该接口，或接口不支持网页跨域调用（第三方中转站多见）。中转站可运行 tools\\start-ai-proxy.cmd 本机转发，并把设置里的 Base URL 改为 http://127.0.0.1:8787；本次未生成结果';
 }
 export async function requestSpecJson(config, { system, user, signal, phase = 'extraction', budgetStep = 0 }, fetchImpl = fetch) {

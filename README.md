@@ -1,5 +1,7 @@
 # UPS与配电选型助手
 
+2026-10-22：v2.14.11 设置中 DeepSeek 预设模型改为 deepseek-flash；连接 DeepSeek 官方报 Failed to fetch 时提示检查代理/DNS（把 api.deepseek.com 加入系统代理例外），不再引导开中转转发。详见[发布记录](docs/release-2.14.11.md)。
+
 2026-10-22：v2.14.10 导出的Excel（AI设备参数、技术要求工作稿、配置清单）加框线与表头样式，说明行与列标题分开，按内容调整列宽行高，冻结表头并可筛选。详见[发布记录](docs/release-2.14.10.md)。
 
 2026-10-21：v2.14.9 AI结果采用到人工复核时，同一句原文提出的多个参数合并为一条条款，不再重复；AI采用的设备在未确认/应答前可"撤销AI采用"后重新采用。详见[发布记录](docs/release-2.14.9.md)。
@@ -36,7 +38,7 @@
 
 2026-10-04：[真实工作稿业务试用准备](docs/nonstandard-business-trial.md)已完成。四份PDU/母线讨论稿的证据、区域数量、恢复与同源导出通过软件预检；私有试用副本和反馈模板已准备，等待本人复核，不代确认；本轮冻结发布安排见下方。
 
-**版本**：v2.14.10 · **线上地址**：https://xiaochuan1989.github.io/data-center-electrical-platform/
+**版本**：v2.14.11 · **线上地址**：https://xiaochuan1989.github.io/data-center-electrical-platform/
 
 ## 使用第三方中转接口（本机转发）
 
